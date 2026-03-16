@@ -1,0 +1,3 @@
+{
+  "extends": "@enhanced-prisma-studio/config/tsconfig.base.json"
+}

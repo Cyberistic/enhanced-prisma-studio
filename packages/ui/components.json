@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-lyra",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@enhanced-prisma-studio/ui/components",
+    "utils": "@enhanced-prisma-studio/ui/lib/utils",
+    "hooks": "@enhanced-prisma-studio/ui/hooks",
+    "lib": "@enhanced-prisma-studio/ui/lib",
+    "ui": "@enhanced-prisma-studio/ui/components"
+  },
+  "menuColor": "default",
+  "menuAccent": "subtle",
+  "registries": {}
+}

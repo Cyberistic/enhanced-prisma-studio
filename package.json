@@ -1,0 +1,47 @@
+{
+  "name": "enhanced-prisma-studio",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "dotenv": "^17.2.2",
+      "zod": "^4.1.13",
+      "@types/node": "^22.13.14",
+      "lucide-react": "^0.546.0",
+      "next-themes": "^0.4.6",
+      "react": "^19.2.3",
+      "react-dom": "^19.2.3",
+      "sonner": "^2.0.5",
+      "tailwindcss": "^4.1.18",
+      "@prisma/client": "^7.2.0",
+      "@types/react": "^19.2.10",
+      "@types/react-dom": "^19.2.3"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter '*' build",
+    "check-types": "bun run --filter '*' check-types",
+    "dev:web": "bun run --filter web dev",
+    "db:push": "bun run --filter @enhanced-prisma-studio/db db:push",
+    "db:studio": "bun run --filter @enhanced-prisma-studio/db db:studio",
+    "db:generate": "bun run --filter @enhanced-prisma-studio/db db:generate",
+    "db:migrate": "bun run --filter @enhanced-prisma-studio/db db:migrate",
+    "db:local": "bun run --filter @enhanced-prisma-studio/db db:local"
+  },
+  "dependencies": {
+    "@enhanced-prisma-studio/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@enhanced-prisma-studio/config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "^5"
+  },
+  "packageManager": "bun@1.3.3"
+}

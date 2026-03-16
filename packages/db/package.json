@@ -1,0 +1,32 @@
+{
+  "name": "@enhanced-prisma-studio/db",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "db:local": "turso dev --db-file local.db",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "postinstall": "prisma generate",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@enhanced-prisma-studio/env": "workspace:*",
+    "@prisma/adapter-libsql": "^7.2.0",
+    "@prisma/client": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@enhanced-prisma-studio/config": "workspace:*",
+    "prisma": "^7.2.0",
+    "typescript": "^5"
+  }
+}
