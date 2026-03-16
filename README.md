@@ -1,95 +1,36 @@
 # enhanced-prisma-studio
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Start, Self, and more.
+THe goal of this project is to create an enhanced version of Prisma Studio with additional features and improvements. 
 
-## Features
+https://www.npmjs.com/package/@prisma/studio-core
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Start** - SSR framework with TanStack Router
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Prisma** - TypeScript-first ORM
-- **SQLite/Turso** - Database engine
+[ ] Main focus is to first, deminimize and reverse engineer the package codebase and then add features iteratively.
 
-## Getting Started
+Features include:
+[ ] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn natively. 
 
-First, install the dependencies:
+[ ] Use shadcn's components to buidl the ui, such that changing the styling affects the studio too.
 
-```bash
-bun install
-```
+[ ] Make nuqs optional and tree-shakeable. For instance, in tanstack router, we don't need nuqs as we can use the router's own data fetching and mutation capabilities.
 
-## Database Setup
 
-This project uses SQLite with Prisma.
+[ ] Make Kysely optional, and allow users to choose their own query builder or ORM for the studio's internal operations.
 
-1. Start the local SQLite database (optional):
+[ ] Have optional separate HTTP support for DB introspection, making it compatible with providers such as Cloudflare D1. See https://gist.github.com/Cyberistic/b3152599b6849022d5aae879cbdf45fa
 
-```bash
-bun run db:local
-```
+[ ] Add robust error handling and test-suite.
 
-2. Update your `.env` file in the `apps/web` directory with the appropriate connection details if needed.
+[ ] Make anonymized telemetry optional.
 
-3. Apply the schema to your database:
 
-```bash
-bun run db:push
-```
+## Important note
 
-Then, run the development server:
+This is not supposed to replace Prisma studio, the team did a pretty good job building it. Hopefully, this POC can one day be considered by the team. I use Prisma in all my projects and these are the main "pain points" I have with the current studio. Hopefully Prisma will consider adding these features.
 
-```bash
-bun run dev
-```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the fullstack application.
+## Legal
+This project is not affiliated with Prisma in any way. It is an independent project created as a POC. Prisma-studio-core is NOT an open-source package.
+Embeddable Prisma Studio (Free) is licensed under Apache 2.0. The main condition for using the free, embeddable version in production is that the Prisma branding must stay visible. Commercial options are available for branding removal or premium features.
+https://www.prisma.io/terms
 
-## UI Customization
-
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
-
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
-
-### Add more shared components
-
-Run this from the project root to add more primitives to the shared UI package:
-
-```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
-```
-
-Import shared components like this:
-
-```tsx
-import { Button } from "@enhanced-prisma-studio/ui/components/button";
-```
-
-### Add app-specific blocks
-
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
-
-## Project Structure
-
-```
-enhanced-prisma-studio/
-├── apps/
-│   └── web/         # Fullstack application (React + TanStack Start)
-├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   └── db/          # Database schema & queries
-```
-
-## Available Scripts
-
-- `bun run dev`: Start all applications in development mode
-- `bun run build`: Build all applications
-- `bun run dev:web`: Start only the web application
-- `bun run check-types`: Check TypeScript types across all apps
-- `bun run db:push`: Push schema changes to database
-- `bun run db:generate`: Generate database client/types
-- `bun run db:migrate`: Run database migrations
-- `bun run db:studio`: Open database studio UI
-- `bun run db:local`: Start the local SQLite database
+prisma plz don't sue me thanks <3

@@ -31,11 +31,14 @@
     "db:studio": "bun run --filter @enhanced-prisma-studio/db db:studio",
     "db:generate": "bun run --filter @enhanced-prisma-studio/db db:generate",
     "db:migrate": "bun run --filter @enhanced-prisma-studio/db db:migrate",
-    "db:local": "bun run --filter @enhanced-prisma-studio/db db:local"
+    "db:local": "bun run --filter @enhanced-prisma-studio/db db:local",
+    "db:seed": "bun run --filter @enhanced-prisma-studio/db db:seed"
   },
   "dependencies": {
     "@enhanced-prisma-studio/env": "workspace:*",
+    "@tailwindcss/vite": "^4.2.1",
     "dotenv": "catalog:",
+    "tailwindcss": "^4.2.1",
     "zod": "catalog:"
   },
   "devDependencies": {

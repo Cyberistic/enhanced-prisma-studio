@@ -15,7 +15,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "postinstall": "prisma generate",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:seed": "bun run src/seed.ts"
   },
   "dependencies": {
     "@enhanced-prisma-studio/env": "workspace:*",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@enhanced-prisma-studio/config": "workspace:*",
+    "@faker-js/faker": "^9.8.0",
     "prisma": "^7.2.0",
     "typescript": "^5"
   }
