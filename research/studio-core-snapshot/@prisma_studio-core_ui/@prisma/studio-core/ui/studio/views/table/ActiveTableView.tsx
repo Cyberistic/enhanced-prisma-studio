@@ -1569,7 +1569,7 @@ export function ActiveTableView(_props: ViewProps) {
             <DropdownMenuContent
               align="start"
               side="bottom"
-              className="w-[220px] max-w-[calc(100vw-2rem)] overflow-hidden p-1 font-sans"
+              className="w-55 max-w-[calc(100vw-2rem)] overflow-hidden p-1 font-sans"
             >
               <DropdownMenuCheckboxItem
                 checked={includeSelectionExportHeader}
@@ -2232,7 +2232,7 @@ function BinaryAlertDialog(props: BinaryAlertDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent
-        className="max-w-[280px] gap-2.5 p-3 font-sans"
+        className="max-w-70 gap-2.5 p-3 font-sans"
         onKeyDown={(event) =>
           handleBinaryDialogKeyDown({
             event,

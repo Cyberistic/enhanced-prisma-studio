@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": false,
+    "noCheck": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "checkJs": false,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["../../node_modules/.bun/node_modules/*"]
+    },
+    "rootDirs": [
+      "./@prisma_studio-core_ui/@prisma/studio-core",
+      "./@prisma_studio-core_data_sqlite-core/@prisma/studio-core",
+      "./@prisma_studio-core_data_bff/@prisma/studio-core/dist"
+    ]
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
+  "exclude": ["**/node_modules/**"]
+}

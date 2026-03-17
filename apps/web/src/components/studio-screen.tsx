@@ -1,12 +1,12 @@
-import type { Query, SqlLintDiagnostic } from "@prisma/studio-core/data";
+import type { Query, SqlLintDiagnostic } from "@enhanced-prisma-studio/studio-core/data";
 import {
   deserializeError,
   serializeError,
   type SerializedError,
   type StudioBFFRequest,
-} from "@prisma/studio-core/data/bff";
-import { createSQLiteAdapter } from "@prisma/studio-core/data/sqlite-core";
-import { Studio } from "@prisma/studio-core/ui";
+} from "@enhanced-prisma-studio/studio-core/data/bff";
+import { createSQLiteAdapter } from "@enhanced-prisma-studio/studio-core/data/sqlite-core";
+import { Studio } from "@enhanced-prisma-studio/studio-core/ui";
 import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 

@@ -1,4 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -11,13 +12,15 @@ import {
 } from "@/components/ui/card";
 
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    const { default: prisma } = await import("@enhanced-prisma-studio/db");
-    return prisma.user.findFirst({
-      include: { todos: { orderBy: { createdAt: "desc" }, take: 5 } },
-    });
-  },
+  loader: () => getHomeData(),
   component: HomeComponent,
+});
+
+const getHomeData = createServerFn({ method: "GET" }).handler(async () => {
+  const { default: prisma } = await import("@enhanced-prisma-studio/db");
+  return prisma.user.findFirst({
+    include: { todos: { orderBy: { createdAt: "desc" }, take: 5 } },
+  });
 });
 
 function HomeComponent() {

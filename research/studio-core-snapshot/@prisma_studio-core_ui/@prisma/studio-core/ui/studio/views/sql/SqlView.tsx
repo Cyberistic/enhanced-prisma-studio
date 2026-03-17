@@ -478,7 +478,7 @@ export function SqlView(_props: ViewProps) {
               foldGutter: false,
             }}
             className={[
-              "[&_.cm-editor]:!border-0 [&_.cm-editor]:font-mono",
+              "[&_.cm-editor]:border-0! [&_.cm-editor]:font-mono",
               "[&_.cm-gutters]:border-r [&_.cm-gutters]:border-border [&_.cm-gutters]:bg-muted/30",
               "[&_.cm-line]:text-[15px] [&_.cm-scroller]:font-mono",
             ].join(" ")}

@@ -1,0 +1,16 @@
+{
+  "name": "@enhanced-prisma-studio/studio-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./data": "./src/data.ts",
+    "./data/bff": "./src/data-bff.ts",
+    "./data/sqlite-core": "./src/data-sqlite-core.ts",
+    "./ui": "./src/ui.ts",
+    "./ui/index.css": "./src/ui-index.css"
+  },
+  "dependencies": {
+    "@prisma/studio-core": "0.25.1"
+  }
+}
