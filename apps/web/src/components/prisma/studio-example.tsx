@@ -35,6 +35,8 @@ export function PrismaStudioExample(props: { theme: StudioThemeInput }) {
 
 			{/* Studio content here, auto populates sidebar and view wiring based on section definitions */}
 			<PrismaStudioContent>
+
+				{/* Default section with Console, SQL, and Visualizer views */}
 				<PrismaStudioSection>
 					<PrismaStudioSectionHeader>
 						<StudioSectionHeader />
@@ -44,6 +46,7 @@ export function PrismaStudioExample(props: { theme: StudioThemeInput }) {
 					<PrismaVisualizer />
 				</PrismaStudioSection>
 
+				{/* Tables section with table names listed  */}
 				<PrismaStudioSection>
 					<PrismaStudioSectionHeader>
 						<PrismaTablesSearchHeader />
