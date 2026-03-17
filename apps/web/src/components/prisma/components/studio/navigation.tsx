@@ -65,7 +65,7 @@ type NavigationProps = {
 };
 
 const sidebarItemClassName =
-  "w-full cursor-pointer rounded-md border border-transparent bg-transparent px-2 py-1 text-left font-mono text-xs text-foreground/60 transition-all hover:bg-accent hover:text-foreground data-[active=true]:bg-accent data-[active=true]:text-foreground";
+  "w-full cursor-pointer rounded-md border border-transparent bg-transparent px-2 py-1 text-left font-mono text-xs text-muted-foreground transition-all hover:bg-accent hover:text-accent-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground";
 
 export function Navigation(props: NavigationProps) {
   const {
