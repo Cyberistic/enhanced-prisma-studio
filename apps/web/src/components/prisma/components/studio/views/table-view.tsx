@@ -569,7 +569,7 @@ export function TableView(props: {
   return (
     <ErrorBoundary>
       <div className="flex h-full min-h-0 flex-col bg-background">
-      <StudioHeader
+        <StudioHeader
         endContent={
           <Button
             aria-label="Refresh table"

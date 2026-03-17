@@ -64,7 +64,17 @@ Features include:
     - [x] Remove motion-dom and framer-motion dependencies; instead use TailwindCSS. Replace custom sidebar implementation with shadcn's sidebar; which has built in support for transitions and animations. 
 
 [ ] Remove nuqs as a dependency; instead have it as one of the providers. For instance, in tanstack router, we don't need nuqs as we can use the router's own data fetching and mutation capabilities.
-    - ✓ Not used in localized implementation; using TanStack Router's built-in query param handling instead.
+    - ✓ Component is now provider-agnostic. Users can wrap PrismaStudio with their preferred provider:
+      ```tsx
+      // With Nuqs for search params
+      <NuqsProvider>
+        <PrismaStudio theme="dark" />
+      </NuqsProvider>
+
+      // With TanStack Router (handles search params natively)
+      <PrismaStudio theme="dark" />
+      ```
+    - This allows users to choose their own URL state management strategy
 
 
 [ ] Remove Kysely as a dependency; instead have it as one of the providers. Allow users to choose their own query builder or ORM for the studio's internal operations. For example, can use Prisma, Drizzle (lol), Bun.sql, or any other query builder/ORM that supports the required operations; making the system extensible.

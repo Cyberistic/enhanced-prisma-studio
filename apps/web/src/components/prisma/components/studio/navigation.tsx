@@ -123,7 +123,7 @@ export function Navigation(props: NavigationProps) {
         collapsible="offcanvas"
         variant="sidebar"
         className={cn(
-          "rounded-l-lg border-r border-border bg-background md:!absolute md:!inset-y-0 md:!h-full md:!max-h-full",
+          "rounded-l-lg border-r border-border bg-background md:absolute! md:inset-y-0! md:h-full! md:max-h-full!",
           className,
         )}
       >
