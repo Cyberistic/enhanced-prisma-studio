@@ -13,8 +13,8 @@ import {
 	PrismaVisualizer,
 	URLProvider,
 } from "@/components/prisma/studio";
-import { createSQLiteKyselyProvider } from "@/components/prisma/providers/adapters";
-import { createNuqsPrismaAdapter } from "@/components/prisma/providers/url";
+import { createSQLiteDrizzleProvider } from "@/components/prisma/providers/adapters";
+import { createTanStackRouterAdapter } from "@/components/prisma/providers/url";
 import { PrismaEvilStats } from "@/components/prisma/components/prisma-studio-components";
 import { StudioSectionHeader } from "@/components/prisma/components/studio-section-header";
 import type { StudioThemeInput } from "@/components/prisma/types";
@@ -26,9 +26,9 @@ export function PrismaStudioExample(props: { theme: StudioThemeInput }) {
 	return (
 		<PrismaStudio theme={theme}>
 			<PrismaProviders>
-				<URLProvider adapter={createNuqsPrismaAdapter()} />
+				<URLProvider adapter={createTanStackRouterAdapter()} />
 				<AdapterProvider
-					adapter={createSQLiteKyselyProvider({ executeStudioRequest })}
+					adapter={createSQLiteDrizzleProvider({ executeStudioRequest })}
 				/>
 			</PrismaProviders>
 			<PrismaStudioContent>
@@ -39,8 +39,6 @@ export function PrismaStudioExample(props: { theme: StudioThemeInput }) {
 					<PrismaConsole />
 					<PrismaSQL />
 					<PrismaVisualizer />
-					<PrismaEvilStats />
-					<PrismaLogs />
 				</PrismaStudioSection>
 
 				<PrismaStudioSection>

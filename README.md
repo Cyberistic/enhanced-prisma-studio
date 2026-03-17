@@ -86,31 +86,33 @@ Features include:
     - Check `apps/web/src/components/prisma/studio-example.tsx` for how composable this system is.
     ```tsx
     		<PrismaStudio theme={theme}>
-			<PrismaProviders>
-				<URLProvider adapter={createNuqsPrismaAdapter()} />
-				<AdapterProvider
-					adapter={createSQLiteKyselyProvider({ executeStudioRequest })}
-				/>
-			</PrismaProviders>
+            
+                <PrismaProviders>
+                    <URLProvider adapter={createNuqsPrismaAdapter()} />
+                    <AdapterProvider
+                        adapter={createSQLiteKyselyProvider({ executeStudioRequest })}
+                    />
+                </PrismaProviders>
+            # Auto populates sidebar and view wiring based on section definitions
 			<PrismaStudioContent>
-				<PrismaStudioSection>
-					<PrismaStudioSectionHeader>
-						<StudioSectionHeader />
-					</PrismaStudioSectionHeader>
-					<PrismaConsole />
-					<PrismaSQL />
-					<PrismaVisualizer />
-					<PrismaEvilStats />
-					<PrismaLogs />
-				</PrismaStudioSection>
+                # Studio content
+                    <PrismaStudioSection>
+                        <PrismaStudioSectionHeader>
+                            <StudioSectionHeader />
+                        </PrismaStudioSectionHeader>
+                        <PrismaConsole />
+                        <PrismaSQL />
+                        <PrismaVisualizer />
+                </PrismaStudioSection>
 
-				<PrismaStudioSection>
-					<PrismaStudioSectionHeader>
-						<PrismaTablesSearchHeader />
-					</PrismaStudioSectionHeader>
-					<PrismaTables />
-				</PrismaStudioSection>
-			</PrismaStudioContent>
+                # Tables content
+                <PrismaStudioSection>
+                    <PrismaStudioSectionHeader>
+                        <PrismaTablesSearchHeader />
+                    </PrismaStudioSectionHeader>
+                    <PrismaTables />
+                </PrismaStudioSection>
+		    </PrismaStudioContent>
 		</PrismaStudio>
     ```
 
@@ -121,19 +123,26 @@ Features include:
 
 
 
-[ ] Add optional logging component which integrates with prisma logs (Under Studio in sidebar). Can be swapped out for other logging providers or custom implementations. https://www.prisma.io/docs/orm/prisma-client/observability-and-logging/logging
+[x] Add optional logging component which integrates with prisma logs (Under Studio in sidebar). Can be swapped out for other logging providers or custom implementations. https://www.prisma.io/docs/orm/prisma-client/observability-and-logging/logging
     - This paired nicely with our existing custom components architechture, allowing us to add a custom `PrismaLogs` view which consumes logs from the shared adapter layer and renders them in a custom UI.
-    
+    - WIP implementation in `apps/web/src/components/prisma/components/studio/views/logs-view.tsx`.
+
 
 [ ] Add test-suite for testing the providers.
+    - WIP `/packages/test-suite`
 
-[ ] Compare gzipped size and performance with the original package.
-    - **Current Build Sizes (Enhanced Version):**
-      - Client bundle: 3.5M (uncompressed)
-      - Server bundle: 1.0M (uncompressed)
-      - Largest assets: studio (1.5M), studio-new (512K), main (400K)
-    - **Original Source (studio-core-snapshot): 9.1M uncompressed**
-    - Local implementation allows for tree-shaking and selective bundling of only used components, reducing final size compared to including the full upstream package.
+[x] Compare gzipped size and performance with the original package.
+    - **Current route bundle sizes (`bun run --filter web build`):**
+      - `/studio` client JS: `dist/client/assets/studio-BkIzLwiV.js` = **1,560.43 kB** (gzip **495.67 kB**)
+      - `/studio-new` client JS: `dist/client/assets/studio-new-BymngWSE.js` = **993.59 kB** (gzip **276.36 kB**)
+      - `/studio-new` saves **~566.84 kB minified** and **~219.31 kB gzip** vs `/studio`.
+    - **CSS comparison:**
+      - `/studio` CSS: `dist/client/assets/studio-ContqqSI.css` = **86.55 kB** (gzip **14.89 kB**)
+      - `/studio-new` CSS: `dist/client/assets/studio-new-B5DZHykP.css` = **7.32 kB** (gzip **1.60 kB**)
+    - **SSR chunk comparison:**
+      - `/studio-new` server chunk: `dist/server/assets/studio-new-CdcJVieE.js` = **199.85 kB**
+      - `/studio` server chunk: `dist/server/assets/studio-Dd6UY43z.js` = **1.57 kB** (this server chunk alone is not directly comparable to client runtime cost).
+    - **Performance implication:** smaller `/studio-new` client JS + CSS should reduce download/parse cost and improve first-load responsiveness relative to `/studio` in production builds.
 
 [x] Add error boundaries to each view, and prevent hard crashes. Add refresh button to each view to recover from errors.
 

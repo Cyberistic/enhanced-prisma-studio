@@ -31,7 +31,7 @@ type ProviderSnapshot = {
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const testSuiteRoot = path.resolve(scriptDir, "../../..");
-const workspaceRoot = path.resolve(testSuiteRoot, "..");
+const workspaceRoot = path.resolve(testSuiteRoot, "../..");
 
 dotenv.config({ path: path.join(workspaceRoot, "apps/web/.env") });
 

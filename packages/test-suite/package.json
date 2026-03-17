@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "alchemy:deploy": "bunx alchemy deploy alchemy.run.ts",
     "alchemy:run": "bunx alchemy run alchemy.run.ts",
     "db:init:sqlite": "bun run src/db/sqlite/init.ts",
     "db:init:d1": "bun run src/db/d1/init.ts",

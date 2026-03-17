@@ -37,14 +37,31 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const testSuiteRoot = path.resolve(scriptDir, "../../..");
 const workspaceRoot = path.resolve(testSuiteRoot, "../..");
 
-dotenv.config({ path: path.join(workspaceRoot, "apps/web/.env") });
+dotenv.config({
+  override: true,
+  path: path.join(workspaceRoot, "apps/web/.env"),
+});
 
 if (!process.env.CLOUDFLARE_API_TOKEN || !process.env.CLOUDFLARE_ACCOUNT_ID) {
-  dotenv.config({ path: path.join(workspaceRoot, "apps/web/.env") });
+  dotenv.config({
+    override: true,
+    path: path.join(workspaceRoot, "apps/web/.env"),
+  });
 }
 
 if (!process.env.CLOUDFLARE_API_TOKEN || !process.env.CLOUDFLARE_ACCOUNT_ID) {
-  dotenv.config({ path: path.join(process.cwd(), "apps/web/.env") });
+  dotenv.config({
+    override: true,
+    path: path.join(process.cwd(), "apps/web/.env"),
+  });
+}
+
+if (!process.env.CLOUDFLARE_API_TOKEN) {
+  process.env.CLOUDFLARE_API_TOKEN = process.env.VITE_CLOUDFLARE_API_TOKEN;
+}
+
+if (!process.env.CLOUDFLARE_ACCOUNT_ID) {
+  process.env.CLOUDFLARE_ACCOUNT_ID = process.env.VITE_CLOUDFLARE_ACCOUNT_ID;
 }
 
 const d1DbName = process.env.D1_TEST_DB_NAME ?? "eps-provider-test";

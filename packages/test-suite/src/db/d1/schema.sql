@@ -1,0 +1,30 @@
+PRAGMA foreign_keys = ON;
+
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS todos;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  createdAt TEXT NOT NULL
+);
+
+CREATE TABLE todos (
+  id TEXT PRIMARY KEY,
+  userId TEXT NOT NULL,
+  title TEXT NOT NULL,
+  completed INTEGER NOT NULL DEFAULT 0,
+  priority TEXT NOT NULL DEFAULT 'medium',
+  createdAt TEXT NOT NULL,
+  FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE comments (
+  id TEXT PRIMARY KEY,
+  todoId TEXT NOT NULL,
+  body TEXT NOT NULL,
+  createdAt TEXT NOT NULL,
+  FOREIGN KEY(todoId) REFERENCES todos(id) ON DELETE CASCADE
+);
