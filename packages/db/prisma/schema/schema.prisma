@@ -70,3 +70,14 @@ model Comment {
   todo      Todo     @relation(fields: [todoId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String
+  oldData   Json?
+  newData   Json?
+  userId    String?
+  createdAt DateTime @default(now())
+}

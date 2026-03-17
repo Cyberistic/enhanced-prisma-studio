@@ -7,16 +7,19 @@
 
 export type { StudioAdapter, AdapterProviderConfig } from "./types";
 export { AdapterProvider, useAdapter, useOptionalAdapter } from "./adapter-provider";
-export { createPrismaStudioAdapter } from "./prisma-adapter";
+export { createKyselyStudioAdapter } from "./kysely-adapter";
+export { createPrismaRawStudioAdapter } from "./prisma-adapter";
 export {
   createSQLiteBunSqlProvider,
   createSQLiteCloudflareD1Provider,
   createSQLiteDrizzleProvider,
   createSQLiteKyselyProvider,
+  createSQLiteProviderFromEnv,
   createSQLitePrismaRawProvider,
 } from "./db";
 export type {
   SQLiteEnv,
+  SQLiteProviderName,
   SQLiteProviderConfig,
   SQLiteProviderFactory,
 } from "./db";

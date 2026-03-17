@@ -57,6 +57,7 @@ type NavigationProps = {
     source: string;
   } | null;
   isIntrospecting?: boolean;
+  showStartupIntrospectionNotice?: boolean;
   onOpenSearch: () => void;
   onRetryIntrospection?: () => void;
   onSchemaChange: (schema: string) => void;
@@ -78,6 +79,7 @@ export function Navigation(props: NavigationProps) {
     className,
     introspectionError = null,
     isIntrospecting = false,
+    showStartupIntrospectionNotice = false,
     onOpenSearch,
     onRetryIntrospection = () => {},
     onSchemaChange,
@@ -105,7 +107,7 @@ export function Navigation(props: NavigationProps) {
   });
 
   const hasStartupIntrospectionFailure =
-    introspectionError != null && tableNames.length === 0;
+    showStartupIntrospectionNotice && introspectionError != null && tableNames.length === 0;
   const hasRecoverableIntrospectionWarning =
     introspectionError != null && tableNames.length > 0;
   const normalizedSections = sectionDefinitions

@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 import { faker } from "@faker-js/faker";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
+import { Prisma } from "../prisma/generated/client.js";
 
 import { PrismaClient } from "../prisma/generated/client.js";
 
@@ -28,9 +29,12 @@ const TAG_NAMES = [
     "bug", "feature", "docs", "design", "backend", "frontend",
     "urgent", "nice-to-have", "refactor", "testing", "security", "perf",
 ];
+const AUDIT_ACTIONS = ["CREATE", "UPDATE", "DELETE"] as const;
+const AUDIT_ENTITIES = ["User", "Project", "Todo", "Comment", "Tag"] as const;
 
 async function main() {
     // Clear all data in dependency order
+    await prisma.auditLog.deleteMany();
     await prisma.todoTag.deleteMany();
     await prisma.comment.deleteMany();
     await prisma.todo.deleteMany();
@@ -65,7 +69,7 @@ async function main() {
 
     // Create users (10 users, mix of roles, spread over past year)
     const userNames = [
-        "Alice Chen", "Bob Martinez", "Carol White", "David Kim", "Eva Rossi",
+        "cyber", "istic", "Carol White", "David Kim", "Eva Rossi",
         "Frank Zhang", "Grace Patel", "Hiro Tanaka", "Iris O'Brien", "Jake Thompson",
     ];
     const users = await Promise.all(
@@ -131,12 +135,46 @@ async function main() {
         }
     }
 
+    const cyberUser = users.find((user) => user.name === "cyber") ?? null;
+    const isticUser = users.find((user) => user.name === "istic") ?? null;
+    const auditUsers = [cyberUser, isticUser].filter((user): user is NonNullable<typeof user> => user != null);
+
+    for (let index = 0; index < 16; index++) {
+        const actor = faker.helpers.arrayElement(auditUsers);
+        const entity = faker.helpers.arrayElement(AUDIT_ENTITIES);
+        const action = faker.helpers.arrayElement(AUDIT_ACTIONS);
+
+        await prisma.auditLog.create({
+            data: {
+                id: faker.string.nanoid(),
+                action,
+                entity,
+                entityId: faker.string.nanoid(12),
+                oldData: action === "CREATE"
+                    ? Prisma.JsonNull
+                    : {
+                        sample: faker.lorem.word(),
+                        value: faker.number.int({ min: 1, max: 100 }),
+                    },
+                newData: action === "DELETE"
+                    ? Prisma.JsonNull
+                    : {
+                        sample: faker.lorem.word(),
+                        value: faker.number.int({ min: 101, max: 200 }),
+                    },
+                userId: actor.id,
+                createdAt: faker.date.recent({ days: 14 }),
+            },
+        });
+    }
+
     const todoCount = await prisma.todo.count();
     const commentCount = await prisma.comment.count();
     const todoTagCount = await prisma.todoTag.count();
+    const auditLogCount = await prisma.auditLog.count();
     console.log(
         `✅  Seeded ${users.length} users, ${projects.length} projects, ${tags.length} tags, ` +
-        `${todoCount} todos, ${todoTagCount} todo-tags, ${commentCount} comments.`
+        `${todoCount} todos, ${todoTagCount} todo-tags, ${commentCount} comments, ${auditLogCount} audit logs.`
     );
 }
 

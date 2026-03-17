@@ -1,6 +1,5 @@
 import type { Query, SqlLintDiagnostic } from "@enhanced-prisma-studio/studio-core/data";
 import type { SerializedError } from "@enhanced-prisma-studio/studio-core/data/bff";
-import type { Studio } from "@enhanced-prisma-studio/studio-core/ui";
 
 export type DataRow = Record<string, unknown>;
 
@@ -23,7 +22,15 @@ export type RawQueryable = {
 };
 
 export type PrismaStudioQuery = Query<unknown>;
-export type StudioThemeInput = Parameters<typeof Studio>[0]["theme"];
-export type StudioEvent = Parameters<
-  NonNullable<Parameters<typeof Studio>[0]["onEvent"]>
->[0];
+
+export type StudioThemeInput =
+  | string
+  | {
+      dark: Record<string, string>;
+      light: Record<string, string>;
+    };
+
+export type StudioEvent = {
+  name: string;
+  payload?: unknown;
+};

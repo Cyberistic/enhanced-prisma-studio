@@ -5,14 +5,14 @@ import "@enhanced-prisma-studio/studio-core/ui/index.css";
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { StudioThemeInput } from "@/components/prisma/types";
-import { createPrismaStudioAdapter } from "@/components/prisma/utils/adapter";
+import { createKyselyStudioAdapter } from "@/components/prisma/utils/adapter";
 import { executeStudioRequest } from "@/components/prisma/utils/studio-request";
 
 export function PrismaStudioScreen(props: { theme?: StudioThemeInput }) {
   const { theme } = props;
 
   const adapter = useMemo(() => {
-    return createPrismaStudioAdapter({ executeStudioRequest });
+    return createKyselyStudioAdapter({ executeStudioRequest });
   }, []);
 
   return (

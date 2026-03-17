@@ -1,13 +1,8 @@
 import {
 	AdapterProvider,
-	createPrismaStudioAdapter,
-} from "@/components/prisma/providers/adapters";
-import {
-	URLProvider,
-	createTanStackRouterAdapter,
-} from "@/components/prisma/providers/url";
-import {
 	PrismaConsole,
+	PrismaLogs,
+	PrismaProviders,
 	PrismaSQL,
 	PrismaStudio,
 	PrismaStudioContent,
@@ -16,7 +11,10 @@ import {
 	PrismaTables,
 	PrismaTablesSearchHeader,
 	PrismaVisualizer,
+	URLProvider,
 } from "@/components/prisma/studio";
+import { createSQLiteKyselyProvider } from "@/components/prisma/providers/adapters";
+import { createNuqsPrismaAdapter } from "@/components/prisma/providers/url";
 import { PrismaEvilStats } from "@/components/prisma/components/prisma-studio-components";
 import { StudioSectionHeader } from "@/components/prisma/components/studio-section-header";
 import type { StudioThemeInput } from "@/components/prisma/types";
@@ -27,28 +25,31 @@ export function PrismaStudioExample(props: { theme: StudioThemeInput }) {
 
 	return (
 		<PrismaStudio theme={theme}>
-			<URLProvider adapter={createTanStackRouterAdapter()}>
-				<AdapterProvider adapter={createPrismaStudioAdapter({ executeStudioRequest })}>
-					<PrismaStudioContent>
-						<PrismaStudioSection>
-							<PrismaStudioSectionHeader>
-								<StudioSectionHeader />
-							</PrismaStudioSectionHeader>
-							<PrismaConsole />
-							<PrismaSQL />
-							<PrismaVisualizer />
-							<PrismaEvilStats />
-						</PrismaStudioSection>
+			<PrismaProviders>
+				<URLProvider adapter={createNuqsPrismaAdapter()} />
+				<AdapterProvider
+					adapter={createSQLiteKyselyProvider({ executeStudioRequest })}
+				/>
+			</PrismaProviders>
+			<PrismaStudioContent>
+				<PrismaStudioSection>
+					<PrismaStudioSectionHeader>
+						<StudioSectionHeader />
+					</PrismaStudioSectionHeader>
+					<PrismaConsole />
+					<PrismaSQL />
+					<PrismaVisualizer />
+					<PrismaEvilStats />
+					<PrismaLogs />
+				</PrismaStudioSection>
 
-						<PrismaStudioSection>
-							<PrismaStudioSectionHeader>
-								<PrismaTablesSearchHeader />
-							</PrismaStudioSectionHeader>
-							<PrismaTables />
-						</PrismaStudioSection>
-					</PrismaStudioContent>
-				</AdapterProvider>
-			</URLProvider>
+				<PrismaStudioSection>
+					<PrismaStudioSectionHeader>
+						<PrismaTablesSearchHeader />
+					</PrismaStudioSectionHeader>
+					<PrismaTables />
+				</PrismaStudioSection>
+			</PrismaStudioContent>
 		</PrismaStudio>
 	);
 }

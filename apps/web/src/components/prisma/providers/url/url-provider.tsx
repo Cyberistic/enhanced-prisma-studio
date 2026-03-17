@@ -9,7 +9,7 @@ const URLProviderContext = createContext<URLProviderAdapter | null>(null);
 
 export interface URLProviderProps {
   adapter: URLProviderAdapter;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 /**

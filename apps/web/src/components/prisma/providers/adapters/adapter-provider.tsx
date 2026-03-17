@@ -9,7 +9,7 @@ const AdapterContext = createContext<StudioAdapter | null>(null);
 
 export interface AdapterProviderProps {
   adapter: StudioAdapter;
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 /**
@@ -20,7 +20,7 @@ export interface AdapterProviderProps {
  *
  * @example
  * // With Prisma SQLite adapter
- * <AdapterProvider adapter={createPrismaStudioAdapter({ executeStudioRequest })}>
+ * <AdapterProvider adapter={createPrismaRawStudioAdapter({ executeStudioRequest })}>
  *   <PrismaStudio theme="dark" />
  * </AdapterProvider>
  */

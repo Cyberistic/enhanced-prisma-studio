@@ -6,9 +6,17 @@ export interface SQLiteProviderConfig extends AdapterProviderConfig {
   env?: SQLiteEnv;
 }
 
+export interface SQLiteProviderServerConfig {
+  env?: SQLiteEnv;
+}
+
 export type SQLiteProviderFactory<TConfig extends SQLiteProviderConfig = SQLiteProviderConfig> = (
   config: TConfig,
 ) => StudioAdapter;
+
+export type SQLiteServerRequestExecutor = (payload: {
+  data: import("@enhanced-prisma-studio/studio-core/data/bff").StudioBFFRequest;
+}) => Promise<unknown>;
 
 export function requireEnv(env: SQLiteEnv | undefined, requiredKeys: readonly string[], providerName: string) {
   const source = env ?? {};

@@ -1,6 +1,6 @@
 import { serializeError, type StudioBFFRequest } from "@enhanced-prisma-studio/studio-core/data/bff";
 
-import { createPrismaStudioAdapter } from "../../prisma-adapter";
+import { createKyselyStudioAdapter } from "../../kysely-adapter";
 import { requireEnv, type SQLiteProviderFactory } from "./types";
 
 const REQUIRED_ENV = [
@@ -16,6 +16,7 @@ export const createSQLiteCloudflareD1Provider: SQLiteProviderFactory = (config) 
   const apiToken = config.env?.CLOUDFLARE_API_TOKEN as string;
   const databaseId = config.env?.D1_DATABASE_ID as string;
   const ttlMs = Number(config.env?.D1_HTTP_SCHEMA_CACHE_TTL_MS ?? 60_000);
+  const disableHttpIntrospection = config.env?.D1_HTTP_INTROSPECTION_DISABLED === "1";
   let cachedBySql = new Map<string, { at: number; rows: unknown[] }>();
 
   async function queryD1HttpApi(sql: string): Promise<unknown[]> {
@@ -74,7 +75,7 @@ export const createSQLiteCloudflareD1Provider: SQLiteProviderFactory = (config) 
     if (request.procedure === "query") {
       const sql = request.query.sql;
       const hasParams = request.query.parameters.length > 0;
-      if (isIntrospectionQuery(sql) && !hasParams) {
+      if (!disableHttpIntrospection && isIntrospectionQuery(sql) && !hasParams) {
         try {
           const rows = await queryD1HttpApi(sql);
           return [null, rows] as const;
@@ -113,7 +114,7 @@ export const createSQLiteCloudflareD1Provider: SQLiteProviderFactory = (config) 
     return config.executeStudioRequest({ data: request });
   }
 
-  return createPrismaStudioAdapter({
+  return createKyselyStudioAdapter({
     executeStudioRequest: async (payload) => {
       return executeWithIntrospectionFallback(payload.data as StudioBFFRequest);
     },

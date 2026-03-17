@@ -1,0 +1,20 @@
+{
+  "name": "@enhanced-prisma-studio/test-suite",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "alchemy:run": "bunx alchemy run alchemy.run.ts",
+    "db:init:sqlite": "bun run src/db/sqlite/init.ts",
+    "db:init:d1": "bun run src/db/d1/init.ts",
+    "test:providers:sqlite": "bun run src/tests/sqlite-providers.ts",
+    "test:providers:d1-remote": "bun run src/tests/d1-remote-providers.ts",
+    "test:sqlite": "bun run db:init:sqlite && bun run test:providers:sqlite",
+    "test:d1-remote": "bun run db:init:d1 && bun run test:providers:d1-remote"
+  },
+  "dependencies": {
+    "@enhanced-prisma-studio/studio-core": "workspace:*",
+    "@libsql/client": "^0.17.0",
+    "alchemy": "^0.89.0",
+    "dotenv": "catalog:"
+  }
+}

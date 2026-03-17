@@ -5,7 +5,6 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  Legend,
   Line,
   LineChart,
   Pie,
@@ -28,8 +27,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-
 import { ErrorBoundary } from "../../error-boundary";
 import { StudioHeader } from "../studio-header";
 
@@ -323,13 +320,11 @@ function Chart(props: ChartProps) {
   );
   const [data, setData] = useState<ChartDatum[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if ("error" in queryPlan) {
       setData([]);
       setErrorMessage(queryPlan.error);
-      setIsLoading(false);
       return;
     }
 
@@ -338,7 +333,6 @@ function Chart(props: ChartProps) {
     let disposed = false;
 
     async function loadData() {
-      setIsLoading(true);
       setErrorMessage(null);
 
       const [error, result] = await adapter.raw(
@@ -355,7 +349,6 @@ function Chart(props: ChartProps) {
         if (!isAbortError) {
           setData([]);
           setErrorMessage(getErrorMessage(error));
-          setIsLoading(false);
         }
         return;
       }
@@ -363,7 +356,6 @@ function Chart(props: ChartProps) {
       const rows = (result?.rows ?? []) as Record<string, unknown>[];
       setData(normalizeData(rows));
       setErrorMessage(null);
-      setIsLoading(false);
     }
 
     void loadData();
@@ -380,11 +372,7 @@ function Chart(props: ChartProps) {
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
       </CardHeader>
       <CardContent className="h-40 min-h-0 px-2 pb-3">
-        {isLoading ? (
-          <div className="flex h-full flex-col gap-2 px-2">
-            <Skeleton className="h-full w-full" />
-          </div>
-        ) : errorMessage ? (
+        {errorMessage ? (
           <div className="flex h-full items-center justify-center rounded-md border border-destructive/30 bg-destructive/10 px-3 text-center text-xs text-destructive">
             {errorMessage}
           </div>
@@ -411,7 +399,6 @@ function Chart(props: ChartProps) {
                     ))}
                   </Pie>
                   <Tooltip wrapperStyle={{ fontSize: 11 }} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : type === "pie-full" ? (
@@ -431,7 +418,6 @@ function Chart(props: ChartProps) {
                     ))}
                   </Pie>
                   <Tooltip wrapperStyle={{ fontSize: 11 }} />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : type === "radial" ? (
@@ -459,15 +445,6 @@ function Chart(props: ChartProps) {
                     ))}
                   </RadialBar>
                   <Tooltip wrapperStyle={{ fontSize: 11 }} />
-                  <Legend
-                    iconType="circle"
-                    iconSize={8}
-                    formatter={(value: string) => {
-                      const item = data.find((d) => d.label === value);
-                      return `${value}${item ? ` (${item.value})` : ""}`;
-                    }}
-                    wrapperStyle={{ fontSize: 10 }}
-                  />
                 </RadialBarChart>
               </ResponsiveContainer>
             ) : type === "radar" ? (
@@ -510,7 +487,8 @@ function Chart(props: ChartProps) {
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
-                    width={72}
+                    tickFormatter={(v: string) => v.length > 14 ? `${v.slice(0, 13)}…` : v}
+                    width={80}
                   />
                   <Tooltip wrapperStyle={{ fontSize: 11 }} />
                   <Bar dataKey="value" radius={[0, 4, 4, 0]}>
@@ -584,19 +562,6 @@ function Chart(props: ChartProps) {
   );
 }
 
-function ChartSkeleton() {
-  return (
-    <Card className="border border-border/70 bg-card/80 shadow-none">
-      <CardHeader className="pb-2 pt-3 px-4">
-        <Skeleton className="h-4 w-32" />
-      </CardHeader>
-      <CardContent className="h-40 min-h-0 px-2 pb-3">
-        <Skeleton className="h-full w-full" />
-      </CardContent>
-    </Card>
-  );
-}
-
 export function EvilStatsView(props: {
   adapter: Adapter;
   isNavigationOpen: boolean;
@@ -608,7 +573,6 @@ export function EvilStatsView(props: {
 }) {
   const {
     adapter,
-    isIntrospecting,
     isNavigationOpen,
     onToggleNavigation,
     schema,
@@ -634,14 +598,7 @@ export function EvilStatsView(props: {
         </StudioHeader>
 
         <div className="flex-1 min-h-0 overflow-auto p-3">
-          {isIntrospecting && tableCount === 0 ? (
-            <div className="grid min-h-0 gap-3 grid-cols-2 lg:grid-cols-4">
-              {Array.from({ length: 16 }).map((_, i) => (
-                <ChartSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="grid min-h-0 gap-3 grid-cols-2 lg:grid-cols-4">
+          <div className="grid min-h-0 gap-3 grid-cols-2 lg:grid-cols-4">
               {/* Todos */}
               <Chart
                 adapter={adapter}
@@ -817,8 +774,7 @@ export function EvilStatsView(props: {
                 title="Work Distribution"
                 limit={8}
               />
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </ErrorBoundary>

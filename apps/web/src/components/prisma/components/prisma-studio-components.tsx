@@ -148,7 +148,7 @@ export function PrismaStudioContent(props: PrismaStudioLayoutProps) {
 
   if (sectionDefinitions.length === 0) {
     throw new Error(
-      "PrismaStudioContent requires at least one view marker component (PrismaConsole, PrismaSQL, PrismaVisualizer, PrismaTables)",
+      "PrismaStudioContent requires at least one view marker component (PrismaConsole, PrismaLogs, PrismaSQL, PrismaVisualizer, PrismaTables)",
     );
   }
 
@@ -231,6 +231,15 @@ export function PrismaVisualizer(_props: PrismaViewMarkerProps) {
 export function PrismaTables(_props: PrismaViewMarkerProps) {
   return null;
 }
+
+export function PrismaLogs(_props: PrismaViewMarkerProps) {
+  return null;
+}
+
+(PrismaLogs as PrismaViewMarkerType).__studioViewMarker = {
+  id: "logs",
+  label: "Logs",
+};
 
 (PrismaTables as PrismaViewMarkerType).__studioViewMarker = {
   id: "table",

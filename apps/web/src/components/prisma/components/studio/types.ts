@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export type StudioView = "table" | "schema" | "console" | "sql" | "evil-stats";
+export type StudioView = "table" | "schema" | "console" | "sql" | "logs" | "evil-stats";
 
 export type StudioViewDefinition = {
     id: StudioView;

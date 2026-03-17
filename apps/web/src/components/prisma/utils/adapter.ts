@@ -10,7 +10,7 @@ import type {
 } from "../types";
 import { toError } from "./errors";
 
-export function createPrismaStudioAdapter(args: {
+export function createKyselyStudioAdapter(args: {
   executeStudioRequest: (payload: { data: StudioBFFRequest }) => Promise<unknown>;
 }) {
   const { executeStudioRequest } = args;

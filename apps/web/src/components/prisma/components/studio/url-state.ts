@@ -92,6 +92,7 @@ function isStudioView(value: string | null): value is StudioView {
     value === "schema" ||
     value === "console" ||
     value === "sql" ||
+    value === "logs" ||
     value === "evil-stats"
   );
 }

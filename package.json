@@ -33,6 +33,13 @@
     "db:migrate": "bun run --filter @enhanced-prisma-studio/db db:migrate",
     "db:local": "bun run --filter @enhanced-prisma-studio/db db:local",
     "db:seed": "bun run --filter @enhanced-prisma-studio/db db:seed",
+    "test-suite:db:init:sqlite": "bun run --filter @enhanced-prisma-studio/test-suite db:init:sqlite",
+    "test-suite:db:init:d1": "bun run --filter @enhanced-prisma-studio/test-suite db:init:d1",
+    "test-suite:alchemy:run": "bun run --filter @enhanced-prisma-studio/test-suite alchemy:run",
+    "test-suite:providers:sqlite": "bun run --filter @enhanced-prisma-studio/test-suite test:providers:sqlite",
+    "test-suite:providers:d1-remote": "bun run --filter @enhanced-prisma-studio/test-suite test:providers:d1-remote",
+    "test-suite:sqlite": "bun run --filter @enhanced-prisma-studio/test-suite test:sqlite",
+    "test-suite:d1-remote": "bun run --filter @enhanced-prisma-studio/test-suite test:d1-remote",
     "research:extract-studio-core": "node scripts/extract-studio-core-sources.mjs"
   },
   "dependencies": {

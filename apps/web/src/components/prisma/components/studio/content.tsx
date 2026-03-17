@@ -1,10 +1,11 @@
 import type { Adapter } from "@enhanced-prisma-studio/studio-core/data";
 import type { SortOrderItem } from "@enhanced-prisma-studio/studio-core/data";
-import { useCallback, useState } from "react";
 
+import { IntrospectionStatusNotice } from "./introspection-status-notice";
 import type { StudioOperationEvent, StudioView } from "./types";
 import { ConsoleView } from "./views/console-view";
 import { EvilStatsView } from "./views/evil-stats-view.tsx";
+import { LogsView } from "./views/logs-view.tsx";
 import { SchemaView } from "./views/schema-view";
 import { SqlView } from "./views/sql-view";
 import { TableView } from "./views/table-view";
@@ -16,7 +17,9 @@ export function StudioContent(props: {
   adapter: Adapter;
   isNavigationOpen: boolean;
   isIntrospecting?: boolean;
+  operationEvents: StudioOperationEvent[];
   onPinnedColumnsChange: (columnNames: string[]) => void;
+  onOperationEvent: (event: StudioOperationEvent) => void;
   onSortOrderChange: (sortOrder: SortOrderItem[]) => void;
   onToggleNavigation: () => void;
   pinnedColumns: string[];
@@ -27,12 +30,20 @@ export function StudioContent(props: {
   schema: string;
   selectedView: StudioView;
   table: string | null;
+  startupIntrospectionError?: {
+    message: string;
+    queryPreview: string | null;
+    source: string;
+  } | null;
+  onRetryIntrospection?: () => void;
 }) {
   const {
     activeTable = null,
     adapter,
     isNavigationOpen,
     isIntrospecting = false,
+    operationEvents,
+    onOperationEvent,
     onPinnedColumnsChange,
     onSortOrderChange,
     onSelectTable,
@@ -44,16 +55,33 @@ export function StudioContent(props: {
     schema,
     selectedView,
     table,
+    startupIntrospectionError = null,
+    onRetryIntrospection = () => {},
   } = props;
-  const [operationEvents, setOperationEvents] = useState<StudioOperationEvent[]>([]);
-
-  const handleOperationEvent = useCallback((event: StudioOperationEvent) => {
-    setOperationEvents((currentEvents) => [...currentEvents, event]);
-  }, []);
 
   function handleSelectTableView(tableName: string) {
     onSelectTable(tableName);
     onSelectView("table");
+  }
+
+  if (startupIntrospectionError) {
+    return (
+      <div className="flex h-full min-h-0 flex-col bg-background">
+        <div className="flex flex-1 items-center justify-center p-6">
+          <IntrospectionStatusNotice
+            className="w-full max-w-2xl"
+            description="Studio could not introspect the database."
+            isRetrying={isIntrospecting}
+            message={startupIntrospectionError.message}
+            onRetry={onRetryIntrospection}
+            queryPreview={startupIntrospectionError.queryPreview}
+            source={startupIntrospectionError.source}
+            title="Introspection failed"
+            variant="error"
+          />
+        </div>
+      </div>
+    );
   }
 
   if (selectedView === "schema") {
@@ -89,10 +117,23 @@ export function StudioContent(props: {
         adapter={adapter}
         isNavigationOpen={isNavigationOpen}
         isIntrospecting={isIntrospecting}
-        onOperationEvent={handleOperationEvent}
+        onOperationEvent={onOperationEvent}
         onToggleNavigation={onToggleNavigation}
         schema={schema}
         table={table}
+      />
+    );
+  }
+
+  if (selectedView === "logs") {
+    return (
+      <LogsView
+        adapter={adapter}
+        isNavigationOpen={isNavigationOpen}
+        isIntrospecting={isIntrospecting}
+        onToggleNavigation={onToggleNavigation}
+        schema={schema}
+        schemaTables={schemaTables}
       />
     );
   }

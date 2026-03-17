@@ -1,4 +1,4 @@
-import type { Studio as UpstreamStudio } from "@enhanced-prisma-studio/studio-core/ui";
+import type { Adapter, SortOrderItem } from "@enhanced-prisma-studio/studio-core/data";
 import { useTheme } from "next-themes";
 import { type CSSProperties, useCallback, useEffect, useMemo, useState } from "react";
 
@@ -10,14 +10,14 @@ import { StudioContent } from "./content";
 import { Navigation } from "./navigation";
 import {
   DEFAULT_STUDIO_VIEW_DEFINITIONS,
+  type StudioOperationEvent,
   type StudioSectionDefinition,
   type StudioView,
   type StudioViewDefinition,
 } from "./types";
 import { createStudioHash, parseStudioHash } from "./url-state";
-import type { SortOrderItem } from "@enhanced-prisma-studio/studio-core/data";
 
-type StudioAdapter = Parameters<typeof UpstreamStudio>[0]["adapter"];
+type StudioAdapter = Adapter;
 type StudioIntrospectionResult = Exclude<
   Awaited<ReturnType<StudioAdapter["introspect"]>>[1],
   undefined
@@ -46,6 +46,53 @@ function hasStudioHashView(hash: string): boolean {
   const search = raw.startsWith("?") ? raw : `?${raw}`;
   const params = new URLSearchParams(search);
   return params.has("view");
+}
+
+function createOperationEventId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function toOperationQuery(query: unknown): { parameters?: unknown[]; sql: string } | undefined {
+  if (typeof query !== "object" || query == null || !("sql" in query)) {
+    return undefined;
+  }
+
+  const querySql = (query as { sql?: unknown }).sql;
+  if (typeof querySql !== "string" || querySql.length === 0) {
+    return undefined;
+  }
+
+  const queryParameters = (query as { parameters?: unknown }).parameters;
+  const parameters = Array.isArray(queryParameters)
+    ? queryParameters
+    : undefined;
+
+  return {
+    parameters,
+    sql: querySql,
+  };
+}
+
+function toOperationError(error: unknown): { adapterSource?: string; message: string } {
+  if (error instanceof Error) {
+    const adapterSource =
+      typeof (error as { adapterSource?: unknown }).adapterSource === "string"
+        ? ((error as { adapterSource?: string }).adapterSource as string)
+        : undefined;
+
+    return {
+      adapterSource,
+      message: error.message,
+    };
+  }
+
+  return {
+    message: String(error),
+  };
 }
 
 export function StudioShell(props: {
@@ -140,6 +187,90 @@ export function StudioShell(props: {
     useState<StudioIntrospectionError | null>(null);
   const [isIntrospecting, setIsIntrospecting] = useState(false);
   const [introspectionRetryToken, setIntrospectionRetryToken] = useState(0);
+  const [operationEvents, setOperationEvents] = useState<StudioOperationEvent[]>([]);
+
+  const handleOperationEvent = useCallback((event: StudioOperationEvent) => {
+    setOperationEvents((currentEvents) => {
+      const nextEvents = [...currentEvents, event];
+
+      if (nextEvents.length <= 100) {
+        return nextEvents;
+      }
+
+      return nextEvents.slice(nextEvents.length - 100);
+    });
+  }, []);
+
+  const instrumentedAdapter = useMemo<StudioAdapter>(() => {
+    const emitSuccess = (operation: string, query: unknown) => {
+      handleOperationEvent({
+        eventId: createOperationEventId(),
+        name: "studio_operation_success",
+        payload: {
+          operation,
+          query: toOperationQuery(query),
+        },
+        timestamp: new Date().toISOString(),
+      });
+    };
+
+    const emitError = (operation: string, error: unknown, query?: unknown) => {
+      if (error instanceof Error && error.name === "AbortError") {
+        return;
+      }
+
+      handleOperationEvent({
+        eventId: createOperationEventId(),
+        name: "studio_operation_error",
+        payload: {
+          error: toOperationError(error),
+          operation,
+          query: toOperationQuery(query),
+        },
+        timestamp: new Date().toISOString(),
+      });
+    };
+
+    return {
+      ...adapter,
+      introspect: async (args) => {
+        const response = await adapter.introspect(args);
+        const [error, result] = response;
+
+        if (error) {
+          emitError("introspect", error, (error as { query?: unknown }).query);
+          return response;
+        }
+
+        emitSuccess("introspect", (result as { query?: unknown } | undefined)?.query);
+        return response;
+      },
+      query: async (args, options) => {
+        const response = await adapter.query(args, options);
+        const [error, result] = response;
+
+        if (error) {
+          emitError("query", error, (error as { query?: unknown }).query);
+          return response;
+        }
+
+        emitSuccess("query", (result as { query?: unknown } | undefined)?.query);
+        return response;
+      },
+      update: async (args, options) => {
+        const response = await adapter.update(args, options);
+        const [error, result] = response;
+
+        if (error) {
+          emitError("update", error, (error as { query?: unknown }).query);
+          return response;
+        }
+
+        emitSuccess("update", (result as { query?: unknown } | undefined)?.query);
+        return response;
+      },
+    };
+  }, [adapter, handleOperationEvent]);
 
   useEffect(() => {
     const applyFromHash = () => {
@@ -172,7 +303,7 @@ export function StudioShell(props: {
     async function introspect() {
       setIsIntrospecting(true);
 
-      const [error, result] = await adapter.introspect({
+      const [error, result] = await instrumentedAdapter.introspect({
         abortSignal: abortController.signal,
       });
 
@@ -197,7 +328,7 @@ export function StudioShell(props: {
       isDisposed = true;
       abortController.abort();
     };
-  }, [adapter, introspectionRetryToken]);
+  }, [instrumentedAdapter, introspectionRetryToken]);
 
   useEffect(() => {
     if (!introspection) {
@@ -212,8 +343,8 @@ export function StudioShell(props: {
 
     const preferredSchema = introspection.schemas[schema]
       ? schema
-      : adapter.defaultSchema && introspection.schemas[adapter.defaultSchema]
-        ? adapter.defaultSchema
+      : instrumentedAdapter.defaultSchema && introspection.schemas[instrumentedAdapter.defaultSchema]
+        ? instrumentedAdapter.defaultSchema
         : schemaNames[0] ?? schema;
 
     if (preferredSchema !== schema) {
@@ -233,7 +364,7 @@ export function StudioShell(props: {
     if (!table || !introspection.schemas[preferredSchema]?.tables[table]) {
       setTable(tableNamesInSchema[0] ?? null);
     }
-  }, [adapter.defaultSchema, introspection, schema, table]);
+  }, [instrumentedAdapter.defaultSchema, introspection, schema, table]);
 
   useEffect(() => {
     const nextHash = createStudioHash({
@@ -291,6 +422,18 @@ export function StudioShell(props: {
     };
   }, [introspectionError]);
 
+  const startupIntrospectionError = useMemo(() => {
+    if (!introspectionNotice || isIntrospecting) {
+      return null;
+    }
+
+    if (tableNames.length > 0) {
+      return null;
+    }
+
+    return introspectionNotice;
+  }, [introspectionNotice, isIntrospecting, tableNames.length]);
+
   const retryIntrospection = useCallback(() => {
     setIntrospectionRetryToken((current) => current + 1);
   }, []);
@@ -313,7 +456,7 @@ export function StudioShell(props: {
     return style;
   }, [resolvedTheme, theme]);
 
-  if (!adapter) {
+  if (!instrumentedAdapter) {
     return <div>Error: No adapter provided</div>;
   }
 
@@ -349,11 +492,13 @@ export function StudioShell(props: {
               <div className="flex-1 min-w-0 min-h-0">
                 <StudioContent
                   activeTable={activeTable}
-                  adapter={adapter}
+                  adapter={instrumentedAdapter}
                   isNavigationOpen={isNavigationOpen}
                   isIntrospecting={isIntrospecting}
+                  operationEvents={operationEvents}
                   pinnedColumns={pinnedColumns}
                   sortOrder={sortOrder}
+                  onOperationEvent={handleOperationEvent}
                   onPinnedColumnsChange={setPinnedColumns}
                   onSortOrderChange={setSortOrder}
                   onSelectTable={setTable}
@@ -362,6 +507,8 @@ export function StudioShell(props: {
                   schemaTables={schemaTables}
                   schema={schema}
                   selectedView={selectedView}
+                  startupIntrospectionError={startupIntrospectionError}
+                  onRetryIntrospection={retryIntrospection}
                   table={table}
                 />
               </div>

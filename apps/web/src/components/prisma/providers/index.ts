@@ -6,7 +6,12 @@
  */
 
 export type { AdapterProviderConfig, StudioAdapter } from "./adapters";
-export { AdapterProvider, createPrismaStudioAdapter, useAdapter } from "./adapters";
+export {
+    AdapterProvider,
+    createKyselyStudioAdapter,
+    createPrismaRawStudioAdapter,
+    useAdapter,
+} from "./adapters";
 
 export type { URLParams, URLProviderAdapter } from "./url";
 export { URLProvider, createNuqsPrismaAdapter, createTanStackRouterAdapter, useURLProvider } from "./url";

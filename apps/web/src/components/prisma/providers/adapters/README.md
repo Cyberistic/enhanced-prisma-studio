@@ -4,8 +4,8 @@ This directory contains different data adapters for Prisma Studio. Adapters hand
 
 ## Available Adapters
 
-### **Prisma Studio Adapter** (`prisma-adapter.ts`)
-The default adapter for Prisma databases using SQLite core.
+### **Prisma Raw Studio Adapter** (`prisma-adapter.ts`)
+Prisma-backed adapter that routes SQLite introspection SQL through Prisma raw queries.
 
 ### **SQLite DB Providers** (`db/sqlite/*`)
 
@@ -16,6 +16,7 @@ Provider scaffolds currently available:
 - `createSQLitePrismaRawProvider`
 - `createSQLiteDrizzleProvider`
 - `createSQLiteCloudflareD1Provider`
+- `createSQLiteProviderFromEnv` (provider selection via env)
 
 All SQLite providers currently share the same runtime adapter implementation and include strict env validation for provider-specific required params.
 
@@ -36,14 +37,33 @@ This aligns with the HTTP introspection strategy described in:
 
 - https://gist.github.com/Cyberistic/b3152599b6849022d5aae879cbdf45fa
 
+## Env-driven Provider Selection
+
+`createSQLiteProviderFromEnv` reads `VITE_STUDIO_SQLITE_PROVIDER` and builds the matching provider.
+
+Supported values:
+
+- `prisma-raw` (default)
+- `kysely`
+- `drizzle`
+- `bun.sql`
+- `cloudflare-d1`
+
+Expected env vars by provider:
+
+- `prisma-raw`: `VITE_DATABASE_URL`
+- `drizzle`: `VITE_DRIZZLE_DATABASE_URL` (fallback `VITE_DATABASE_URL`)
+- `bun.sql`: `VITE_BUN_SQL_DATABASE_URL`
+- `cloudflare-d1`: `VITE_CLOUDFLARE_ACCOUNT_ID`, `VITE_CLOUDFLARE_API_TOKEN`, `VITE_D1_DATABASE_ID` (optional `VITE_D1_HTTP_SCHEMA_CACHE_TTL_MS`)
+
 ```tsx
-import { AdapterProvider, createPrismaStudioAdapter } from '@/components/prisma/providers/adapters';
+import { AdapterProvider, createPrismaRawStudioAdapter } from '@/components/prisma/providers/adapters';
 import { PrismaStudio } from '@/components/prisma/studio';
 import { executeStudioRequest } from '@/components/prisma/utils/studio-request';
 
 export function App() {
   return (
-    <AdapterProvider adapter={createPrismaStudioAdapter({ executeStudioRequest })}>
+    <AdapterProvider adapter={createPrismaRawStudioAdapter({ executeStudioRequest })}>
       <PrismaStudio theme="dark" />
     </AdapterProvider>
   );
@@ -61,7 +81,7 @@ import {
 } from '@/components/prisma/providers/url';
 import {
   AdapterProvider,
-  createPrismaStudioAdapter,
+  createPrismaRawStudioAdapter,
 } from '@/components/prisma/providers/adapters';
 import { PrismaStudio } from '@/components/prisma/studio';
 import { executeStudioRequest } from '@/components/prisma/utils/studio-request';
@@ -69,7 +89,7 @@ import { executeStudioRequest } from '@/components/prisma/utils/studio-request';
 export function StudioPage() {
   return (
     <URLProvider adapter={createTanStackRouterAdapter()}>
-      <AdapterProvider adapter={createPrismaStudioAdapter({ executeStudioRequest })}>
+      <AdapterProvider adapter={createPrismaRawStudioAdapter({ executeStudioRequest })}>
         <div className="h-screen w-screen">
           <PrismaStudio theme="dark" />
         </div>
