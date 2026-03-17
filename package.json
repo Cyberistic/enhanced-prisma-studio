@@ -32,7 +32,8 @@
     "db:generate": "bun run --filter @enhanced-prisma-studio/db db:generate",
     "db:migrate": "bun run --filter @enhanced-prisma-studio/db db:migrate",
     "db:local": "bun run --filter @enhanced-prisma-studio/db db:local",
-    "db:seed": "bun run --filter @enhanced-prisma-studio/db db:seed"
+    "db:seed": "bun run --filter @enhanced-prisma-studio/db db:seed",
+    "research:extract-studio-core": "node scripts/extract-studio-core-sources.mjs"
   },
   "dependencies": {
     "@enhanced-prisma-studio/env": "workspace:*",

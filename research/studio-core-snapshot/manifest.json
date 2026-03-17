@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-03-17T03:32:58.217Z",
+  "depsDir": "/Users/cyberistic/src/tries/2026-03-16-enhanced-prisma-studio/enhanced-prisma-studio/apps/web/node_modules/.vite/deps",
+  "mapFiles": [
+    {
+      "extractedSources": 1,
+      "fileName": "@prisma_studio-core_data_bff.js.map",
+      "pathCollisions": 0,
+      "sourceEntries": 1
+    },
+    {
+      "extractedSources": 11,
+      "fileName": "@prisma_studio-core_data_sqlite-core.js.map",
+      "pathCollisions": 0,
+      "sourceEntries": 11
+    },
+    {
+      "extractedSources": 1115,
+      "fileName": "@prisma_studio-core_ui.js.map",
+      "pathCollisions": 0,
+      "sourceEntries": 1115
+    }
+  ],
+  "totalPathCollisions": 0,
+  "totalExtractedSources": 1127
+}

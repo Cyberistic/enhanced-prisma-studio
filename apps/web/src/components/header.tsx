@@ -3,14 +3,22 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 export default function Header() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const isDark = theme === "dark";
+  const isDark = resolvedTheme === "dark";
+
+  function toggleTheme() {
+    if (!mounted) {
+      return;
+    }
+
+    setTheme(isDark ? "light" : "dark");
+  }
 
   return (
     <header className="border-b border-border/80 bg-card/80 backdrop-blur supports-backdrop-filter:bg-card/70">
@@ -22,11 +30,14 @@ export default function Header() {
           <a href="/studio" className="transition-colors hover:text-foreground/80">
             Studio
           </a>
+          <a href="/studio-new" className="transition-colors hover:text-foreground/80">
+            Studio New
+          </a>
         </nav>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setTheme(isDark ? "light" : "dark")}
+          onClick={toggleTheme}
         >
           {mounted ? (isDark ? "Light mode" : "Dark mode") : "Theme"}
         </Button>

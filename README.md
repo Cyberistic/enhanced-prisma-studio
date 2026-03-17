@@ -4,21 +4,24 @@ THe goal of this project is to create an enhanced version of Prisma Studio with 
 
 https://www.npmjs.com/package/@prisma/studio-core
 
-[ ] Main focus is to first, deminimize and reverse engineer the package codebase and then add features iteratively.
+[x] Main focus is to first, deminimize and reverse engineer the package codebase and then add features iteratively. Initial snapshot and findings are in `research/studio-core-snapshot/`.
 
 Features include:
-[ ] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn natively. 
+[ ] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn and tailwind natively. 
+    - Experimental route available at `/studio-new` with host-provided Studio theme and randomizer (`baseColor x theme`) inspired by shadcn create's theme merge flow.
+    - Randomizer now supports multiple accents including purple and emerald, plus radius presets.
+    - Expanded base color palettes beyond grays (sky, emerald, rose, amber).
 
 [ ] Use shadcn's components to buidl the ui, such that changing the styling affects the studio too.
 
-[ ] Make nuqs optional and tree-shakeable. For instance, in tanstack router, we don't need nuqs as we can use the router's own data fetching and mutation capabilities.
+[ ] Remove nuqs as a dependency; instead have it as one of the providers. For instance, in tanstack router, we don't need nuqs as we can use the router's own data fetching and mutation capabilities.
 
 
-[ ] Make Kysely optional, and allow users to choose their own query builder or ORM for the studio's internal operations.
+[ ] Remove Kysely as a dependency; instead have it as one of the providers. Allow users to choose their own query builder or ORM for the studio's internal operations. For example, can use Prisma, Drizzle (lol), Bun.sql, or any other query builder/ORM that supports the required operations; making the system extensible.
 
 [ ] Have optional separate HTTP support for DB introspection, making it compatible with providers such as Cloudflare D1. See https://gist.github.com/Cyberistic/b3152599b6849022d5aae879cbdf45fa
 
-[ ] Add robust error handling and test-suite.
+[ ] Add robust error handling and test-suite. Compare gzipped size and performance with the original package.
 
 [ ] Make anonymized telemetry optional.
 
