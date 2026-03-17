@@ -17,7 +17,7 @@ export function StudioHeader(props: StudioHeaderProps) {
   return (
     <div
       className={cn(
-        "bg-studio-header-background flex w-full rounded-t-lg border-b border-border bg-card p-2 py-3",
+        "bg-studio-header-background flex w-full border-b border-border bg-card p-2 py-3",
         className,
       )}
     >
@@ -27,6 +27,7 @@ export function StudioHeader(props: StudioHeaderProps) {
             aria-label={isNavigationOpen ? "Close navigation" : "Open navigation"}
             variant="outline"
             size="icon"
+            className="size-9"
             onClick={onToggleNavigation}
           >
             {isNavigationOpen ? (

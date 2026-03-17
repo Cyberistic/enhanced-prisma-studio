@@ -8,7 +8,7 @@ export type StudioUrlState = {
 
 export const DEFAULT_STUDIO_URL_STATE: StudioUrlState = {
   schemaParam: "main",
-  tableParam: "User",
+  tableParam: null,
   viewParam: "table",
 };
 

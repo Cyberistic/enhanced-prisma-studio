@@ -1,3 +1,4 @@
+import { StudioThemedLayout } from "@/components/studio-themed-layout";
 import { Toaster } from "@/components/ui/sonner";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -42,10 +43,10 @@ function RootDocument() {
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <div className="grid h-svh grid-rows-[auto_1fr]">
+          <StudioThemedLayout className="grid h-svh grid-rows-[auto_1fr] bg-background text-foreground">
             <Header />
             <Outlet />
-          </div>
+          </StudioThemedLayout>
           <Toaster richColors />
           <TanStackRouterDevtools position="bottom-left" />
           <Scripts />

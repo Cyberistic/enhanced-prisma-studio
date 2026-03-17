@@ -21,7 +21,7 @@ export default function Header() {
   }
 
   return (
-    <header className="border-b border-border/80 bg-card/80 backdrop-blur supports-backdrop-filter:bg-card/70">
+    <header className="border-b border-border/80 bg-card/80 text-foreground backdrop-blur supports-backdrop-filter:bg-card/70">
       <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         <nav className="flex items-center gap-4 text-sm font-medium">
           <a href="/" className="transition-colors hover:text-foreground/80">

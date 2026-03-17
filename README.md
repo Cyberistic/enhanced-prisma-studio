@@ -48,13 +48,18 @@ https://www.npmjs.com/package/@prisma/studio-core
 > Prisma CEO personally replied to me and said prisma-studio-core will be going open-source! So hopefully this step won't be needed later.
 
 Features include:
-[ ] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn and tailwind natively. 
-    - Experimental route available at `/studio-new` with host-provided Studio theme and randomizer (`baseColor x theme`) inspired by shadcn create's theme merge flow.
+[x] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn and tailwind natively. 
     - `/studio-new` now runs without importing `@enhanced-prisma-studio/studio-core/ui/index.css` and relies on host Tailwind/shadcn tokens.
-    - Randomizer now supports multiple accents including purple and emerald, plus radius presets.
-    - Expanded base color palettes beyond grays (sky, emerald, rose, amber).
 
-[ ] Use shadcn's components to buidl the ui, such that changing the styling affects the studio too.
+
+[ ] Use shadcn's components to build the ui, such that changing the styling affects the studio too.
+    - [x] Replaced enhanced `/studio-new` shell and navigation controls to use host UI primitives (`button`, `input`, `select`, `sidebar`, `table`, `dropdown-menu`, `switch`).
+    - [x] Localized Studio shell into app-owned components under `apps/web/src/components/prisma/**` (`studio.tsx`, `components/studio/*`, `utils/*`, `icons.tsx`) so UI can be edited without touching upstream package.
+    - [x] Removed nested upstream Studio renderer from table mode; local table view now renders host table primitives and local header/footer controls.
+    - [ ] Finish shadcn parity for all views (`schema`, `console`, `sql`) with final spacing/interaction parity to upstream.
+    - [ ] Replace remaining custom/unified variants with host-safe variants only (remove unsupported badge/button variants and normalize tokens).
+    - [ ] Complete TypeScript cleanup for ongoing view refactors and keep `bunx tsc -p apps/web/tsconfig.json --noEmit` green.
+    - [ ] Remove remaining direct UI fallbacks to upstream internals (only data/adapter layer should remain shared during migration).
 
 [ ] Remove nuqs as a dependency; instead have it as one of the providers. For instance, in tanstack router, we don't need nuqs as we can use the router's own data fetching and mutation capabilities.
 
@@ -63,11 +68,17 @@ Features include:
 
 [ ] Have optional separate HTTP support for DB introspection, making it compatible with providers such as Cloudflare D1. See https://gist.github.com/Cyberistic/b3152599b6849022d5aae879cbdf45fa
 
-[ ] Add robust error handling and test-suite. Compare gzipped size and performance with the original package.
+[ ] Add robust error handling and test-suite. 
 
-[ ] Make anonymized telemetry optional.
+[ ] Add optional logging component which integrates with prisma logs (Under Studio in sidebar). Can be swapped out for other logging providers or custom implementations. https://www.prisma.io/docs/orm/prisma-client/observability-and-logging/logging
+
+[ ] Compare gzipped size and performance with the original package.
+
+[ ] Add error boundaries to each view, and prevent hard crashes. Add refresh button to each view to recover from errors.
+
+[x] Make anonymized telemetry optional.
     - Added anonymized telemetry via `VITE_PRISMA_TELEMETRY_DISABLED` (default enabled, set to `1` to disable).
-    - Current telemetry payload is anonymized metadata only: source, event name, operation name (if present), and error flag.
+
 
 
 ## Important note
@@ -76,6 +87,7 @@ This is not supposed to replace Prisma studio, the team did a pretty good job bu
 
 
 ## Legal
+
 This project is not affiliated with Prisma in any way. It is an independent project created as a POC. Prisma-studio-core is NOT an open-source package.
 Embeddable Prisma Studio (Free) is licensed under Apache 2.0. The main condition for using the free, embeddable version in production is that the Prisma branding must stay visible. Commercial options are available for branding removal or premium features.
 https://www.prisma.io/terms

@@ -3,6 +3,9 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/nunito-sans";
 @import "@fontsource-variable/inter";
+@import "@fontsource/geist";
+@import "@fontsource/source-serif-4";
+@import "@fontsource/fira-code";
 
 @custom-variant dark (&:is(.dark *));
 
