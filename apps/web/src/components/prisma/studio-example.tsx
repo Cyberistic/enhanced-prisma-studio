@@ -25,12 +25,15 @@ export function PrismaStudioExample(props: { theme: StudioThemeInput }) {
 
 	return (
 		<PrismaStudio theme={theme}>
+			{/* Providers for URL, DB actions, DB query builder */}
 			<PrismaProviders>
 				<URLProvider adapter={createTanStackRouterAdapter()} />
 				<AdapterProvider
 					adapter={createSQLiteDrizzleProvider({ executeStudioRequest })}
 				/>
 			</PrismaProviders>
+
+			{/* Studio content here, auto populates sidebar and view wiring based on section definitions */}
 			<PrismaStudioContent>
 				<PrismaStudioSection>
 					<PrismaStudioSectionHeader>

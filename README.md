@@ -93,7 +93,7 @@ Features include:
                         adapter={createSQLiteKyselyProvider({ executeStudioRequest })}
                     />
                 </PrismaProviders>
-            # Auto populates sidebar and view wiring based on section definitions
+            // Auto populates sidebar and view wiring based on section definitions
 			<PrismaStudioContent>
                 # Studio content
                     <PrismaStudioSection>
@@ -105,7 +105,7 @@ Features include:
                         <PrismaVisualizer />
                 </PrismaStudioSection>
 
-                # Tables content
+                // Tables content
                 <PrismaStudioSection>
                     <PrismaStudioSectionHeader>
                         <PrismaTablesSearchHeader />
