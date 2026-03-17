@@ -63,7 +63,7 @@ Features include:
 [ ] Add robust error handling and test-suite. Compare gzipped size and performance with the original package.
 
 [ ] Make anonymized telemetry optional.
-    - Added opt-in telemetry via `VITE_STUDIO_TELEMETRY_ENABLED` (default off).
+    - Added anonymized telemetry via `VITE_PRISMA_TELEMETRY_DISABLED` (default enabled, set to `1` to disable).
     - Current telemetry payload is anonymized metadata only: source, event name, operation name (if present), and error flag.
 
 

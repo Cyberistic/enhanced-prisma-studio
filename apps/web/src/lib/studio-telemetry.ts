@@ -15,7 +15,7 @@ type StudioEventLike = {
 };
 
 export const studioTelemetryEnabled =
-    import.meta.env.VITE_STUDIO_TELEMETRY_ENABLED === "true";
+    import.meta.env.VITE_PRISMA_TELEMETRY_DISABLED !== "1";
 
 export function toStudioTelemetryPayload(
     source: StudioTelemetrySource,
@@ -41,7 +41,7 @@ export function toStudioTelemetryPayload(
 export const trackStudioTelemetry = createServerFn({ method: "POST" })
     .inputValidator((payload: StudioTelemetryPayload) => payload)
     .handler(async ({ data }) => {
-        if (process.env.VITE_STUDIO_TELEMETRY_ENABLED !== "true") {
+        if (process.env.VITE_PRISMA_TELEMETRY_DISABLED === "1") {
             return { tracked: false } as const;
         }
 

@@ -4,7 +4,7 @@ import { z } from "zod";
 export const env = createEnv({
   clientPrefix: "VITE_",
   client: {
-    VITE_STUDIO_TELEMETRY_ENABLED: z.enum(["true", "false"]).optional(),
+    VITE_PRISMA_TELEMETRY_DISABLED: z.enum(["0", "1"]).optional().default("0"),
   },
   runtimeEnv: (import.meta as any).env,
   emptyStringAsUndefined: true,
