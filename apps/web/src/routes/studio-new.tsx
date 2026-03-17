@@ -15,8 +15,6 @@ import {
   parseThemeValue,
 } from "@/lib/studio-theme-randomizer";
 
-import "@enhanced-prisma-studio/studio-core/ui/index.css";
-
 export const Route = createFileRoute("/studio-new")({
   component: StudioNewRouteComponent,
 });

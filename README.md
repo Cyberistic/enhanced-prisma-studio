@@ -1,5 +1,41 @@
-# enhanced-prisma-studio
+# Enhanced Prisma Studio
 
+## Problem Statement
+
+The only way to access your DB should be internally through your server. DB strings shouldn't be exposed. The DB ITSELF shouldn't be exposed to the internet. Need to see your data? ssh into your machine. RLS sucks. Any DB level sucks. 
+
+But.. that's like, just my opinion man. Good luck convincing clients they should ssh into their machines to see their data. This is where Prisma Studio comes in, I've grown to implement it in all my clients' projects because it provides a nice UI for exploring the database, running queries, and managing data. It's embedded directly into their app and the app's auth handles who has access.
+
+Multiple projects exist today but they all have their pain points and do not, IMO, follow modern practices. Furthermore, they aren't open source, so we can't contribute to them directly or make our own fork. The only close canditate I've found is [premieroctet/next-admin](https://github.com/premieroctet/next-admin), but even that has its pain points and depends on prisma-json. Other projects include [drizzle-kit-studio](https://orm.drizzle.team/docs/drizzle-kit-studio), but that is a paid, B2B product and not open source.
+
+## The shadcn-ification of Prisma Studio
+
+The ui depends on:
+1. lucide-react
+2. radix-ui
+3. motion-dom
+4. framer-motion
+5. reactflow
+6. dnd-kit/core
+
+
+The data layer depends on:
+1. Kysely
+2. nuqs
+
+Utils depend on:
+1. date-fns 
+2. codemirror
+3. @lezer/lr
+
+amongst others.
+
+My app is built on Hugeicons, base-ui, tanstack router search params, D3.. and it has its own styling. Why do I have to depend on other component libraries and styling solutions just to use the studio? Why can't I use the same component library and styling solution for the studio as I do for the rest of my app? just let me use my stuff man. Studio should live under @components and use the same styling and components as the rest of the app, and I should be able to gut it and change whatver I want. The default install can stay the same, but community (or self-made) versions and patterns can exist. Eventually, a cli-command which just sees what you're using and tailors the install to your stack. *Yes, I blame shadcn for this, we're spoiled.*
+
+> [!Note] 
+> I haven't listed tanstack/db, tanstack/react-table, and tanstack/react-query because I'm biased and I consider them part of the core stack; your project should be using them anyways. 
+
+## Goal
 THe goal of this project is to create an enhanced version of Prisma Studio with additional features and improvements. 
 
 https://www.npmjs.com/package/@prisma/studio-core

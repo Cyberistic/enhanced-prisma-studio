@@ -10,6 +10,8 @@ import { Studio } from "@enhanced-prisma-studio/studio-core/ui";
 import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 
+import "@enhanced-prisma-studio/studio-core/ui/index.css";
+
 import { Card, CardContent } from "@/components/ui/card";
 
 type DataRow = Record<string, unknown>;
