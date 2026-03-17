@@ -8,8 +8,14 @@ import { cn } from "@/lib/utils";
 import type { StudioThemeInput } from "../../types";
 import { StudioContent } from "./content";
 import { Navigation } from "./navigation";
-import type { StudioView } from "./types";
+import {
+  DEFAULT_STUDIO_VIEW_DEFINITIONS,
+  type StudioSectionDefinition,
+  type StudioView,
+  type StudioViewDefinition,
+} from "./types";
 import { createStudioHash, parseStudioHash } from "./url-state";
+import type { SortOrderItem } from "@enhanced-prisma-studio/studio-core/data";
 
 type StudioAdapter = Parameters<typeof UpstreamStudio>[0]["adapter"];
 type StudioIntrospectionResult = Exclude<
@@ -35,17 +41,99 @@ function getQueryPreview(query: unknown): string | null {
   return querySql.length > 120 ? `${preview}...` : preview;
 }
 
+function hasStudioHashView(hash: string): boolean {
+  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+  const search = raw.startsWith("?") ? raw : `?${raw}`;
+  const params = new URLSearchParams(search);
+  return params.has("view");
+}
+
 export function StudioShell(props: {
   adapter: StudioAdapter;
+  defaultView?: StudioView;
+  sectionDefinitions?: readonly StudioSectionDefinition[];
   theme?: StudioThemeInput;
+  viewDefinitions?: readonly StudioViewDefinition[];
 }) {
-  const { adapter, theme } = props;
+  const {
+    adapter,
+    defaultView,
+    sectionDefinitions,
+    theme,
+    viewDefinitions = DEFAULT_STUDIO_VIEW_DEFINITIONS,
+  } = props;
   const { resolvedTheme } = useTheme();
+  const availableSections = useMemo<StudioSectionDefinition[]>(() => {
+    if (sectionDefinitions && sectionDefinitions.length > 0) {
+      const normalizedSections: StudioSectionDefinition[] = [];
+
+      for (const sectionDefinition of sectionDefinitions) {
+        const dedupedViews = new Map<StudioView, StudioViewDefinition>();
+        for (const viewDefinition of sectionDefinition.views) {
+          dedupedViews.set(viewDefinition.id, viewDefinition);
+        }
+
+        if (dedupedViews.size === 0) {
+          continue;
+        }
+
+        normalizedSections.push({
+          id: sectionDefinition.id,
+          header: sectionDefinition.header,
+          views: Array.from(dedupedViews.values()),
+        });
+      }
+
+      if (normalizedSections.length > 0) {
+        return normalizedSections;
+      }
+    }
+
+    const dedupedViews = new Map<StudioView, StudioViewDefinition>();
+    for (const viewDefinition of viewDefinitions) {
+      dedupedViews.set(viewDefinition.id, viewDefinition);
+    }
+
+    if (dedupedViews.size === 0) {
+      for (const fallbackViewDefinition of DEFAULT_STUDIO_VIEW_DEFINITIONS) {
+        dedupedViews.set(fallbackViewDefinition.id, fallbackViewDefinition);
+      }
+    }
+
+    return [
+      {
+        id: "default",
+        views: Array.from(dedupedViews.values()),
+      },
+    ];
+  }, [sectionDefinitions, viewDefinitions]);
+  const availableViews = useMemo<StudioViewDefinition[]>(() => {
+    const dedupedViews = new Map<StudioView, StudioViewDefinition>();
+
+    for (const sectionDefinition of availableSections) {
+      for (const viewDefinition of sectionDefinition.views) {
+        dedupedViews.set(viewDefinition.id, viewDefinition);
+      }
+    }
+
+    return Array.from(dedupedViews.values());
+  }, [availableSections]);
+  const availableViewSet = useMemo(() => {
+    return new Set(availableViews.map((viewDefinition) => viewDefinition.id));
+  }, [availableViews]);
+  const initialView = useMemo<StudioView>(() => {
+    if (defaultView && availableViewSet.has(defaultView)) {
+      return defaultView;
+    }
+
+    return availableViews[0]?.id ?? "table";
+  }, [availableViewSet, availableViews, defaultView]);
   const [isNavigationOpen, setIsNavigationOpen] = useState(true);
   const [schema, setSchema] = useState("main");
   const [table, setTable] = useState<string | null>(null);
-  const [selectedView, setSelectedView] = useState<StudioView>("table");
+  const [selectedView, setSelectedView] = useState<StudioView>(initialView);
   const [pinnedColumns, setPinnedColumns] = useState<string[]>([]);
+  const [sortOrder, setSortOrder] = useState<SortOrderItem[]>([]);
   const [introspection, setIntrospection] =
     useState<StudioIntrospectionResult | null>(null);
   const [introspectionError, setIntrospectionError] =
@@ -56,10 +144,17 @@ export function StudioShell(props: {
   useEffect(() => {
     const applyFromHash = () => {
       const parsed = parseStudioHash(window.location.hash);
+      const fallbackView = initialView;
+      const hashView = parsed.viewParam;
       setSchema(parsed.schemaParam);
       setTable(parsed.tableParam);
-      setSelectedView(parsed.viewParam);
+      setSelectedView(
+        hasStudioHashView(window.location.hash) && availableViewSet.has(hashView)
+          ? hashView
+          : fallbackView,
+      );
       setPinnedColumns(parsed.pinnedColumnsParam);
+      setSortOrder(parsed.sortOrderParam);
     };
 
     applyFromHash();
@@ -68,7 +163,7 @@ export function StudioShell(props: {
     return () => {
       window.removeEventListener("hashchange", applyFromHash);
     };
-  }, []);
+  }, [availableViewSet, initialView]);
 
   useEffect(() => {
     let isDisposed = false;
@@ -144,6 +239,7 @@ export function StudioShell(props: {
     const nextHash = createStudioHash({
       pinnedColumnsParam: pinnedColumns,
       schemaParam: schema,
+      sortOrderParam: sortOrder,
       tableParam: table,
       viewParam: selectedView,
     });
@@ -151,7 +247,7 @@ export function StudioShell(props: {
     if (window.location.hash !== nextHash) {
       window.location.hash = nextHash;
     }
-  }, [pinnedColumns, schema, selectedView, table]);
+  }, [pinnedColumns, schema, selectedView, sortOrder, table]);
 
   const schemas = useMemo(() => {
     const schemaNames = Object.keys(introspection?.schemas ?? {});
@@ -224,7 +320,7 @@ export function StudioShell(props: {
   const containerClasses = cn("relative flex flex-col w-full h-full min-h-0 font-sans");
 
   return (
-    <div className="ps" style={studioStyle}>
+    <div className="ps h-full w-full" style={studioStyle}>
       <div className={containerClasses}>
         <SidebarProvider
           defaultOpen
@@ -245,6 +341,7 @@ export function StudioShell(props: {
               onSelectView={setSelectedView}
               schema={schema}
               schemas={schemas}
+              sectionDefinitions={availableSections}
               selectedView={selectedView}
               tableNames={tableNames}
             />
@@ -256,7 +353,9 @@ export function StudioShell(props: {
                   isNavigationOpen={isNavigationOpen}
                   isIntrospecting={isIntrospecting}
                   pinnedColumns={pinnedColumns}
+                  sortOrder={sortOrder}
                   onPinnedColumnsChange={setPinnedColumns}
+                  onSortOrderChange={setSortOrder}
                   onSelectTable={setTable}
                   onToggleNavigation={() => setIsNavigationOpen((current) => !current)}
                   onSelectView={setSelectedView}

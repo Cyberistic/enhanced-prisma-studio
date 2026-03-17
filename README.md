@@ -38,14 +38,14 @@ Also, while it's true that tree-shaking is reducing the impact of these dependen
 > I haven't listed tanstack/db, tanstack/react-table, and tanstack/react-query because I'm biased and I consider them part of the core stack; your project should be using them anyways. 
 
 ## Goal
-THe goal of this project is to create an enhanced version of Prisma Studio with additional features and improvements. 
+The goal of this project is to create an enhanced version of Prisma Studio with additional features and improvements. Mainly, we want it to be extremely composable. Easily swap icons, add/remove sections, change providers, etc.
 
 https://www.npmjs.com/package/@prisma/studio-core
 
 [x] Main focus is to first, deminimize and reverse engineer the package codebase and then add features iteratively. Initial snapshot and findings are in `research/studio-core-snapshot/`.
 
 > [!Note]
-> Prisma CEO personally replied to me and said prisma-studio-core will be going open-source! So hopefully this step won't be needed later.
+> Prisma CEO personally replied to me and said prisma-studio-core will be going open-source! So hopefully this step won't be needed in the future and we can leverage the open-source version.
 
 Features include:
 [x] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn and tailwind natively. 
@@ -64,17 +64,7 @@ Features include:
     - [x] Remove motion-dom and framer-motion dependencies; instead use TailwindCSS. Replace custom sidebar implementation with shadcn's sidebar; which has built in support for transitions and animations. 
 
 [ ] Remove nuqs as a dependency; instead have it as one of the providers. For instance, in tanstack router, we don't need nuqs as we can use the router's own data fetching and mutation capabilities.
-    - ✓ Component is now provider-agnostic. Users can wrap PrismaStudio with their preferred provider:
-      ```tsx
-      // With Nuqs for search params
-      <NuqsProvider>
-        <PrismaStudio theme="dark" />
-      </NuqsProvider>
 
-      // With TanStack Router (handles search params natively)
-      <PrismaStudio theme="dark" />
-      ```
-    - This allows users to choose their own URL state management strategy
 
 
 [ ] Remove Kysely as a dependency; instead have it as one of the providers. Allow users to choose their own query builder or ORM for the studio's internal operations. For example, can use Prisma, Drizzle (lol), Bun.sql, or any other query builder/ORM that supports the required operations; making the system extensible.

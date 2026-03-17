@@ -11,17 +11,21 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { cloneElement, Fragment, isValidElement, type ReactElement } from "react";
 
 import { IconSearch, IconTable } from "@/components/prisma/icons";
 import { IntrospectionStatusNotice } from "./introspection-status-notice";
 import { useNavigationKeyboardNav } from "./hooks/use-navigation-keyboard-nav";
 import { useNavigationTableList } from "./hooks/use-navigation-table-list";
 import { useNavigationTableSearch } from "./hooks/use-navigation-table-search";
-import type { StudioView } from "./types";
+import type { StudioSectionDefinition, StudioView, StudioViewDefinition } from "./types";
+
+type HeaderWithSearchHandlerType = {
+  __studioHandlesSearch?: boolean;
+};
 
 function PrismaLogo(props: { className?: string }) {
   return (
@@ -60,6 +64,7 @@ type NavigationProps = {
   onSelectView: (view: StudioView) => void;
   schema: string;
   schemas: readonly string[];
+  sectionDefinitions: readonly StudioSectionDefinition[];
   selectedView: StudioView;
   tableNames?: readonly string[];
 };
@@ -80,6 +85,7 @@ export function Navigation(props: NavigationProps) {
     onSelectView,
     schema,
     schemas = [],
+    sectionDefinitions,
     selectedView,
     tableNames = [],
   } = props;
@@ -102,6 +108,18 @@ export function Navigation(props: NavigationProps) {
     introspectionError != null && tableNames.length === 0;
   const hasRecoverableIntrospectionWarning =
     introspectionError != null && tableNames.length > 0;
+  const normalizedSections = sectionDefinitions
+    .map((sectionDefinition) => {
+      const tableViews = sectionDefinition.views.filter((viewDefinition) => viewDefinition.id === "table");
+      const nonTableViews = sectionDefinition.views.filter((viewDefinition) => viewDefinition.id !== "table");
+
+      return {
+        hasTableView: tableViews.length > 0,
+        nonTableViews,
+        sectionDefinition,
+      };
+    })
+    .filter((section) => section.hasTableView || section.nonTableViews.length > 0);
 
   function selectTable(tableName: string) {
     onSelectTable(tableName);
@@ -160,41 +178,49 @@ export function Navigation(props: NavigationProps) {
         </Select>
       </SidebarGroup>
 
-      <SidebarGroup className="px-2 pb-3 pt-4">
-        <SidebarGroupLabel className="px-2 py-1 text-sm font-medium text-foreground">
-          <div className="flex items-center gap-1">
-            <IconTable size={16} className="text-muted-foreground/60" />
-            <span>Studio</span>
-          </div>
-        </SidebarGroupLabel>
+      {normalizedSections.map(({ hasTableView, nonTableViews, sectionDefinition }) => {
+      const sectionHeaderNode = sectionDefinition.header;
+      const sectionHeaderType =
+        isValidElement(sectionHeaderNode)
+          ? (sectionHeaderNode.type as HeaderWithSearchHandlerType)
+          : null;
+      const headerHandlesSearch = Boolean(sectionHeaderType?.__studioHandlesSearch);
+      const renderedSectionHeader =
+        isValidElement(sectionHeaderNode)
+          ? cloneElement(sectionHeaderNode as ReactElement<{ onSearch?: () => void }>, {
+              onSearch: openSearch,
+            })
+          : sectionHeaderNode;
+
+      return (
+      <Fragment key={sectionDefinition.id}>
+      {nonTableViews.length > 0 ? (
+      <SidebarGroup className="px-2 pb-3">
+        <div className="flex items-center gap-1 pt-4 pb-2 px-4">
+          {renderedSectionHeader ?? (
+            <>
+              <IconTable size={16} className="shrink-0 text-muted-foreground/60" />
+              <span className="text-sm font-medium leading-none">Studio</span>
+            </>
+          )}
+        </div>
         <SidebarGroupContent className="flex flex-col gap-px px-2 pb-3">
-        <button
-          type="button"
-          data-active={selectedView === "schema" ? "true" : "false"}
-          className={sidebarItemClassName}
-          onClick={() => onSelectView("schema")}
-        >
-          Visualizer
-        </button>
-        <button
-          type="button"
-          data-active={selectedView === "console" ? "true" : "false"}
-          className={sidebarItemClassName}
-          onClick={() => onSelectView("console")}
-        >
-          Console
-        </button>
-        <button
-          type="button"
-          data-active={selectedView === "sql" ? "true" : "false"}
-          className={sidebarItemClassName}
-          onClick={() => onSelectView("sql")}
-        >
-          SQL
-        </button>
+        {nonTableViews.map((viewDefinition: StudioViewDefinition) => (
+          <button
+            key={viewDefinition.id}
+            type="button"
+            data-active={selectedView === viewDefinition.id ? "true" : "false"}
+            className={sidebarItemClassName}
+            onClick={() => onSelectView(viewDefinition.id)}
+          >
+            {viewDefinition.label}
+          </button>
+        ))}
         </SidebarGroupContent>
       </SidebarGroup>
+      ) : null}
 
+      {hasTableView ? (
       <SidebarGroup className="group/tables relative px-2 pb-3" data-search-open={isSearchOpen ? "true" : "false"}>
         <div className="flex items-center gap-1 pt-4 pb-2 px-4 sticky top-0 backdrop-blur-sm min-h-10">
           <div
@@ -203,10 +229,15 @@ export function Navigation(props: NavigationProps) {
               isSearchOpen && "opacity-0 pointer-events-none",
             )}
           >
-            <IconTable size={16} className="text-muted-foreground/60" />
-            <h2 className="text-sm font-medium">Tables</h2>
+            {renderedSectionHeader ?? (
+              <>
+                <IconTable size={16} className="shrink-0 text-muted-foreground/60" />
+                <h2 className="text-sm font-medium leading-none">Tables</h2>
+              </>
+            )}
           </div>
 
+          {!headerHandlesSearch ? (
           <button
             aria-label="Search tables"
             className={cn(
@@ -220,6 +251,7 @@ export function Navigation(props: NavigationProps) {
           >
             <IconSearch size={14} />
           </button>
+          ) : null}
 
           <div
             data-table-search-input-wrapper
@@ -310,6 +342,10 @@ export function Navigation(props: NavigationProps) {
           ) : null}
         </nav>
       </SidebarGroup>
+      ) : null}
+      </Fragment>
+      );
+      })}
       </SidebarContent>
       </Sidebar>
   );

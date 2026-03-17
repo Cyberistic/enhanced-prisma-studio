@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useState } from "react";
 
-import { PrismaStudio } from "@/components/prisma/studio";
+import { PrismaStudioExample } from "@/components/prisma/studio-example";
 import { StudioThemedLayout } from "@/components/studio-themed-layout";
 import { Button } from "@/components/ui/button";
 import { StudioThemeProvider } from "@/lib/studio-theme-context";
@@ -110,7 +110,8 @@ function StudioNewRouteComponent() {
             Mode: {mounted ? (resolvedTheme ?? "light") : "..."} | {themeValue.replace("preset:", "")} | {radiusValue} | {currentFontLabel}
           </span>
         </div>
-        <PrismaStudio theme={studioTheme} />
+
+        <PrismaStudioExample theme={studioTheme} />
       </StudioThemedLayout>
     </StudioThemeProvider>
   );

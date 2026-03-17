@@ -21,37 +21,123 @@ const DATABASE_URL = rawUrl.startsWith("file:")
 const adapter = new PrismaLibSql({ url: DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+const ROLES = ["admin", "member", "member", "member", "viewer", "viewer"] as const;
+const PRIORITIES = ["low", "medium", "medium", "high", "urgent"] as const;
+const PROJECT_STATUSES = ["active", "active", "active", "completed", "archived"] as const;
+const TAG_NAMES = [
+    "bug", "feature", "docs", "design", "backend", "frontend",
+    "urgent", "nice-to-have", "refactor", "testing", "security", "perf",
+];
+
 async function main() {
-    // Clear existing data
+    // Clear all data in dependency order
+    await prisma.todoTag.deleteMany();
+    await prisma.comment.deleteMany();
     await prisma.todo.deleteMany();
+    await prisma.tag.deleteMany();
+    await prisma.project.deleteMany();
     await prisma.user.deleteMany();
 
-    const users = Array.from({ length: 5 }, () => ({
-        id: faker.string.nanoid(),
-        name: faker.person.fullName(),
-        email: faker.internet.email().toLowerCase(),
-    }));
+    // Create tags
+    const tags = await Promise.all(
+        TAG_NAMES.map((name) =>
+            prisma.tag.create({ data: { id: faker.string.nanoid(), name } })
+        )
+    );
 
-    for (const user of users) {
-        const todoCount = faker.number.int({ min: 2, max: 6 });
-        await prisma.user.create({
-            data: {
-                ...user,
-                todos: {
-                    create: Array.from({ length: todoCount }, () => ({
-                        id: faker.string.nanoid(),
-                        title: faker.hacker.phrase(),
-                        description: faker.lorem.sentence(),
-                        completed: faker.datatype.boolean(0.3),
-                        dueDate: faker.date.soon({ days: 14 }),
-                    })),
+    // Create projects (spread over past 6 months)
+    const projectNames = [
+        "Platform Rewrite", "Mobile App", "API Gateway", "Data Pipeline",
+        "Admin Dashboard", "Customer Portal", "DevOps Infra", "Analytics Engine",
+    ];
+    const projects = await Promise.all(
+        projectNames.map((name) =>
+            prisma.project.create({
+                data: {
+                    id: faker.string.nanoid(),
+                    name,
+                    status: faker.helpers.arrayElement(PROJECT_STATUSES),
+                    createdAt: faker.date.recent({ days: 180 }),
                 },
-            },
-        });
+            })
+        )
+    );
+
+    // Create users (10 users, mix of roles, spread over past year)
+    const userNames = [
+        "Alice Chen", "Bob Martinez", "Carol White", "David Kim", "Eva Rossi",
+        "Frank Zhang", "Grace Patel", "Hiro Tanaka", "Iris O'Brien", "Jake Thompson",
+    ];
+    const users = await Promise.all(
+        userNames.map((name, i) =>
+            prisma.user.create({
+                data: {
+                    id: faker.string.nanoid(),
+                    name,
+                    email: `${name.toLowerCase().replace(/[^a-z]/g, ".")}@example.com`,
+                    role: ROLES[i % ROLES.length],
+                    createdAt: faker.date.recent({ days: 365 }),
+                },
+            })
+        )
+    );
+
+    // Create todos per user, each with a project and priority
+    const allTodos: { id: string }[] = [];
+    for (const user of users) {
+        const todoCount = faker.number.int({ min: 4, max: 12 });
+        for (let i = 0; i < todoCount; i++) {
+            const todo = await prisma.todo.create({
+                data: {
+                    id: faker.string.nanoid(),
+                    title: faker.hacker.phrase(),
+                    description: faker.lorem.sentence(),
+                    completed: faker.datatype.boolean(0.35),
+                    priority: faker.helpers.arrayElement(PRIORITIES),
+                    dueDate: faker.date.soon({ days: 21 }),
+                    createdAt: faker.date.recent({ days: 90 }),
+                    userId: user.id,
+                    projectId: faker.helpers.arrayElement(projects).id,
+                },
+            });
+            allTodos.push(todo);
+
+            // Attach 1–3 random tags to each todo
+            const todoTagCount = faker.number.int({ min: 1, max: 3 });
+            const selectedTags = faker.helpers.arrayElements(tags, todoTagCount);
+            await Promise.all(
+                selectedTags.map((tag) =>
+                    prisma.todoTag.create({
+                        data: { todoId: todo.id, tagId: tag.id },
+                    })
+                )
+            );
+        }
     }
 
-    const count = await prisma.todo.count();
-    console.log(`✅  Seeded ${users.length} users and ${count} todos.`);
+    // Create comments — heavier users comment more
+    for (const todo of allTodos) {
+        const commentCount = faker.number.int({ min: 0, max: 5 });
+        for (let i = 0; i < commentCount; i++) {
+            await prisma.comment.create({
+                data: {
+                    id: faker.string.nanoid(),
+                    content: faker.lorem.sentences({ min: 1, max: 3 }),
+                    createdAt: faker.date.recent({ days: 60 }),
+                    todoId: todo.id,
+                    userId: faker.helpers.arrayElement(users).id,
+                },
+            });
+        }
+    }
+
+    const todoCount = await prisma.todo.count();
+    const commentCount = await prisma.comment.count();
+    const todoTagCount = await prisma.todoTag.count();
+    console.log(
+        `✅  Seeded ${users.length} users, ${projects.length} projects, ${tags.length} tags, ` +
+        `${todoCount} todos, ${todoTagCount} todo-tags, ${commentCount} comments.`
+    );
 }
 
 main()

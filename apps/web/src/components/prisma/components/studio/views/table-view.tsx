@@ -86,8 +86,10 @@ export function TableView(props: {
   isNavigationOpen: boolean;
   isIntrospecting: boolean;
   onPinnedColumnsChange: (columnNames: string[]) => void;
+  onSortOrderChange: (sortOrder: SortOrderItem[]) => void;
   onToggleNavigation: () => void;
   pinnedColumns: string[];
+  sortOrder: SortOrderItem[];
   schema: string;
   table: string | null;
 }) {
@@ -97,8 +99,10 @@ export function TableView(props: {
     isNavigationOpen,
     isIntrospecting,
     onPinnedColumnsChange,
+    onSortOrderChange,
     onToggleNavigation,
     pinnedColumns,
+    sortOrder: controlledSortOrder,
     table,
   } = props;
   const activeTableName = activeTable?.name ?? table ?? "";
@@ -113,7 +117,7 @@ export function TableView(props: {
   const [totalRowCount, setTotalRowCount] = useState(0);
   const [rowsError, setRowsError] = useState<string | null>(null);
   const [isLoadingRows, setIsLoadingRows] = useState(false);
-  const [sortOrder, setSortOrder] = useState<SortOrderItem[]>([]);
+  const sortOrder = controlledSortOrder;
   const [selectedCell, setSelectedCell] = useState<TableCellCoordinate | null>(
     null,
   );
@@ -337,7 +341,8 @@ export function TableView(props: {
   }
 
   function toggleColumnSort(columnKey: string) {
-    setSortOrder((currentSortOrder) => {
+    onSortOrderChange((() => {
+      const currentSortOrder = sortOrder;
       const currentDirection = currentSortOrder.find(
         (item) => item.column === columnKey,
       )?.direction;
@@ -351,7 +356,7 @@ export function TableView(props: {
       }
 
       return [];
-    });
+    })());
   }
 
   function isColumnPinned(columnKey: string) {

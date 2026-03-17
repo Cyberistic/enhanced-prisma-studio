@@ -1,36 +1,58 @@
-import { useMemo } from "react";
+import type { ReactNode } from "react";
 
-import { StudioShell } from "./components/studio/studio";
+import { cn } from "@/lib/utils";
+
+import { PrismaStudioThemeProvider } from "./components/prisma-studio-context";
 import type { StudioThemeInput } from "./types";
-import { createPrismaStudioAdapter } from "./utils/adapter";
-import { executeStudioRequest } from "./utils/studio-request";
+
+type PrismaStudioProps = {
+  children: ReactNode;
+  className?: string;
+  theme?: StudioThemeInput;
+};
 
 /**
  * PrismaStudio Component
  *
- * A provider-agnostic Studio component that works with any URL query parameter provider.
- * Users can wrap this component with their preferred provider.
+ * Root composition component. Children are required.
  *
  * @example
- * // With Nuqs
- * <NuqsProvider>
- *   <PrismaStudio theme="dark" />
- * </NuqsProvider>
- *
- * @example
- * // With TanStack Router (already provides query params)
- * <PrismaStudio theme="dark" />
+ * <PrismaStudio theme="dark">
+ *   <URLProvider adapter={createTanStackRouterAdapter()}>
+ *     <AdapterProvider adapter={createPrismaStudioAdapter({ executeStudioRequest })}>
+ *       <PrismaStudioContent>
+ *         <PrismaStudioSection>
+ *           <PrismaStudioSectionHeader>Studio</PrismaStudioSectionHeader>
+ *           <PrismaTables />
+ *         </PrismaStudioSection>
+ *       </PrismaStudioContent>
+ *     </AdapterProvider>
+ *   </URLProvider>
+ * </PrismaStudio>
  */
-export function PrismaStudio(props: { theme?: StudioThemeInput }) {
-  const { theme } = props;
+export function PrismaStudio(props: PrismaStudioProps) {
+  const { children, className, theme } = props;
 
-  const adapter = useMemo(() => {
-    return createPrismaStudioAdapter({ executeStudioRequest });
-  }, []);
+  if (!children) {
+    throw new Error(
+      "PrismaStudio requires children-based composition. Wrap URLProvider and AdapterProvider inside PrismaStudio and render PrismaStudioContent/Section components.",
+    );
+  }
 
   return (
-    <div className="h-full min-h-0 overflow-hidden bg-background p-4 text-foreground">
-      <StudioShell adapter={adapter} theme={theme} />
-    </div>
+    <PrismaStudioThemeProvider theme={theme}>
+      <div className={cn("h-full min-h-0", className)}>{children}</div>
+    </PrismaStudioThemeProvider>
   );
 }
+
+export {
+  PrismaConsole,
+  PrismaSQL,
+  PrismaStudioContent,
+  PrismaStudioSection,
+  PrismaStudioSectionHeader,
+  PrismaTablesSearchHeader,
+  PrismaTables,
+  PrismaVisualizer,
+} from "./components/prisma-studio-components";

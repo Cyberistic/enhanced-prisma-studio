@@ -87,5 +87,11 @@ export function createStudioHash(state: StudioUrlState): string {
 }
 
 function isStudioView(value: string | null): value is StudioView {
-  return value === "table" || value === "schema" || value === "console" || value === "sql";
+  return (
+    value === "table" ||
+    value === "schema" ||
+    value === "console" ||
+    value === "sql" ||
+    value === "evil-stats"
+  );
 }

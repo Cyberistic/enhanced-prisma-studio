@@ -1,8 +1,10 @@
 import type { Adapter } from "@enhanced-prisma-studio/studio-core/data";
+import type { SortOrderItem } from "@enhanced-prisma-studio/studio-core/data";
 import { useCallback, useState } from "react";
 
 import type { StudioOperationEvent, StudioView } from "./types";
 import { ConsoleView } from "./views/console-view";
+import { EvilStatsView } from "./views/evil-stats-view.tsx";
 import { SchemaView } from "./views/schema-view";
 import { SqlView } from "./views/sql-view";
 import { TableView } from "./views/table-view";
@@ -15,8 +17,10 @@ export function StudioContent(props: {
   isNavigationOpen: boolean;
   isIntrospecting?: boolean;
   onPinnedColumnsChange: (columnNames: string[]) => void;
+  onSortOrderChange: (sortOrder: SortOrderItem[]) => void;
   onToggleNavigation: () => void;
   pinnedColumns: string[];
+  sortOrder: SortOrderItem[];
   onSelectTable: (tableName: string) => void;
   onSelectView: (view: StudioView) => void;
   schemaTables?: IntrospectionResult["schemas"][string]["tables"];
@@ -30,10 +34,12 @@ export function StudioContent(props: {
     isNavigationOpen,
     isIntrospecting = false,
     onPinnedColumnsChange,
+    onSortOrderChange,
     onSelectTable,
     onSelectView,
     onToggleNavigation,
     pinnedColumns,
+    sortOrder,
     schemaTables = {},
     schema,
     selectedView,
@@ -91,6 +97,20 @@ export function StudioContent(props: {
     );
   }
 
+  if (selectedView === "evil-stats") {
+    return (
+      <EvilStatsView
+        adapter={adapter}
+        isNavigationOpen={isNavigationOpen}
+        isIntrospecting={isIntrospecting}
+        onToggleNavigation={onToggleNavigation}
+        schemaTables={schemaTables}
+        schema={schema}
+        table={table}
+      />
+    );
+  }
+
   return (
     <TableView
       activeTable={activeTable}
@@ -100,6 +120,8 @@ export function StudioContent(props: {
       onPinnedColumnsChange={onPinnedColumnsChange}
       onToggleNavigation={onToggleNavigation}
       pinnedColumns={pinnedColumns}
+      sortOrder={sortOrder}
+      onSortOrderChange={onSortOrderChange}
       schema={schema}
       table={table}
     />
