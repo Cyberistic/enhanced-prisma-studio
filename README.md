@@ -57,10 +57,11 @@ Features include:
     - [x] Replaced enhanced `/studio-new` shell and navigation controls to use host UI primitives (`button`, `input`, `select`, `sidebar`, `table`, `dropdown-menu`, `switch`).
     - [x] Localized Studio shell into app-owned components under `apps/web/src/components/prisma/**` (`studio.tsx`, `components/studio/*`, `utils/*`, `icons.tsx`) so UI can be edited without touching upstream package.
     - [x] Removed nested upstream Studio renderer from table mode; local table view now renders host table primitives and local header/footer controls.
+    - [x] Added lightweight local table animations (row/color transitions and pinned-column left-position transitions) to partially cover upstream `motion/react` grid animation behavior.
     - [ ] Finish shadcn parity for all views (`schema`, `console`, `sql`) with final spacing/interaction parity to upstream.
     - [ ] Replace remaining custom/unified variants with host-safe variants only (remove unsupported badge/button variants and normalize tokens).
-    - [ ] Complete TypeScript cleanup for ongoing view refactors and keep `bunx tsc -p apps/web/tsconfig.json --noEmit` green.
     - [ ] Remove remaining direct UI fallbacks to upstream internals (only data/adapter layer should remain shared during migration).
+    - [x] Remove motion-dom and framer-motion dependencies; instead use TailwindCSS. Replace custom sidebar implementation with shadcn's sidebar; which has built in support for transitions and animations. 
 
 [ ] Remove nuqs as a dependency; instead have it as one of the providers. For instance, in tanstack router, we don't need nuqs as we can use the router's own data fetching and mutation capabilities.
 

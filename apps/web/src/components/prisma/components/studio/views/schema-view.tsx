@@ -1,6 +1,7 @@
 import type { Adapter } from "@enhanced-prisma-studio/studio-core/data";
 import { KeyRound } from "lucide-react";
 import { Component, type ErrorInfo, useMemo } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { StudioHeader } from "../studio-header";
 import {
@@ -99,6 +100,7 @@ function buildRelationships(schemaTables: SchemaTables): VisualizerRelationship[
 
 export function SchemaView(props: {
   isNavigationOpen: boolean;
+  isIntrospecting: boolean;
   onSelectTableView: (tableName: string) => void;
   onToggleNavigation: () => void;
   schemaTables: SchemaTables;
@@ -107,6 +109,7 @@ export function SchemaView(props: {
 }) {
   const {
     isNavigationOpen,
+    isIntrospecting,
     onSelectTableView,
     onToggleNavigation,
     schema,
@@ -159,13 +162,36 @@ export function SchemaView(props: {
       </StudioHeader>
 
       <div className="h-full min-h-0 w-full">
-        <VisualizerBoundary>
-          <SchemaVisualizer
-            tables={tables}
-            relationships={relationships}
-            onOpenTable={(tableName) => onSelectTableView(tableName)}
-          />
-        </VisualizerBoundary>
+        {isIntrospecting && tables.length === 0 ? (
+          <div className="grid h-full min-h-0 w-full grid-cols-3 gap-4 p-4">
+            <div className="rounded-md border border-border/70 bg-card p-3">
+              <Skeleton className="mb-3 h-4 w-24" />
+              <Skeleton className="mb-2 h-3 w-40" />
+              <Skeleton className="mb-2 h-3 w-32" />
+              <Skeleton className="h-3 w-36" />
+            </div>
+            <div className="rounded-md border border-border/70 bg-card p-3">
+              <Skeleton className="mb-3 h-4 w-20" />
+              <Skeleton className="mb-2 h-3 w-28" />
+              <Skeleton className="mb-2 h-3 w-36" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+            <div className="rounded-md border border-border/70 bg-card p-3">
+              <Skeleton className="mb-3 h-4 w-28" />
+              <Skeleton className="mb-2 h-3 w-34" />
+              <Skeleton className="mb-2 h-3 w-30" />
+              <Skeleton className="h-3 w-40" />
+            </div>
+          </div>
+        ) : (
+          <VisualizerBoundary>
+            <SchemaVisualizer
+              tables={tables}
+              relationships={relationships}
+              onOpenTable={(tableName) => onSelectTableView(tableName)}
+            />
+          </VisualizerBoundary>
+        )}
       </div>
     </div>
   );

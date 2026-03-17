@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 import { StudioHeader } from "../studio-header";
@@ -122,12 +123,13 @@ function OperationEventEntry(props: { event: StudioOperationEvent }) {
 
 export function ConsoleView(props: {
   isNavigationOpen: boolean;
+  isIntrospecting: boolean;
   onToggleNavigation: () => void;
   operationEvents: StudioOperationEvent[];
   schema: string;
   table: string | null;
 }) {
-  const { isNavigationOpen, onToggleNavigation, operationEvents, schema, table } = props;
+  const { isIntrospecting, isNavigationOpen, onToggleNavigation, operationEvents, schema, table } = props;
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -150,9 +152,17 @@ export function ConsoleView(props: {
 
       <div ref={scrollRef} className="flex grow flex-col gap-2 overflow-y-auto bg-background/50 p-4">
         {operationEvents.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-muted-foreground">
-            No operation events yet.
-          </div>
+          isIntrospecting ? (
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-18 w-full" />
+              <Skeleton className="h-18 w-full" />
+              <Skeleton className="h-18 w-full" />
+            </div>
+          ) : (
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              No operation events yet.
+            </div>
+          )
         ) : (
           operationEvents.map((eventItem) => (
             <OperationEventEntry key={eventItem.eventId} event={eventItem} />

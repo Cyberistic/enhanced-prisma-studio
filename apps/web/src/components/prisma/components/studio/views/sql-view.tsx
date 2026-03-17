@@ -3,6 +3,7 @@ import { Play, Square } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -59,6 +60,7 @@ function getErrorAdapterSource(error: unknown): string | undefined {
 export function SqlView(props: {
   adapter: Adapter;
   isNavigationOpen: boolean;
+  isIntrospecting: boolean;
   onOperationEvent: (event: StudioOperationEvent) => void;
   onToggleNavigation: () => void;
   schema: string;
@@ -67,6 +69,7 @@ export function SqlView(props: {
   const {
     adapter,
     isNavigationOpen,
+    isIntrospecting,
     onOperationEvent,
     onToggleNavigation,
     schema,
@@ -245,7 +248,25 @@ export function SqlView(props: {
         </div>
 
         <div className="flex-1 min-h-0 overflow-auto p-3">
-          {result ? (
+          {isIntrospecting && !result && !isRunning ? (
+            <div className="flex min-h-0 flex-col gap-2">
+              <Skeleton className="h-4 w-32" />
+              <div className="rounded-md border border-border/70 p-2">
+                <Skeleton className="mb-2 h-8 w-full" />
+                <Skeleton className="mb-2 h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            </div>
+          ) : isRunning && !result ? (
+            <div className="flex min-h-0 flex-col gap-2">
+              <Skeleton className="h-4 w-40" />
+              <div className="rounded-md border border-border/70 p-2">
+                <Skeleton className="mb-2 h-8 w-full" />
+                <Skeleton className="mb-2 h-8 w-11/12" />
+                <Skeleton className="h-8 w-10/12" />
+              </div>
+            </div>
+          ) : result ? (
             <div className="flex min-h-0 flex-col gap-2">
               <div className="text-xs text-muted-foreground">
                 {result.rowCount} row{result.rowCount === 1 ? "" : "s"} · {result.durationMs}ms

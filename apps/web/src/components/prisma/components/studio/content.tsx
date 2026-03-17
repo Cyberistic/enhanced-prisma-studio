@@ -54,6 +54,7 @@ export function StudioContent(props: {
     return (
       <SchemaView
         isNavigationOpen={isNavigationOpen}
+        isIntrospecting={isIntrospecting}
         onSelectTableView={handleSelectTableView}
         onToggleNavigation={onToggleNavigation}
         schemaTables={schemaTables}
@@ -67,6 +68,7 @@ export function StudioContent(props: {
     return (
       <ConsoleView
         isNavigationOpen={isNavigationOpen}
+        isIntrospecting={isIntrospecting}
         operationEvents={operationEvents}
         onToggleNavigation={onToggleNavigation}
         schema={schema}
@@ -80,6 +82,7 @@ export function StudioContent(props: {
       <SqlView
         adapter={adapter}
         isNavigationOpen={isNavigationOpen}
+        isIntrospecting={isIntrospecting}
         onOperationEvent={handleOperationEvent}
         onToggleNavigation={onToggleNavigation}
         schema={schema}

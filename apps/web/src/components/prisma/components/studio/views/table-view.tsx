@@ -14,7 +14,13 @@ import {
   Pin,
   RefreshCw,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  type MouseEvent as ReactMouseEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { IconSearch } from "@/components/prisma/icons";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -28,6 +34,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -51,10 +63,16 @@ type TableColumn = {
   key: string;
   label: string;
   type: string;
+  typeGroup?: string;
   widthPx: number;
   widthClassName: string;
   isPrimary?: boolean;
   isRequired?: boolean;
+};
+
+type TableCellCoordinate = {
+  columnKey: string;
+  rowIndex: number;
 };
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100, 500] as const;
@@ -95,10 +113,19 @@ export function TableView(props: {
   const [rowsError, setRowsError] = useState<string | null>(null);
   const [isLoadingRows, setIsLoadingRows] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrderItem[]>([]);
-  const [selectedCell, setSelectedCell] = useState<{
-    columnKey: string;
-    rowIndex: number;
-  } | null>(null);
+  const [selectedCell, setSelectedCell] = useState<TableCellCoordinate | null>(
+    null,
+  );
+  const [selectedRowIndexes, setSelectedRowIndexes] = useState<number[]>([]);
+  const [rowSelectionAnchor, setRowSelectionAnchor] = useState<number | null>(
+    null,
+  );
+  const [editingCell, setEditingCell] = useState<TableCellCoordinate | null>(
+    null,
+  );
+  const [cellEditorDraft, setCellEditorDraft] = useState("");
+  const [cellEditorError, setCellEditorError] = useState<string | null>(null);
+  const [isSavingCell, setIsSavingCell] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const rowSearchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -114,6 +141,7 @@ export function TableView(props: {
         key: column.name,
         label: column.name,
         type: column.datatype.name,
+        typeGroup: column.datatype.group,
         widthClassName: widthSpec.className,
         widthPx: widthSpec.widthPx,
         isPrimary:
@@ -174,6 +202,13 @@ export function TableView(props: {
       setTotalRowCount(0);
       setRowsError(null);
       setIsLoadingRows(false);
+      setSelectedCell(null);
+      setSelectedRowIndexes([]);
+      setRowSelectionAnchor(null);
+      setEditingCell(null);
+      setCellEditorDraft("");
+      setCellEditorError(null);
+      setIsSavingCell(false);
       return;
     }
 
@@ -262,6 +297,11 @@ export function TableView(props: {
   );
 
   const visibleRows = rows;
+  const selectedRowIndexSet = useMemo(
+    () => new Set(selectedRowIndexes),
+    [selectedRowIndexes],
+  );
+  const hasRowSelection = selectedRowIndexes.length > 0;
 
   useEffect(() => {
     setPageIndex((current) => Math.min(current, pageCount - 1));
@@ -280,6 +320,16 @@ export function TableView(props: {
     setPageIndex(0);
     setPageDraft("1");
   }, [sortOrder]);
+
+  useEffect(() => {
+    setSelectedCell(null);
+    setSelectedRowIndexes([]);
+    setRowSelectionAnchor(null);
+    setEditingCell(null);
+    setCellEditorDraft("");
+    setCellEditorError(null);
+    setIsSavingCell(false);
+  }, [activeTableName, queryPageIndex, queryPageSize, querySearchTerm, sortOrder]);
 
   function getColumnSortDirection(columnKey: string) {
     return sortOrder.find((item) => item.column === columnKey)?.direction;
@@ -321,6 +371,149 @@ export function TableView(props: {
 
   function isCellSelected(rowIndex: number, columnKey: string) {
     return selectedCell?.rowIndex === rowIndex && selectedCell.columnKey === columnKey;
+  }
+
+  function isRowSelected(rowIndex: number) {
+    return selectedRowIndexSet.has(rowIndex);
+  }
+
+  function clearRowSelection() {
+    setSelectedRowIndexes([]);
+    setRowSelectionAnchor(null);
+  }
+
+  function selectSingleRow(rowIndex: number) {
+    setSelectedRowIndexes([rowIndex]);
+    setRowSelectionAnchor(rowIndex);
+  }
+
+  function selectRowRange(anchorRowIndex: number, rowIndex: number) {
+    const rangeStart = Math.min(anchorRowIndex, rowIndex);
+    const rangeEnd = Math.max(anchorRowIndex, rowIndex);
+    const nextSelection: number[] = [];
+
+    for (let candidateIndex = rangeStart; candidateIndex <= rangeEnd; candidateIndex += 1) {
+      nextSelection.push(candidateIndex);
+    }
+
+    setSelectedRowIndexes(nextSelection);
+  }
+
+  function toggleRowSelection(rowIndex: number) {
+    setSelectedRowIndexes((currentSelection) => {
+      if (currentSelection.includes(rowIndex)) {
+        return currentSelection.filter((candidateIndex) => candidateIndex !== rowIndex);
+      }
+
+      return [...currentSelection, rowIndex].sort((leftIndex, rightIndex) => leftIndex - rightIndex);
+    });
+  }
+
+  function handleRowMarkerClick(
+    event: ReactMouseEvent<HTMLButtonElement>,
+    rowIndex: number,
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+    setSelectedCell(null);
+    setEditingCell(null);
+    setCellEditorError(null);
+
+    if (event.shiftKey && rowSelectionAnchor != null) {
+      selectRowRange(rowSelectionAnchor, rowIndex);
+      return;
+    }
+
+    if (event.metaKey || event.ctrlKey) {
+      toggleRowSelection(rowIndex);
+      setRowSelectionAnchor(rowIndex);
+      return;
+    }
+
+    selectSingleRow(rowIndex);
+  }
+
+  function openCellEditor(coordinate: TableCellCoordinate, cellValue: unknown) {
+    setSelectedCell(coordinate);
+    setEditingCell(coordinate);
+    setCellEditorDraft(formatCellValue(cellValue));
+    setCellEditorError(null);
+  }
+
+  function closeCellEditor() {
+    setEditingCell(null);
+    setCellEditorError(null);
+    setIsSavingCell(false);
+  }
+
+  function handleCellClick(rowIndex: number, columnKey: string, cellValue: unknown) {
+    if (hasRowSelection) {
+      clearRowSelection();
+    }
+
+    openCellEditor({ columnKey, rowIndex }, cellValue);
+  }
+
+  async function saveCellEdit() {
+    const targetCell = editingCell;
+
+    if (!targetCell || !activeTable) {
+      return;
+    }
+
+    const targetColumn = columns.find(
+      (candidateColumn) => candidateColumn.key === targetCell.columnKey,
+    );
+    const targetRow = visibleRows[targetCell.rowIndex];
+
+    if (!targetColumn || !targetRow) {
+      closeCellEditor();
+      return;
+    }
+
+    const parsedValue = parseCellEditorValue({
+      draftValue: cellEditorDraft,
+      typeGroup: targetColumn.typeGroup,
+    });
+
+    if (!parsedValue.success) {
+      setCellEditorError(parsedValue.error);
+      return;
+    }
+
+    setCellEditorError(null);
+    setIsSavingCell(true);
+
+    const [updateError, updateResult] = await adapter.update(
+      {
+        changes: {
+          [targetCell.columnKey]: parsedValue.value,
+        },
+        row: targetRow,
+        table: activeTable,
+      },
+      {},
+    );
+
+    setIsSavingCell(false);
+
+    if (updateError) {
+      setCellEditorError(updateError.message || "Failed to update cell.");
+      return;
+    }
+
+    const nextRow = updateResult?.row
+      ? { ...targetRow, ...updateResult.row }
+      : { ...targetRow, [targetCell.columnKey]: parsedValue.value };
+
+    setRows((currentRows) =>
+      currentRows.map((candidateRow, candidateIndex) =>
+        candidateIndex === targetCell.rowIndex ? nextRow : candidateRow,
+      ),
+    );
+    setSelectedCell(targetCell);
+    setEditingCell(null);
+    setCellEditorError(null);
   }
 
   function commitPageDraft(draftValue = pageDraft) {
@@ -462,13 +655,13 @@ export function TableView(props: {
           <div className="min-h-0 overflow-auto **:data-[slot=table-container]:h-full **:data-[slot=table]:h-full **:data-[slot=table-body]:h-full">
             <Table className="table-auto h-full min-w-max">
               <TableHeader className="sticky top-0 z-10 bg-card">
-                <TableRow className="hover:bg-transparent">
+                <TableRow className="transition-colors duration-150 hover:bg-transparent">
                   <TableHead className="w-10 border-r border-border/70 bg-muted/20" />
                   {orderedColumns.map((column) => (
                     <TableHead
                       key={column.key}
                       className={cn(
-                        "group relative h-10 min-w-40 border-r border-border/70 px-3 align-middle font-medium whitespace-nowrap",
+                        "group relative h-10 min-w-40 border-r border-border/70 px-3 align-middle font-medium whitespace-nowrap transition-[left,background-color,box-shadow] duration-200 ease-out",
                         isColumnPinned(column.key) &&
                           "sticky z-30 bg-card shadow-[1px_0_0_0_hsl(var(--border))]",
                         column.widthClassName,
@@ -555,7 +748,12 @@ export function TableView(props: {
                   <TableRow>
                     <TableCell colSpan={columns.length + 1} className="h-full px-4 py-3 align-top text-sm text-muted-foreground">
                       {isIntrospecting
-                        ? "Loading table metadata..."
+                        ? (
+                          <div className="flex flex-col gap-2">
+                            <Skeleton className="h-4 w-44" />
+                            <Skeleton className="h-4 w-28" />
+                          </div>
+                        )
                         : "Select a table from the sidebar."}
                     </TableCell>
                   </TableRow>
@@ -566,43 +764,168 @@ export function TableView(props: {
                     </TableCell>
                   </TableRow>
                 ) : isLoadingRows && visibleRows.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length + 1} className="h-full px-4 py-3 align-top text-sm text-muted-foreground">
-                      Loading rows...
-                    </TableCell>
-                  </TableRow>
+                  <>
+                    {Array.from({ length: 8 }).map((_, rowIndex) => (
+                      <TableRow key={`table-skeleton-row-${rowIndex}`} className="hover:bg-transparent">
+                        <TableCell className="h-10 w-10 border-r border-border/70 bg-muted/20 px-0" />
+                        {orderedColumns.map((column, columnIndex) => (
+                          <TableCell
+                            key={`table-skeleton-cell-${rowIndex}-${column.key}`}
+                            className={cn(
+                              "h-10 min-w-40 border-r border-border/70 px-3",
+                              column.widthClassName,
+                            )}
+                          >
+                            <Skeleton
+                              className={cn(
+                                "h-3.5",
+                                columnIndex % 3 === 0
+                                  ? "w-3/5"
+                                  : columnIndex % 3 === 1
+                                    ? "w-4/5"
+                                    : "w-2/3",
+                              )}
+                            />
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </>
                 ) : visibleRows.length > 0 ? (
                   <>
                     {visibleRows.map((row, rowIndex) => (
                       <TableRow
                         key={getRowKey(row, rowIndex, primaryColumnNames)}
-                        className="hover:bg-transparent"
+                        className={cn(
+                          "transition-colors duration-150 hover:bg-transparent",
+                          isRowSelected(rowIndex) && "bg-accent/10",
+                        )}
                       >
-                        <TableCell className="sticky left-0 z-20 h-10 w-10 border-r border-border/70 bg-muted/20 px-0" />
-                        {orderedColumns.map((column) => (
-                          <TableCell
-                            key={column.key}
-                            className={cn(
-                              "h-10 min-w-40 border-r border-border/70 px-3 font-mono text-[13px] text-foreground/95",
-                              isColumnPinned(column.key) &&
-                                "sticky z-10 bg-background shadow-[1px_0_0_0_hsl(var(--border))]",
-                              column.widthClassName,
-                              rowIndex === 0 && column.isPrimary && "outline-1 outline-sky-400/70 -outline-offset-1",
-                              isCellSelected(rowIndex, column.key) &&
-                                "bg-accent/40 outline-2 outline-primary -outline-offset-2",
-                            )}
-                            style={
-                              isColumnPinned(column.key)
-                                ? { left: `${pinnedColumnLeftOffsets.get(column.key) ?? ROW_MARKER_COLUMN_WIDTH}px` }
-                                : undefined
-                            }
-                            onClick={() => setSelectedCell({ rowIndex, columnKey: column.key })}
+                        <TableCell
+                          className={cn(
+                            "sticky left-0 z-20 h-10 w-10 border-r border-border/70 px-0",
+                            isRowSelected(rowIndex) ? "bg-accent/20" : "bg-muted/20",
+                          )}
+                        >
+                          <button
+                            type="button"
+                            className="flex h-full w-full items-center justify-center text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+                            onClick={(event) => handleRowMarkerClick(event, rowIndex)}
                           >
-                            <span className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                              {formatCellValue(row[column.key])}
-                            </span>
-                          </TableCell>
-                        ))}
+                            {isRowSelected(rowIndex) ? "●" : rowIndex + 1}
+                          </button>
+                        </TableCell>
+                        {orderedColumns.map((column) => {
+                          const isEditingCurrentCell =
+                            editingCell?.rowIndex === rowIndex &&
+                            editingCell.columnKey === column.key;
+
+                          return (
+                            <TableCell
+                              key={column.key}
+                              className={cn(
+                                "h-10 min-w-40 border-r border-border/70 px-0 font-mono text-[13px] text-foreground/95 transition-[left,background-color,box-shadow,outline-color] duration-200 ease-out",
+                                isColumnPinned(column.key) &&
+                                  "sticky z-10 bg-background shadow-[1px_0_0_0_hsl(var(--border))]",
+                                isRowSelected(rowIndex) && "bg-accent/15",
+                                column.widthClassName,
+                                rowIndex === 0 &&
+                                  column.isPrimary &&
+                                  "outline-1 outline-sky-400/70 -outline-offset-1",
+                                isCellSelected(rowIndex, column.key) &&
+                                  "bg-accent/40 outline-2 outline-primary -outline-offset-2",
+                              )}
+                              style={
+                                isColumnPinned(column.key)
+                                  ? {
+                                      left: `${pinnedColumnLeftOffsets.get(column.key) ?? ROW_MARKER_COLUMN_WIDTH}px`,
+                                    }
+                                  : undefined
+                              }
+                            >
+                              <Popover
+                                open={isEditingCurrentCell}
+                                onOpenChange={(nextOpen) => {
+                                  if (!nextOpen && isEditingCurrentCell) {
+                                    closeCellEditor();
+                                  }
+                                }}
+                              >
+                                <PopoverTrigger
+                                  className="block h-full w-full cursor-pointer px-3 py-0 text-left"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    handleCellClick(
+                                      rowIndex,
+                                      column.key,
+                                      row[column.key],
+                                    );
+                                  }}
+                                >
+                                  <span className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                                    {formatCellValue(row[column.key])}
+                                  </span>
+                                </PopoverTrigger>
+                                {isEditingCurrentCell ? (
+                                  <PopoverContent
+                                    align="start"
+                                    alignOffset={-1}
+                                    className="w-(--anchor-width) max-w-none gap-0 p-0"
+                                    sideOffset={2}
+                                  >
+                                    <Input
+                                      autoFocus
+                                      className="h-9 rounded-none border-0 px-3 font-mono text-[13px] shadow-none focus-visible:ring-0"
+                                      value={cellEditorDraft}
+                                      onChange={(event) => {
+                                        setCellEditorDraft(event.currentTarget.value);
+                                        setCellEditorError(null);
+                                      }}
+                                      onFocus={(event) => {
+                                        event.currentTarget.select();
+                                      }}
+                                      onKeyDown={(event) => {
+                                        if (event.key === "Enter") {
+                                          event.preventDefault();
+                                          event.stopPropagation();
+                                          void saveCellEdit();
+                                          return;
+                                        }
+
+                                        if (event.key === "Escape") {
+                                          event.preventDefault();
+                                          event.stopPropagation();
+                                          closeCellEditor();
+                                        }
+                                      }}
+                                    />
+                                    {cellEditorError ? (
+                                      <p className="px-2 pb-1 text-xs text-red-400">
+                                        {cellEditorError}
+                                      </p>
+                                    ) : null}
+                                    <div className="flex flex-row items-center border-t border-border/70 p-2 text-xs">
+                                      <button
+                                        className="flex flex-row items-center gap-1"
+                                        onClick={closeCellEditor}
+                                      >
+                                        <kbd className="inline-flex h-6 w-6 items-center justify-center rounded-none bg-muted text-[8px] leading-none font-semibold text-muted-foreground">
+                                          Esc
+                                        </kbd>
+                                        <span>Cancel changes</span>
+                                      </button>
+                                      {isSavingCell ? (
+                                        <span className="ml-auto text-[11px] text-muted-foreground">
+                                          Saving...
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                  </PopoverContent>
+                                ) : null}
+                              </Popover>
+                            </TableCell>
+                          );
+                        })}
                       </TableRow>
                     ))}
                     <TableRow aria-hidden="true" className="h-full border-0 hover:bg-transparent">
@@ -882,6 +1205,71 @@ function formatCellValue(value: unknown) {
   }
 
   return String(value);
+}
+
+function parseCellEditorValue(args: {
+  draftValue: string;
+  typeGroup: string | undefined;
+}):
+  | {
+      success: true;
+      value: unknown;
+    }
+  | {
+      error: string;
+      success: false;
+    } {
+  const { draftValue, typeGroup } = args;
+  const trimmedDraftValue = draftValue.trim();
+
+  if (typeGroup === "numeric") {
+    if (trimmedDraftValue.length === 0) {
+      return { success: true, value: null };
+    }
+
+    const numericValue = Number(trimmedDraftValue);
+
+    if (!Number.isFinite(numericValue)) {
+      return { error: "Enter a valid numeric value.", success: false };
+    }
+
+    return { success: true, value: numericValue };
+  }
+
+  if (typeGroup === "boolean") {
+    if (trimmedDraftValue.length === 0) {
+      return { success: true, value: null };
+    }
+
+    const normalizedValue = trimmedDraftValue.toLowerCase();
+
+    if (normalizedValue === "true" || normalizedValue === "1") {
+      return { success: true, value: true };
+    }
+
+    if (normalizedValue === "false" || normalizedValue === "0") {
+      return { success: true, value: false };
+    }
+
+    return {
+      error: "Use true, false, 1, or 0 for boolean values.",
+      success: false,
+    };
+  }
+
+  if (typeGroup === "json") {
+    if (trimmedDraftValue.length === 0) {
+      return { success: true, value: null };
+    }
+
+    try {
+      return { success: true, value: JSON.parse(trimmedDraftValue) };
+    } catch {
+      return { error: "Enter valid JSON.", success: false };
+    }
+  }
+
+  return { success: true, value: draftValue };
 }
 
 function parsePositiveInteger(value: string): number | null {
