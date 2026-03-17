@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { IconPanelLeftClose, IconPanelLeftOpen } from "./icons";
+import { IconPanelLeftClose, IconPanelLeftOpen } from "@/components/prisma/icons";
 
 interface StudioHeaderProps {
   children?: React.ReactNode;

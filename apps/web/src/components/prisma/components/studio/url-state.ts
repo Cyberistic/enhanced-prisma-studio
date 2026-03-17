@@ -1,18 +1,18 @@
-import type { ForkedStudioView } from "./types";
+import type { StudioView } from "./types";
 
-export type ForkedStudioUrlState = {
+export type StudioUrlState = {
   schemaParam: string;
   tableParam: string | null;
-  viewParam: ForkedStudioView;
+  viewParam: StudioView;
 };
 
-export const DEFAULT_FORKED_URL_STATE: ForkedStudioUrlState = {
+export const DEFAULT_STUDIO_URL_STATE: StudioUrlState = {
   schemaParam: "main",
   tableParam: "User",
   viewParam: "table",
 };
 
-export function parseForkedStudioHash(hash: string): ForkedStudioUrlState {
+export function parseStudioHash(hash: string): StudioUrlState {
   const raw = hash.startsWith("#") ? hash.slice(1) : hash;
   const search = raw.startsWith("?") ? raw : `?${raw}`;
   const params = new URLSearchParams(search);
@@ -21,15 +21,15 @@ export function parseForkedStudioHash(hash: string): ForkedStudioUrlState {
   const tableParam = params.get("table");
 
   return {
-    schemaParam: schemaParam ?? DEFAULT_FORKED_URL_STATE.schemaParam,
+    schemaParam: schemaParam ?? DEFAULT_STUDIO_URL_STATE.schemaParam,
     tableParam,
-    viewParam: isForkedStudioView(viewParam)
+    viewParam: isStudioView(viewParam)
       ? viewParam
-      : DEFAULT_FORKED_URL_STATE.viewParam,
+      : DEFAULT_STUDIO_URL_STATE.viewParam,
   };
 }
 
-export function createForkedStudioHash(state: ForkedStudioUrlState): string {
+export function createStudioHash(state: StudioUrlState): string {
   const params = new URLSearchParams();
   params.set("view", state.viewParam);
   params.set("schema", state.schemaParam);
@@ -41,6 +41,6 @@ export function createForkedStudioHash(state: ForkedStudioUrlState): string {
   return `#?${params.toString()}`;
 }
 
-function isForkedStudioView(value: string | null): value is ForkedStudioView {
+function isStudioView(value: string | null): value is StudioView {
   return value === "table" || value === "schema" || value === "console" || value === "sql";
 }

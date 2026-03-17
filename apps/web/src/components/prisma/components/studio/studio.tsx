@@ -3,30 +3,28 @@ import { useEffect, useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-import type { StudioEvent, StudioThemeInput } from "../types";
-import { ForkedStudioContent } from "./forked/content";
-import { IntrospectionStatusNotice } from "./forked/introspection-status-notice";
-import { Navigation } from "./forked/navigation";
-import { StudioHeader } from "./forked/studio-header";
-import type { ForkedStudioView } from "./forked/types";
-import { createForkedStudioHash, parseForkedStudioHash } from "./forked/url-state";
-import { ForkedViewShell } from "./forked/view-shell";
+import type { StudioThemeInput } from "../../types";
+import { StudioContent } from "./content";
+import { Navigation } from "./navigation";
+import { StudioHeader } from "./studio-header";
+import type { StudioView } from "./types";
+import { createStudioHash, parseStudioHash } from "./url-state";
 
-export function ForkedStudio(props: {
-  adapter: Parameters<typeof UpstreamStudio>[0]["adapter"];
-  aiFilter?: Parameters<typeof UpstreamStudio>[0]["aiFilter"];
-  onEvent?: (event: StudioEvent) => void;
+type StudioAdapter = Parameters<typeof UpstreamStudio>[0]["adapter"];
+
+export function StudioShell(props: {
+  adapter: StudioAdapter;
   theme?: StudioThemeInput;
 }) {
-  const { adapter, aiFilter, onEvent, theme } = props;
+  const { adapter } = props;
   const [isNavigationOpen, setIsNavigationOpen] = useState(true);
   const [schema, setSchema] = useState("main");
   const [table, setTable] = useState<string | null>("User");
-  const [selectedView, setSelectedView] = useState<ForkedStudioView>("table");
+  const [selectedView, setSelectedView] = useState<StudioView>("table");
 
   useEffect(() => {
     const applyFromHash = () => {
-      const parsed = parseForkedStudioHash(window.location.hash);
+      const parsed = parseStudioHash(window.location.hash);
       setSchema(parsed.schemaParam);
       setTable(parsed.tableParam);
       setSelectedView(parsed.viewParam);
@@ -41,7 +39,7 @@ export function ForkedStudio(props: {
   }, []);
 
   useEffect(() => {
-    const nextHash = createForkedStudioHash({
+    const nextHash = createStudioHash({
       schemaParam: schema,
       tableParam: table,
       viewParam: selectedView,
@@ -81,34 +79,16 @@ export function ForkedStudio(props: {
                 isNavigationOpen={isNavigationOpen}
                 onToggleNavigation={() => setIsNavigationOpen((current) => !current)}
               >
-                <span className="text-sm text-foreground/80">Enhanced Studio Fork</span>
+                <span className="text-sm text-foreground/80">Enhanced Studio</span>
               </StudioHeader>
-              <div className="px-3 pt-3">
-                <IntrospectionStatusNotice
-                  compact
-                  description="Local fork shell active. Inner content is still upstream Studio while we replace views incrementally."
-                  isRetrying={false}
-                  message="Current phase: forking UI shell and shared shadcn primitives."
-                  onRetry={() => {}}
-                  queryPreview={null}
-                  source="enhanced-prisma-studio"
-                  title="Fork in progress"
-                  variant="warning"
-                />
-              </div>
               <div className="flex-1 min-h-0">
-                <ForkedViewShell schema={schema} table={table} view={selectedView}>
-                  <ForkedStudioContent
-                    adapter={adapter}
-                    aiFilter={aiFilter}
-                    onEvent={onEvent}
-                    onSelectView={setSelectedView}
-                    schema={schema}
-                    selectedView={selectedView}
-                    table={table}
-                    theme={theme}
-                  />
-                </ForkedViewShell>
+                <StudioContent
+                  adapter={adapter}
+                  onSelectView={setSelectedView}
+                  schema={schema}
+                  selectedView={selectedView}
+                  table={table}
+                />
               </div>
             </div>
           </div>

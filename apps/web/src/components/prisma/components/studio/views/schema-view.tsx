@@ -2,9 +2,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { IconKey } from "./icons";
+import { IconKey } from "@/components/prisma/icons";
 
-export function ForkedSchemaView(props: {
+export function SchemaView(props: {
   schema: string;
   table: string | null;
   onSelectTableView: () => void;
@@ -45,7 +45,7 @@ export function ForkedSchemaView(props: {
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>
-              Rendering now comes from the local forked router for the <Badge variant="secondary">schema</Badge> view.
+              Rendering now comes from the local router for the <Badge variant="secondary">schema</Badge> view.
             </p>
             <p>
               Active schema: <span className="font-mono text-foreground/80">{schema}</span>

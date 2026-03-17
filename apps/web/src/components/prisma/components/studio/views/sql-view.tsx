@@ -4,11 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-import { IconPlay, IconSquare } from "./icons";
+import { IconPlay, IconSquare } from "@/components/prisma/icons";
 
 const DEFAULT_SQL = "select * from \"User\" limit 25;";
 
-export function ForkedSqlView(props: {
+export function SqlView(props: {
   schema: string;
   table: string | null;
 }) {

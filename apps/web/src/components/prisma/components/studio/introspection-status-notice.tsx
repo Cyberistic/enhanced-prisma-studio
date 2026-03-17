@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { IconAlertCircle, IconRefreshCw } from "./icons";
+import { IconAlertCircle, IconRefreshCw } from "@/components/prisma/icons";
 
 interface IntrospectionStatusNoticeProps {
   className?: string;

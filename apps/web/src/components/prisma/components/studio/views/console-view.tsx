@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function ForkedConsoleView(props: {
+export function ConsoleView(props: {
   schema: string;
   table: string | null;
 }) {

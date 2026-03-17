@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { ForkedStudio } from "./components/forked-studio";
+import { StudioShell } from "./components/studio/studio";
 import type { StudioThemeInput } from "./types";
 import { createPrismaStudioAdapter } from "./utils/adapter";
 import { executeStudioRequest } from "./utils/studio-request";
-import { createStudioEventHandler } from "./utils/telemetry";
 
 export function PrismaStudio(props: { theme?: StudioThemeInput }) {
   const { theme } = props;
@@ -19,16 +18,12 @@ export function PrismaStudio(props: { theme?: StudioThemeInput }) {
     return createPrismaStudioAdapter({ executeStudioRequest });
   }, []);
 
-  const onStudioEvent = useMemo(() => {
-    return createStudioEventHandler("enhanced");
-  }, []);
-
   return (
     <div className="h-full min-h-0 overflow-hidden p-4">
       <Card className="h-full min-h-0 overflow-hidden">
         <CardContent className="h-full min-h-0 p-0">
           {mounted ? (
-            <ForkedStudio adapter={adapter} theme={theme} onEvent={onStudioEvent} />
+            <StudioShell adapter={adapter} theme={theme} />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
               Loading Studio...
