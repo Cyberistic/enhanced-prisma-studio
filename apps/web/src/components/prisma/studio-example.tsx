@@ -13,8 +13,8 @@ import {
 	PrismaVisualizer,
 	URLProvider,
 } from "@/components/prisma/studio";
-import { createSQLiteDrizzleProvider, createSQLiteKyselyProvider } from "@/components/prisma/providers/adapters";
-import { createNuqsPrismaAdapter, createTanStackRouterAdapter } from "@/components/prisma/providers/url";
+import { createSQLiteDrizzleProvider } from "@/components/prisma/providers/adapters";
+import { createTanStackRouterAdapter } from "@/components/prisma/providers/url";
 import { PrismaEvilStats } from "@/components/prisma/components/prisma-studio-components";
 import { StudioSectionHeader } from "@/components/prisma/components/studio-section-header";
 import type { StudioThemeInput } from "@/components/prisma/types";
@@ -27,9 +27,9 @@ export function PrismaStudioExample(props: { theme: StudioThemeInput }) {
 		<PrismaStudio theme={theme}>
 			{/* Providers for URL, DB actions, DB query builder */}
 			<PrismaProviders>
-				<URLProvider adapter={createNuqsPrismaAdapter()} />
+				<URLProvider adapter={createTanStackRouterAdapter()} />
 				<AdapterProvider
-					adapter={createSQLiteKyselyProvider({ executeStudioRequest })}
+					adapter={createSQLiteDrizzleProvider({ executeStudioRequest })}
 				/>
 			</PrismaProviders>
 
