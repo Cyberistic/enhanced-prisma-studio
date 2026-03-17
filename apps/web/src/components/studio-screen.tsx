@@ -10,9 +10,12 @@ import { Studio } from "@enhanced-prisma-studio/studio-core/ui";
 import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 
-import "@enhanced-prisma-studio/studio-core/ui/index.css";
-
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  studioTelemetryEnabled,
+  toStudioTelemetryPayload,
+  trackStudioTelemetry,
+} from "@/lib/studio-telemetry";
 
 type DataRow = Record<string, unknown>;
 
@@ -35,6 +38,7 @@ type RawQueryable = {
 };
 
 export type StudioThemeInput = Parameters<typeof Studio>[0]["theme"];
+type StudioEvent = Parameters<NonNullable<Parameters<typeof Studio>[0]["onEvent"]>>[0];
 
 async function executeSqlQuery(queryable: RawQueryable, query: Query<unknown>) {
   const rows = (await queryable.$queryRawUnsafe(
@@ -200,12 +204,24 @@ export function StudioScreen(props: { theme?: StudioThemeInput }) {
     });
   }, []);
 
+  const onStudioEvent = useMemo(() => {
+    if (!studioTelemetryEnabled) {
+      return undefined;
+    }
+
+    return (event: StudioEvent) => {
+      void trackStudioTelemetry({
+        data: toStudioTelemetryPayload("enhanced", event),
+      });
+    };
+  }, []);
+
   return (
     <div className="h-full min-h-0 overflow-hidden p-4">
       <Card className="h-full min-h-0 overflow-hidden">
         <CardContent className="h-full min-h-0 p-0">
           {mounted ? (
-            <Studio adapter={adapter} theme={theme} />
+            <Studio adapter={adapter} theme={theme} onEvent={onStudioEvent} />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
               Loading Studio...

@@ -32,6 +32,8 @@ amongst others.
 
 My app is built on Hugeicons, base-ui, tanstack router search params, D3.. and it has its own styling. Why do I have to depend on other component libraries and styling solutions just to use the studio? Why can't I use the same component library and styling solution for the studio as I do for the rest of my app? just let me use my stuff man. Studio should live under @components and use the same styling and components as the rest of the app, and I should be able to gut it and change whatver I want. The default install can stay the same, but community (or self-made) versions and patterns can exist. Eventually, a cli-command which just sees what you're using and tailors the install to your stack. *Yes, I blame shadcn for this, we're spoiled.*
 
+Also, while it's true that tree-shaking is reducing the impact of these dependencies (for example, lucide-react (~3.0 MB) metafile shows only ~8 KB of Lucide code ends up in dist/ui/index.js), these extras quickly add up. Not only do they bloat the app and create UI inconsistencies, but also they reach size constraints of _some_ environments. In a recent project, Cloudflare workers had a hard limit of 3 MB for the entire app, and Prisma Studio alone taking around 1.1 MB.
+
 > [!Note] 
 > I haven't listed tanstack/db, tanstack/react-table, and tanstack/react-query because I'm biased and I consider them part of the core stack; your project should be using them anyways. 
 
@@ -45,6 +47,7 @@ https://www.npmjs.com/package/@prisma/studio-core
 Features include:
 [ ] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn and tailwind natively. 
     - Experimental route available at `/studio-new` with host-provided Studio theme and randomizer (`baseColor x theme`) inspired by shadcn create's theme merge flow.
+    - `/studio-new` now runs without importing `@enhanced-prisma-studio/studio-core/ui/index.css` and relies on host Tailwind/shadcn tokens.
     - Randomizer now supports multiple accents including purple and emerald, plus radius presets.
     - Expanded base color palettes beyond grays (sky, emerald, rose, amber).
 
@@ -60,6 +63,8 @@ Features include:
 [ ] Add robust error handling and test-suite. Compare gzipped size and performance with the original package.
 
 [ ] Make anonymized telemetry optional.
+    - Added opt-in telemetry via `VITE_STUDIO_TELEMETRY_ENABLED` (default off).
+    - Current telemetry payload is anonymized metadata only: source, event name, operation name (if present), and error flag.
 
 
 ## Important note
