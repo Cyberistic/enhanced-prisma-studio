@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import { useEffect, useMemo, useState } from "react";
 
-import { StudioScreen } from "@/components/studio-screen";
+import { PrismaStudio } from "@/components/prisma/studio";
 import { Button } from "@/components/ui/button";
 import {
   applyRadiusPreset,
@@ -75,7 +75,7 @@ function StudioNewRouteComponent() {
           Mode: {mounted ? (resolvedTheme ?? "light") : "..."} | {themeValue} | {radiusValue}
         </span>
       </div>
-      <StudioScreen theme={studioTheme} />
+      <PrismaStudio theme={studioTheme} />
     </div>
   );
 }

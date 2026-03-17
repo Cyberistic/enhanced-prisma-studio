@@ -30,7 +30,7 @@ Utils depend on:
 
 amongst others.
 
-My app is built on Hugeicons, base-ui, tanstack router search params, D3.. and it has its own styling. Why do I have to depend on other component libraries and styling solutions just to use the studio? Why can't I use the same component library and styling solution for the studio as I do for the rest of my app? just let me use my stuff man. Studio should live under @components and use the same styling and components as the rest of the app, and I should be able to gut it and change whatver I want. The default install can stay the same, but community (or self-made) versions and patterns can exist. Eventually, a cli-command which just sees what you're using and tailors the install to your stack. *Yes, I blame shadcn for this, we're spoiled.*
+My app is built on Hugeicons, base-ui, tanstack router search params, D3.. and it has its own styling. Why do I have to depend on other component libraries and styling solutions just to use the studio? Why can't I use the same component library and styling solution for the studio as I do for the rest of my app? just let me use my stuff man. Studio should live under @components and use the same styling and components as the rest of the app, and I should be able to gut it and change whatver I want. I never use the react-flow viewer, my machete shall chop chop as it wishes. The default install can stay the same, but community (or self-made) versions and patterns can exist. Eventually, a cli-command which just sees what you're using and tailors the install to your stack. *Yes, I blame shadcn for this, we're spoiled.*
 
 Also, while it's true that tree-shaking is reducing the impact of these dependencies (for example, lucide-react (~3.0 MB) metafile shows only ~8 KB of Lucide code ends up in dist/ui/index.js), these extras quickly add up. Not only do they bloat the app and create UI inconsistencies, but also they reach size constraints of _some_ environments. In a recent project, Cloudflare workers had a hard limit of 3 MB for the entire app, and Prisma Studio alone taking around 1.1 MB.
 
@@ -43,6 +43,9 @@ THe goal of this project is to create an enhanced version of Prisma Studio with 
 https://www.npmjs.com/package/@prisma/studio-core
 
 [x] Main focus is to first, deminimize and reverse engineer the package codebase and then add features iteratively. Initial snapshot and findings are in `research/studio-core-snapshot/`.
+
+> [!Note]
+> Prisma CEO personally replied to me and said prisma-studio-core will be going open-source! So hopefully this step won't be needed later.
 
 Features include:
 [ ] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn and tailwind natively. 
