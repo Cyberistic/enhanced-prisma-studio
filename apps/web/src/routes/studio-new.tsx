@@ -15,6 +15,8 @@ import {
   parseThemeValue,
 } from "@/lib/studio-theme-randomizer";
 
+import "@enhanced-prisma-studio/studio-core/ui/index.css";
+
 export const Route = createFileRoute("/studio-new")({
   component: StudioNewRouteComponent,
 });
@@ -45,7 +47,7 @@ function StudioNewRouteComponent() {
   return (
     <div className="grid h-full min-h-0 grid-rows-[auto_1fr]">
       <div className="flex flex-wrap items-center gap-2 border-b border-border/70 bg-card/70 px-4 py-3">
-        <span className="text-sm font-medium text-foreground/80">Studio New Theme</span>
+        <h1 className="mr-3 text-xl font-semibold tracking-tight">Studio New (Enhanced)</h1>
         <select
           value={themeValue}
           onChange={(event) => setThemeValue(event.target.value)}

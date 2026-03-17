@@ -28,6 +28,7 @@ function HomeComponent() {
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight">Home</h1>
       <div className="grid gap-6">
         <Card>
           <CardHeader>

@@ -28,10 +28,10 @@ export default function Header() {
             Home
           </a>
           <a href="/studio" className="transition-colors hover:text-foreground/80">
-            Studio
+            Studio (Prisma)
           </a>
           <a href="/studio-new" className="transition-colors hover:text-foreground/80">
-            Studio New
+            Studio New (Enhanced)
           </a>
         </nav>
         <Button
