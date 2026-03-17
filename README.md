@@ -50,6 +50,7 @@ https://www.npmjs.com/package/@prisma/studio-core
 Features include:
 [x] Instead of importing .css file (which causes problems, for example prisma studio overwriting the theme of the host application), we want to support shadcn and tailwind natively. 
     - `/studio-new` now runs without importing `@enhanced-prisma-studio/studio-core/ui/index.css` and relies on host Tailwind/shadcn tokens.
+    - Prisma logo in Studio navigation now renders as inline SVG with `currentColor`, so it follows dark/light mode and active theme tokens.
 
 
 [ ] Use shadcn's components to build the ui, such that changing the styling affects the studio too.

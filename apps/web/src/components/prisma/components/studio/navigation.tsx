@@ -16,13 +16,33 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
-import PrismaLogo from "../../assets/prisma.svg";
 import { IconSearch, IconTable } from "@/components/prisma/icons";
 import { IntrospectionStatusNotice } from "./introspection-status-notice";
 import { useNavigationKeyboardNav } from "./hooks/use-navigation-keyboard-nav";
 import { useNavigationTableList } from "./hooks/use-navigation-table-list";
 import { useNavigationTableSearch } from "./hooks/use-navigation-table-search";
 import type { StudioView } from "./types";
+
+function PrismaLogo(props: { className?: string }) {
+  return (
+    <svg
+      width="12"
+      height="14"
+      viewBox="0 0 12 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={props.className}
+      aria-hidden="true"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M0.396923 8.8719C0.25789 9.09869 0.260041 9.38484 0.402469 9.60951L2.98037 13.6761C3.14768 13.94 3.47018 14.0603 3.76949 13.9705L11.2087 11.7388C11.6147 11.617 11.8189 11.1641 11.6415 10.7792L6.8592 0.405309C6.62598 -0.100601 5.92291 -0.142128 5.63176 0.332808L0.396923 8.8719ZM6.73214 2.77688C6.6305 2.54169 6.2863 2.57792 6.23585 2.82912L4.3947 11.9965C4.35588 12.1898 4.53686 12.3549 4.72578 12.2985L9.86568 10.7642C10.0157 10.7194 10.093 10.5537 10.0309 10.41L6.73214 2.77688Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
 
 type NavigationProps = {
   className?: string;
@@ -109,7 +129,7 @@ export function Navigation(props: NavigationProps) {
       >
       <SidebarHeader className="px-4 pt-4 pb-0.5">
         <div className="flex items-center gap-2">
-          <img src={PrismaLogo} alt="Prisma Logo" className="h-6 w-auto" />
+          <PrismaLogo className="h-6 w-auto text-foreground/90" />
           <span className="text-lg font-medium font-sans whitespace-nowrap">Prisma Studio</span>
         </div>
       </SidebarHeader>

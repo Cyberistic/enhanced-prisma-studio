@@ -14,7 +14,9 @@ export function StudioContent(props: {
   adapter: Adapter;
   isNavigationOpen: boolean;
   isIntrospecting?: boolean;
+  onPinnedColumnsChange: (columnNames: string[]) => void;
   onToggleNavigation: () => void;
+  pinnedColumns: string[];
   onSelectTable: (tableName: string) => void;
   onSelectView: (view: StudioView) => void;
   schemaTables?: IntrospectionResult["schemas"][string]["tables"];
@@ -27,9 +29,11 @@ export function StudioContent(props: {
     adapter,
     isNavigationOpen,
     isIntrospecting = false,
+    onPinnedColumnsChange,
     onSelectTable,
     onSelectView,
     onToggleNavigation,
+    pinnedColumns,
     schemaTables = {},
     schema,
     selectedView,
@@ -90,7 +94,9 @@ export function StudioContent(props: {
       adapter={adapter}
       isNavigationOpen={isNavigationOpen}
       isIntrospecting={isIntrospecting}
+      onPinnedColumnsChange={onPinnedColumnsChange}
       onToggleNavigation={onToggleNavigation}
+      pinnedColumns={pinnedColumns}
       schema={schema}
       table={table}
     />

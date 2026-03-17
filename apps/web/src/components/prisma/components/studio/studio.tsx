@@ -45,6 +45,7 @@ export function StudioShell(props: {
   const [schema, setSchema] = useState("main");
   const [table, setTable] = useState<string | null>(null);
   const [selectedView, setSelectedView] = useState<StudioView>("table");
+  const [pinnedColumns, setPinnedColumns] = useState<string[]>([]);
   const [introspection, setIntrospection] =
     useState<StudioIntrospectionResult | null>(null);
   const [introspectionError, setIntrospectionError] =
@@ -58,6 +59,7 @@ export function StudioShell(props: {
       setSchema(parsed.schemaParam);
       setTable(parsed.tableParam);
       setSelectedView(parsed.viewParam);
+      setPinnedColumns(parsed.pinnedColumnsParam);
     };
 
     applyFromHash();
@@ -140,6 +142,7 @@ export function StudioShell(props: {
 
   useEffect(() => {
     const nextHash = createStudioHash({
+      pinnedColumnsParam: pinnedColumns,
       schemaParam: schema,
       tableParam: table,
       viewParam: selectedView,
@@ -148,7 +151,7 @@ export function StudioShell(props: {
     if (window.location.hash !== nextHash) {
       window.location.hash = nextHash;
     }
-  }, [schema, selectedView, table]);
+  }, [pinnedColumns, schema, selectedView, table]);
 
   const schemas = useMemo(() => {
     const schemaNames = Object.keys(introspection?.schemas ?? {});
@@ -252,6 +255,8 @@ export function StudioShell(props: {
                   adapter={adapter}
                   isNavigationOpen={isNavigationOpen}
                   isIntrospecting={isIntrospecting}
+                  pinnedColumns={pinnedColumns}
+                  onPinnedColumnsChange={setPinnedColumns}
                   onSelectTable={setTable}
                   onToggleNavigation={() => setIsNavigationOpen((current) => !current)}
                   onSelectView={setSelectedView}

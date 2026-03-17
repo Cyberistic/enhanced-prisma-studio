@@ -1,5 +1,9 @@
-import type { Adapter } from "@enhanced-prisma-studio/studio-core/data";
+import type { Adapter, SortOrderItem } from "@enhanced-prisma-studio/studio-core/data";
 import {
+  Asterisk,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -7,6 +11,7 @@ import {
   ChevronsRight,
   Filter,
   KeyRound,
+  Pin,
   RefreshCw,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -46,6 +51,7 @@ type TableColumn = {
   key: string;
   label: string;
   type: string;
+  widthPx: number;
   widthClassName: string;
   isPrimary?: boolean;
   isRequired?: boolean;
@@ -53,13 +59,16 @@ type TableColumn = {
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100, 500] as const;
 const INFINITE_SCROLL_PAGE_SIZE = 500;
+const ROW_MARKER_COLUMN_WIDTH = 40;
 
 export function TableView(props: {
   activeTable: IntrospectedTable | null;
   adapter: Adapter;
   isNavigationOpen: boolean;
   isIntrospecting: boolean;
+  onPinnedColumnsChange: (columnNames: string[]) => void;
   onToggleNavigation: () => void;
+  pinnedColumns: string[];
   schema: string;
   table: string | null;
 }) {
@@ -68,7 +77,9 @@ export function TableView(props: {
     adapter,
     isNavigationOpen,
     isIntrospecting,
+    onPinnedColumnsChange,
     onToggleNavigation,
+    pinnedColumns,
     table,
   } = props;
   const activeTableName = activeTable?.name ?? table ?? "";
@@ -83,6 +94,11 @@ export function TableView(props: {
   const [totalRowCount, setTotalRowCount] = useState(0);
   const [rowsError, setRowsError] = useState<string | null>(null);
   const [isLoadingRows, setIsLoadingRows] = useState(false);
+  const [sortOrder, setSortOrder] = useState<SortOrderItem[]>([]);
+  const [selectedCell, setSelectedCell] = useState<{
+    columnKey: string;
+    rowIndex: number;
+  } | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
   const rowSearchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -91,22 +107,53 @@ export function TableView(props: {
       return [];
     }
 
-    return Object.values(activeTable.columns).map((column) => ({
-      key: column.name,
-      label: column.name,
-      type: column.datatype.name,
-      widthClassName: getColumnWidthClass(column.datatype.group, column.name),
-      isPrimary:
-        typeof column.pkPosition === "number" &&
-        Number.isFinite(column.pkPosition) &&
-        column.pkPosition > 0,
-      isRequired: column.isRequired && !column.nullable,
-    }));
+    return Object.values(activeTable.columns).map((column) => {
+      const widthSpec = getColumnWidthSpec(column.datatype.group, column.name);
+
+      return {
+        key: column.name,
+        label: column.name,
+        type: column.datatype.name,
+        widthClassName: widthSpec.className,
+        widthPx: widthSpec.widthPx,
+        isPrimary:
+          typeof column.pkPosition === "number" &&
+          Number.isFinite(column.pkPosition) &&
+          column.pkPosition > 0,
+        isRequired: column.isRequired && !column.nullable,
+      };
+    });
   }, [activeTable]);
 
   const primaryColumnNames = useMemo(() => {
     return columns.filter((column) => column.isPrimary).map((column) => column.key);
   }, [columns]);
+
+  const orderedColumns = useMemo(() => {
+    if (pinnedColumns.length === 0) {
+      return columns;
+    }
+
+    const pinned = columns.filter((column) => pinnedColumns.includes(column.key));
+    const unpinned = columns.filter((column) => !pinnedColumns.includes(column.key));
+    return [...pinned, ...unpinned];
+  }, [columns, pinnedColumns]);
+
+  const pinnedColumnLeftOffsets = useMemo(() => {
+    const offsets = new Map<string, number>();
+    let runningLeft = ROW_MARKER_COLUMN_WIDTH;
+
+    for (const column of orderedColumns) {
+      if (!pinnedColumns.includes(column.key)) {
+        continue;
+      }
+
+      offsets.set(column.key, runningLeft);
+      runningLeft += column.widthPx;
+    }
+
+    return offsets;
+  }, [orderedColumns, pinnedColumns]);
 
   const querySearchTerm = searchInput.trim();
   const queryPageIndex = isInfiniteScrollEnabled ? 0 : pageIndex;
@@ -148,7 +195,7 @@ export function TableView(props: {
             querySearchTerm.length > 0 ? querySearchTerm : undefined,
           pageIndex: queryPageIndex,
           pageSize: queryPageSize,
-          sortOrder: [],
+          sortOrder,
           table: activeTable,
         },
         { abortSignal: abortController.signal },
@@ -195,6 +242,7 @@ export function TableView(props: {
     queryPageSize,
     querySearchTerm,
     refreshTick,
+    sortOrder,
   ]);
 
   const pageCount = useMemo(() => {
@@ -227,6 +275,53 @@ export function TableView(props: {
     setPageIndex(0);
     setPageDraft("1");
   }, [activeTableName, querySearchTerm]);
+
+  useEffect(() => {
+    setPageIndex(0);
+    setPageDraft("1");
+  }, [sortOrder]);
+
+  function getColumnSortDirection(columnKey: string) {
+    return sortOrder.find((item) => item.column === columnKey)?.direction;
+  }
+
+  function toggleColumnSort(columnKey: string) {
+    setSortOrder((currentSortOrder) => {
+      const currentDirection = currentSortOrder.find(
+        (item) => item.column === columnKey,
+      )?.direction;
+
+      if (!currentDirection) {
+        return [{ column: columnKey, direction: "asc" }];
+      }
+
+      if (currentDirection === "asc") {
+        return [{ column: columnKey, direction: "desc" }];
+      }
+
+      return [];
+    });
+  }
+
+  function isColumnPinned(columnKey: string) {
+    return pinnedColumns.includes(columnKey);
+  }
+
+  function toggleColumnPin(columnKey: string) {
+    onPinnedColumnsChange((() => {
+      const current = pinnedColumns;
+
+      if (current.includes(columnKey)) {
+        return current.filter((key) => key !== columnKey);
+      }
+
+      return [columnKey, ...current];
+    })());
+  }
+
+  function isCellSelected(rowIndex: number, columnKey: string) {
+    return selectedCell?.rowIndex === rowIndex && selectedCell.columnKey === columnKey;
+  }
 
   function commitPageDraft(draftValue = pageDraft) {
     if (shouldDisablePageControls) {
@@ -365,28 +460,92 @@ export function TableView(props: {
       <div className="flex-1 min-h-0 overflow-hidden border-t border-border/70">
         <div className="grid h-full min-h-0 grid-rows-[1fr_auto]">
           <div className="min-h-0 overflow-auto **:data-[slot=table-container]:h-full **:data-[slot=table]:h-full **:data-[slot=table-body]:h-full">
-            <Table className="table-fixed h-full">
+            <Table className="table-auto h-full min-w-max">
               <TableHeader className="sticky top-0 z-10 bg-card">
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="w-10 border-r border-border/70 bg-muted/20" />
-                  {columns.map((column) => (
+                  {orderedColumns.map((column) => (
                     <TableHead
                       key={column.key}
                       className={cn(
-                        "h-10 border-r border-border/70 px-3 align-middle font-medium whitespace-nowrap",
+                        "group relative h-10 min-w-40 border-r border-border/70 px-3 align-middle font-medium whitespace-nowrap",
+                        isColumnPinned(column.key) &&
+                          "sticky z-30 bg-card shadow-[1px_0_0_0_hsl(var(--border))]",
                         column.widthClassName,
                       )}
+                      style={
+                        isColumnPinned(column.key)
+                          ? { left: `${pinnedColumnLeftOffsets.get(column.key) ?? ROW_MARKER_COLUMN_WIDTH}px` }
+                          : undefined
+                      }
                     >
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex min-w-0 items-center gap-1.5 pr-18">
                         {column.isPrimary ? (
-                          <KeyRound size={12} className="text-amber-500" />
+                          <KeyRound size={12} className="shrink-0 text-amber-500" />
                         ) : null}
                         {column.isRequired ? (
-                          <span className="text-xs font-semibold text-red-500">*</span>
+                          <Asterisk size={12} className="shrink-0 text-red-500" />
                         ) : null}
-                        <span className="font-mono text-[13px] text-foreground">{column.label}</span>
-                        <span className="text-xs text-muted-foreground">{column.type}</span>
+                        <span className="min-w-0 truncate font-mono text-[13px] text-foreground">
+                          {column.label}
+                        </span>
+                        <span className="truncate text-[13px] text-muted-foreground/80">{column.type}</span>
                       </div>
+                      <span
+                        className={cn(
+                          "absolute right-1 top-1/2 z-10 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-full border border-border bg-background/95 p-1 shadow-sm transition-opacity",
+                          isColumnPinned(column.key) || getColumnSortDirection(column.key)
+                            ? "opacity-100 pointer-events-auto"
+                            : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto",
+                        )}
+                      >
+                        <button
+                          type="button"
+                          aria-label={isColumnPinned(column.key) ? "Unpin column" : "Pin column"}
+                          className={cn(
+                            "inline-flex size-5 items-center justify-center rounded-full",
+                            isColumnPinned(column.key)
+                              ? "bg-muted text-foreground"
+                              : "text-muted-foreground/70 hover:text-foreground",
+                          )}
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                          }}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleColumnPin(column.key);
+                          }}
+                        >
+                          <Pin size={12} />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label="Toggle sort order"
+                          className={cn(
+                            "inline-flex size-5 items-center justify-center rounded-full",
+                            getColumnSortDirection(column.key)
+                              ? "bg-muted text-foreground"
+                              : "text-muted-foreground/70 hover:text-foreground",
+                          )}
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                          }}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleColumnSort(column.key);
+                          }}
+                        >
+                          {getColumnSortDirection(column.key) === "asc" ? (
+                            <ArrowUp size={12} />
+                          ) : getColumnSortDirection(column.key) === "desc" ? (
+                            <ArrowDown size={12} />
+                          ) : (
+                            <ArrowUpDown size={12} />
+                          )}
+                        </button>
+                      </span>
                     </TableHead>
                   ))}
                 </TableRow>
@@ -419,17 +578,29 @@ export function TableView(props: {
                         key={getRowKey(row, rowIndex, primaryColumnNames)}
                         className="hover:bg-transparent"
                       >
-                        <TableCell className="h-10 w-10 border-r border-border/70 bg-muted/20 px-0" />
-                        {columns.map((column) => (
+                        <TableCell className="sticky left-0 z-20 h-10 w-10 border-r border-border/70 bg-muted/20 px-0" />
+                        {orderedColumns.map((column) => (
                           <TableCell
                             key={column.key}
                             className={cn(
-                              "h-10 border-r border-border/70 px-3 font-mono text-[13px] text-foreground/95",
+                              "h-10 min-w-40 border-r border-border/70 px-3 font-mono text-[13px] text-foreground/95",
+                              isColumnPinned(column.key) &&
+                                "sticky z-10 bg-background shadow-[1px_0_0_0_hsl(var(--border))]",
                               column.widthClassName,
                               rowIndex === 0 && column.isPrimary && "outline-1 outline-sky-400/70 -outline-offset-1",
+                              isCellSelected(rowIndex, column.key) &&
+                                "bg-accent/40 outline-2 outline-primary -outline-offset-2",
                             )}
+                            style={
+                              isColumnPinned(column.key)
+                                ? { left: `${pinnedColumnLeftOffsets.get(column.key) ?? ROW_MARKER_COLUMN_WIDTH}px` }
+                                : undefined
+                            }
+                            onClick={() => setSelectedCell({ rowIndex, columnKey: column.key })}
                           >
-                            {formatCellValue(row[column.key])}
+                            <span className="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                              {formatCellValue(row[column.key])}
+                            </span>
                           </TableCell>
                         ))}
                       </TableRow>
@@ -625,30 +796,30 @@ export function TableView(props: {
   );
 }
 
-function getColumnWidthClass(typeGroup: string | undefined, columnName: string) {
+function getColumnWidthSpec(typeGroup: string | undefined, columnName: string) {
   const normalizedColumnName = columnName.toLowerCase();
 
   if (normalizedColumnName === "id") {
-    return "w-[340px]";
+    return { className: "min-w-[340px]", widthPx: 340 };
   }
 
   if (typeGroup === "boolean") {
-    return "w-[160px]";
+    return { className: "min-w-[160px]", widthPx: 160 };
   }
 
   if (typeGroup === "datetime" || typeGroup === "time") {
-    return "w-[300px]";
+    return { className: "min-w-[300px]", widthPx: 300 };
   }
 
   if (typeGroup === "numeric") {
-    return "w-[220px]";
+    return { className: "min-w-[220px]", widthPx: 220 };
   }
 
   if (typeGroup === "json") {
-    return "w-[420px]";
+    return { className: "min-w-[420px]", widthPx: 420 };
   }
 
-  return "w-[360px]";
+  return { className: "min-w-[360px]", widthPx: 360 };
 }
 
 function parseRowCount(value: unknown, fallback: number) {
