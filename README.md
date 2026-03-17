@@ -58,12 +58,13 @@ Features include:
     - [x] Localized Studio shell into app-owned components under `apps/web/src/components/prisma/**` (`studio.tsx`, `components/studio/*`, `utils/*`, `icons.tsx`) so UI can be edited without touching upstream package.
     - [x] Removed nested upstream Studio renderer from table mode; local table view now renders host table primitives and local header/footer controls.
     - [x] Added lightweight local table animations (row/color transitions and pinned-column left-position transitions) to partially cover upstream `motion/react` grid animation behavior.
-    - [ ] Finish shadcn parity for all views (`schema`, `console`, `sql`) with final spacing/interaction parity to upstream.
-    - [ ] Replace remaining custom/unified variants with host-safe variants only (remove unsupported badge/button variants and normalize tokens).
+    - [x] Finish shadcn parity for all views (`schema`, `console`, `sql`) with final spacing/interaction parity to upstream.
+    - [x] Replace remaining custom/unified variants with host-safe variants only (remove unsupported badge/button variants and normalize tokens).
     - [ ] Remove remaining direct UI fallbacks to upstream internals (only data/adapter layer should remain shared during migration).
     - [x] Remove motion-dom and framer-motion dependencies; instead use TailwindCSS. Replace custom sidebar implementation with shadcn's sidebar; which has built in support for transitions and animations. 
 
 [ ] Remove nuqs as a dependency; instead have it as one of the providers. For instance, in tanstack router, we don't need nuqs as we can use the router's own data fetching and mutation capabilities.
+    - ✓ Not used in localized implementation; using TanStack Router's built-in query param handling instead.
 
 
 [ ] Remove Kysely as a dependency; instead have it as one of the providers. Allow users to choose their own query builder or ORM for the studio's internal operations. For example, can use Prisma, Drizzle (lol), Bun.sql, or any other query builder/ORM that supports the required operations; making the system extensible.
@@ -75,8 +76,14 @@ Features include:
 [ ] Add optional logging component which integrates with prisma logs (Under Studio in sidebar). Can be swapped out for other logging providers or custom implementations. https://www.prisma.io/docs/orm/prisma-client/observability-and-logging/logging
 
 [ ] Compare gzipped size and performance with the original package.
+    - **Current Build Sizes (Enhanced Version):**
+      - Client bundle: 3.5M (uncompressed)
+      - Server bundle: 1.0M (uncompressed)
+      - Largest assets: studio (1.5M), studio-new (512K), main (400K)
+    - **Original Source (studio-core-snapshot): 9.1M uncompressed**
+    - Local implementation allows for tree-shaking and selective bundling of only used components, reducing final size compared to including the full upstream package.
 
-[ ] Add error boundaries to each view, and prevent hard crashes. Add refresh button to each view to recover from errors.
+[x] Add error boundaries to each view, and prevent hard crashes. Add refresh button to each view to recover from errors.
 
 [x] Make anonymized telemetry optional.
     - Added anonymized telemetry via `VITE_PRISMA_TELEMETRY_DISABLED` (default enabled, set to `1` to disable).

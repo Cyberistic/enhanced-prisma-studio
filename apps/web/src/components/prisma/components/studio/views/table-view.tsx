@@ -51,6 +51,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
+import { ErrorBoundary } from "../../error-boundary";
 import { StudioHeader } from "../studio-header";
 
 type IntrospectionResult = Exclude<
@@ -566,7 +567,8 @@ export function TableView(props: {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
+    <ErrorBoundary>
+      <div className="flex h-full min-h-0 flex-col bg-background">
       <StudioHeader
         endContent={
           <Button
@@ -1115,7 +1117,8 @@ export function TableView(props: {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
 

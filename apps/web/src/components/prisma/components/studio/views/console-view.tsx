@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
+import { ErrorBoundary } from "../../error-boundary";
 import { StudioHeader } from "../studio-header";
 import type { StudioOperationEvent } from "../types";
 
@@ -141,8 +142,9 @@ export function ConsoleView(props: {
   }, [operationEvents]);
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
-      <StudioHeader isNavigationOpen={isNavigationOpen} onToggleNavigation={onToggleNavigation}>
+    <ErrorBoundary>
+      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
+        <StudioHeader isNavigationOpen={isNavigationOpen} onToggleNavigation={onToggleNavigation}>
         <div className="text-xs text-muted-foreground">
           Operation Console · <span className="font-mono text-foreground/80">{schema}</span>
           <span className="mx-1 text-foreground/40">/</span>
@@ -170,5 +172,6 @@ export function ConsoleView(props: {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

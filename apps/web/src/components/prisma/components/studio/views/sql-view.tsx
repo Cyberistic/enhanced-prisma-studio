@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 
+import { ErrorBoundary } from "../../error-boundary";
 import { StudioHeader } from "../studio-header";
 import type { StudioOperationEvent } from "../types";
 
@@ -200,10 +201,11 @@ export function SqlView(props: {
   }
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
-      <StudioHeader
-        isNavigationOpen={isNavigationOpen}
-        onToggleNavigation={onToggleNavigation}
+    <ErrorBoundary>
+      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
+        <StudioHeader
+          isNavigationOpen={isNavigationOpen}
+          onToggleNavigation={onToggleNavigation}
         endContent={
           <Button
             disabled={!isRunning && sqlText.trim().length === 0}
@@ -314,5 +316,6 @@ export function SqlView(props: {
         </div>
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

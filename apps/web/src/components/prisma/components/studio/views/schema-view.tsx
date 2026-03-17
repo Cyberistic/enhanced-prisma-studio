@@ -1,8 +1,9 @@
 import type { Adapter } from "@enhanced-prisma-studio/studio-core/data";
 import { KeyRound } from "lucide-react";
-import { Component, type ErrorInfo, useMemo } from "react";
+import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { ErrorBoundary } from "../../error-boundary";
 import { StudioHeader } from "../studio-header";
 import {
   SchemaVisualizer,
@@ -13,34 +14,6 @@ import {
 type IntrospectionResult = Exclude<Awaited<ReturnType<Adapter["introspect"]>>[1], undefined>;
 
 type SchemaTables = IntrospectionResult["schemas"][string]["tables"] | null | undefined;
-
-type VisualizerBoundaryState = {
-  hasError: boolean;
-};
-
-class VisualizerBoundary extends Component<{ children: React.ReactNode }, VisualizerBoundaryState> {
-  state: VisualizerBoundaryState = { hasError: false };
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: unknown, errorInfo: ErrorInfo) {
-    console.error("Schema visualizer failed to render", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="flex h-full min-h-0 w-full items-center justify-center border border-dashed border-border bg-muted/20 p-6 text-sm text-muted-foreground">
-          Schema visualizer failed to render. Try refreshing introspection or selecting another table.
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 function toVisualizerTables(schemaTables: SchemaTables): VisualizerTable[] {
   const tables = schemaTables ?? {};
@@ -184,13 +157,13 @@ export function SchemaView(props: {
             </div>
           </div>
         ) : (
-          <VisualizerBoundary>
+          <ErrorBoundary>
             <SchemaVisualizer
               tables={tables}
               relationships={relationships}
               onOpenTable={(tableName) => onSelectTableView(tableName)}
             />
-          </VisualizerBoundary>
+          </ErrorBoundary>
         )}
       </div>
     </div>
