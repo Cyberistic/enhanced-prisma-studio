@@ -18,10 +18,7 @@ interface MatchRange {
 const DATETIME_HIGHLIGHT_TERM_PATTERN =
   /^(\d{4}-\d{2}-\d{2})([Tt ]?)([01]\d|2[0-3])((?::[0-5]\d(?::[0-5]\d(?:\.\d{1,6})?)?)?)([Zz]?)$/;
 
-export function getSearchMatchSegments(
-  text: string,
-  searchTerm?: string,
-): SearchMatchSegment[] {
+export function getSearchMatchSegments(text: string, searchTerm?: string): SearchMatchSegment[] {
   const normalizedSearchTerm = searchTerm?.trim() ?? "";
 
   if (normalizedSearchTerm.length === 0 || text.length === 0) {
@@ -69,10 +66,7 @@ function getMatchRanges(text: string, searchTerm: string): MatchRange[] {
   return ranges;
 }
 
-function rangesToSegments(
-  text: string,
-  ranges: MatchRange[],
-): SearchMatchSegment[] {
+function rangesToSegments(text: string, ranges: MatchRange[]): SearchMatchSegment[] {
   if (ranges.length === 0) {
     return [{ isMatch: false, text }];
   }

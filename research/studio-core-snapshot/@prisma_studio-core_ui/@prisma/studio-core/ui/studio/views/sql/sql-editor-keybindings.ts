@@ -1,8 +1,6 @@
 import type { KeyBinding } from "@codemirror/view";
 
-export function createSqlEditorKeybindings(args: {
-  runSql: () => void;
-}): readonly KeyBinding[] {
+export function createSqlEditorKeybindings(args: { runSql: () => void }): readonly KeyBinding[] {
   const { runSql } = args;
 
   return [

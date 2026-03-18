@@ -16,13 +16,7 @@ export interface HeaderProps<TData> {
 }
 
 export function DataGridHeader<TData>(props: HeaderProps<TData>) {
-  const {
-    column,
-    header,
-    className,
-    isSortDisabled = false,
-    onBlockedSortInteraction,
-  } = props;
+  const { column, header, className, isSortDisabled = false, onBlockedSortInteraction } = props;
   const isPinned = header.column.getIsPinned() !== false;
   const sortedState = header.column.getIsSorted();
   const isSorted = sortedState !== false;
@@ -109,9 +103,7 @@ export function DataGridHeader<TData>(props: HeaderProps<TData>) {
             onMouseDown={(event) => event.stopPropagation()}
             className={cn(
               "flex h-5 w-5 items-center justify-center rounded-full transition-colors",
-              isPinned
-                ? "text-foreground"
-                : "text-muted-foreground/70 hover:text-foreground",
+              isPinned ? "text-foreground" : "text-muted-foreground/70 hover:text-foreground",
             )}
           >
             <Pin size={12} />
@@ -122,11 +114,7 @@ export function DataGridHeader<TData>(props: HeaderProps<TData>) {
             type="button"
             aria-disabled={isSortDisabled || undefined}
             aria-label={
-              isSortAsc
-                ? "Sort descending"
-                : isSortDesc
-                  ? "Clear sorting"
-                  : "Sort ascending"
+              isSortAsc ? "Sort descending" : isSortDesc ? "Clear sorting" : "Sort ascending"
             }
             onClick={(event) => {
               event.stopPropagation();
@@ -136,9 +124,7 @@ export function DataGridHeader<TData>(props: HeaderProps<TData>) {
             className={cn(
               "flex h-5 w-5 items-center justify-center rounded-full transition-colors",
               isSortDisabled && "opacity-60",
-              isSorted
-                ? "text-foreground"
-                : "text-muted-foreground/70 hover:text-foreground",
+              isSorted ? "text-foreground" : "text-muted-foreground/70 hover:text-foreground",
             )}
           >
             {isSortDesc ? <ArrowDown size={12} /> : <ArrowUp size={12} />}

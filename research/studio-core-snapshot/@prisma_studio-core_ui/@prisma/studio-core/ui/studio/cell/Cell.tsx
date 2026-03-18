@@ -1,18 +1,11 @@
-import {
-  type CSSProperties,
-  DetailedHTMLProps,
-  forwardRef,
-  type PropsWithChildren,
-} from "react";
+import { type CSSProperties, DetailedHTMLProps, forwardRef, type PropsWithChildren } from "react";
 
 import { TableCell } from "../../components/ui/table";
 import { cn } from "../../lib/utils";
 import { DataGridCellContextMenu } from "../grid/DataGridCellContextMenu";
 
 export interface CellProps
-  extends
-    PropsWithChildren,
-    DetailedHTMLProps<React.HTMLAttributes<unknown>, unknown> {
+  extends PropsWithChildren, DetailedHTMLProps<React.HTMLAttributes<unknown>, unknown> {
   [key: `data-${string}`]: boolean | number | string | undefined;
   className?: string;
   contentClassName?: string;
@@ -57,9 +50,7 @@ export const Cell = forwardRef((props: CellProps, ref) => {
   } = props;
 
   const cellContent = withContextMenu ? (
-    <DataGridCellContextMenu copyText={contextMenuCopyText}>
-      {children}
-    </DataGridCellContextMenu>
+    <DataGridCellContextMenu copyText={contextMenuCopyText}>{children}</DataGridCellContextMenu>
   ) : (
     children
   );
@@ -77,10 +68,7 @@ export const Cell = forwardRef((props: CellProps, ref) => {
       ref={ref as never}
       style={style}
     >
-      <div
-        data-studio-cell-content
-        className={cn(defaultCellContentClassName, contentClassName)}
-      >
+      <div data-studio-cell-content className={cn(defaultCellContentClassName, contentClassName)}>
         {cellContent}
       </div>
     </TableCell>

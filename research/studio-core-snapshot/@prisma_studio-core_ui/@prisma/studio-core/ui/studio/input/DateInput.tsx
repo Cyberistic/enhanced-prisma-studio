@@ -49,15 +49,7 @@ function getLocalUtcOffsetLabel(date: Date = new Date()): string {
 }
 
 export function DateInput(props: DateInputProps) {
-  const {
-    column,
-    context,
-    onNavigate,
-    onSubmit,
-    readonly,
-    showSaveAction,
-    value,
-  } = props;
+  const { column, context, onNavigate, onSubmit, readonly, showSaveAction, value } = props;
   const { datatype, defaultValue, fkColumn, isRequired } = column;
   const { format, group } = datatype;
 
@@ -66,11 +58,7 @@ export function DateInput(props: DateInputProps) {
   }
 
   const valueAsString =
-    value == null
-      ? isRequired && !fkColumn
-        ? getDate0(format)
-        : ""
-      : String(value);
+    value == null ? (isRequired && !fkColumn ? getDate0(format) : "") : String(value);
 
   const emptyValue =
     context === "insert" && defaultValue != null
@@ -244,18 +232,9 @@ export function DateInput(props: DateInputProps) {
       .set("year", newDateParts.year ?? baseDate.year())
       .set("month", newDateParts.month ?? baseDate.month()) // month is 0-indexed for dayjs
       .set("date", newDateParts.day ?? baseDate.date())
-      .set(
-        "hour",
-        newDateParts.hour ?? (hasTimePrecision ? baseDate.hour() : 0),
-      )
-      .set(
-        "minute",
-        newDateParts.minute ?? (hasTimePrecision ? baseDate.minute() : 0),
-      )
-      .set(
-        "second",
-        newDateParts.second ?? (hasTimePrecision ? baseDate.second() : 0),
-      );
+      .set("hour", newDateParts.hour ?? (hasTimePrecision ? baseDate.hour() : 0))
+      .set("minute", newDateParts.minute ?? (hasTimePrecision ? baseDate.minute() : 0))
+      .set("second", newDateParts.second ?? (hasTimePrecision ? baseDate.second() : 0));
 
     setSelectedDate(newDate.toDate());
     // setCurrentMonth should only be updated if year or month changes, not just time
@@ -265,11 +244,9 @@ export function DateInput(props: DateInputProps) {
 
     setValue(newDate.format(format));
 
-    if (newDateParts.year !== undefined)
-      setYearValue(String(newDateParts.year));
+    if (newDateParts.year !== undefined) setYearValue(String(newDateParts.year));
     if (hasTimePrecision) {
-      if (newDateParts.hour !== undefined)
-        setHourValue(String(newDateParts.hour).padStart(2, "0"));
+      if (newDateParts.hour !== undefined) setHourValue(String(newDateParts.hour).padStart(2, "0"));
       if (newDateParts.minute !== undefined)
         setMinuteValue(String(newDateParts.minute).padStart(2, "0"));
       if (newDateParts.second !== undefined)
@@ -284,19 +261,13 @@ export function DateInput(props: DateInputProps) {
 
     const newYear = Number(newYearStr);
 
-    if (
-      newYear >= MIN_JS_DATE.getFullYear() &&
-      newYear <= MAX_JS_DATE.getFullYear()
-    ) {
+    if (newYear >= MIN_JS_DATE.getFullYear() && newYear <= MAX_JS_DATE.getFullYear()) {
       updateDateFromInputs({ year: newYear });
     }
   };
 
   // TODO: simplify this function
-  const handleTimeChange = (
-    part: "hour" | "minute" | "second",
-    value: string,
-  ) => {
+  const handleTimeChange = (part: "hour" | "minute" | "second", value: string) => {
     const numericValue = parseInt(value);
     if (isNaN(numericValue)) return;
 
@@ -310,20 +281,11 @@ export function DateInput(props: DateInputProps) {
 
     // Update only if the value is a complete number for that part
     const isCompleteHour =
-      part === "hour" &&
-      value.length >= 1 &&
-      numericValue >= 0 &&
-      numericValue <= 23;
+      part === "hour" && value.length >= 1 && numericValue >= 0 && numericValue <= 23;
     const isCompleteMinute =
-      part === "minute" &&
-      value.length >= 1 &&
-      numericValue >= 0 &&
-      numericValue <= 59;
+      part === "minute" && value.length >= 1 && numericValue >= 0 && numericValue <= 59;
     const isCompleteSecond =
-      part === "second" &&
-      value.length >= 1 &&
-      numericValue >= 0 &&
-      numericValue <= 59;
+      part === "second" && value.length >= 1 && numericValue >= 0 && numericValue <= 59;
 
     if (
       (part === "hour" && isCompleteHour) ||
@@ -379,9 +341,7 @@ export function DateInput(props: DateInputProps) {
       <div className="flex flex-col gap-0 p-2 border-t border-table-border">
         <div className="flex items-center justify-between mb-1 gap-2">
           <Select
-            onValueChange={(value) =>
-              updateDateFromInputs({ month: parseInt(value) })
-            }
+            onValueChange={(value) => updateDateFromInputs({ month: parseInt(value) })}
             value={currentMonthValue}
           >
             <SelectTrigger className="text-xs data-[state=open]:border-primary shadow-none">

@@ -18,11 +18,7 @@ export function buildCellSelectionExportTable(args: {
   const selectedColumnIds: string[] = [];
   const selectedRows: string[][] = [];
 
-  for (
-    let columnIndex = range.columnStart;
-    columnIndex <= range.columnEnd;
-    columnIndex++
-  ) {
+  for (let columnIndex = range.columnStart; columnIndex <= range.columnEnd; columnIndex++) {
     const columnId = columnIds[columnIndex];
 
     if (!columnId) {
@@ -47,9 +43,7 @@ export function buildCellSelectionExportTable(args: {
     }
 
     selectedRows.push(
-      selectedColumnIds.map((columnId) =>
-        stringifySelectionExportValue(row[columnId]),
-      ),
+      selectedColumnIds.map((columnId) => stringifySelectionExportValue(row[columnId])),
     );
   }
 
@@ -79,9 +73,7 @@ export function buildRowSelectionExportTable(args: {
 
       return typeof rowId === "string" && rowSelectionState[rowId] === true;
     })
-    .map((row) =>
-      columnIds.map((columnId) => stringifySelectionExportValue(row[columnId])),
-    );
+    .map((row) => columnIds.map((columnId) => stringifySelectionExportValue(row[columnId])));
 
   return {
     columnIds: [...columnIds],
@@ -125,10 +117,7 @@ export function downloadSelectionExport(args: {
   const { content, filename, format } = args;
 
   const blob = new Blob([content], {
-    type:
-      format === "csv"
-        ? "text/csv;charset=utf-8"
-        : "text/markdown;charset=utf-8",
+    type: format === "csv" ? "text/csv;charset=utf-8" : "text/markdown;charset=utf-8",
   });
   const objectUrl = URL.createObjectURL(blob);
   const link = document.createElement("a");

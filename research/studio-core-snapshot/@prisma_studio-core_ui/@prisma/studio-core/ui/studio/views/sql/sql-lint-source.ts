@@ -18,10 +18,7 @@ interface LintState {
   requestId: number;
 }
 
-export function createSqlLintSource(args: {
-  lintSql: SqlLintRunner;
-  schemaVersion?: string;
-}): {
+export function createSqlLintSource(args: { lintSql: SqlLintRunner; schemaVersion?: string }): {
   dispose: () => void;
   source: LintSource;
 } {
@@ -70,9 +67,7 @@ export function createSqlLintSource(args: {
       ];
     }
 
-    return result.diagnostics.map((diagnostic) =>
-      clampDiagnostic(diagnostic, sql.length),
-    );
+    return result.diagnostics.map((diagnostic) => clampDiagnostic(diagnostic, sql.length));
   };
 
   return {
@@ -84,10 +79,7 @@ export function createSqlLintSource(args: {
   };
 }
 
-function clampDiagnostic(
-  diagnostic: AdapterSqlLintDiagnostic,
-  sqlLength: number,
-): Diagnostic {
+function clampDiagnostic(diagnostic: AdapterSqlLintDiagnostic, sqlLength: number): Diagnostic {
   if (sqlLength <= 0) {
     return {
       ...diagnostic,

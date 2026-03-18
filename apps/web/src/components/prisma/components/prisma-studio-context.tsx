@@ -11,9 +11,7 @@ export function PrismaStudioThemeProvider(props: {
   const { children, theme } = props;
 
   return (
-    <PrismaStudioThemeContext.Provider value={theme}>
-      {children}
-    </PrismaStudioThemeContext.Provider>
+    <PrismaStudioThemeContext.Provider value={theme}>{children}</PrismaStudioThemeContext.Provider>
   );
 }
 

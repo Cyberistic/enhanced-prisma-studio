@@ -91,14 +91,8 @@ export function Navigation(props: NavigationProps) {
     selectedView,
     tableNames = [],
   } = props;
-  const {
-    closeSearch,
-    isSearchOpen,
-    openSearch,
-    searchInputRef,
-    searchTerm,
-    setSearchTerm,
-  } = useNavigationTableSearch({ onOpenSearch });
+  const { closeSearch, isSearchOpen, openSearch, searchInputRef, searchTerm, setSearchTerm } =
+    useNavigationTableSearch({ onOpenSearch });
 
   const { isSearchActive, tables } = useNavigationTableList({
     schema,
@@ -108,12 +102,15 @@ export function Navigation(props: NavigationProps) {
 
   const hasStartupIntrospectionFailure =
     showStartupIntrospectionNotice && introspectionError != null && tableNames.length === 0;
-  const hasRecoverableIntrospectionWarning =
-    introspectionError != null && tableNames.length > 0;
+  const hasRecoverableIntrospectionWarning = introspectionError != null && tableNames.length > 0;
   const normalizedSections = sectionDefinitions
     .map((sectionDefinition) => {
-      const tableViews = sectionDefinition.views.filter((viewDefinition) => viewDefinition.id === "table");
-      const nonTableViews = sectionDefinition.views.filter((viewDefinition) => viewDefinition.id !== "table");
+      const tableViews = sectionDefinition.views.filter(
+        (viewDefinition) => viewDefinition.id === "table",
+      );
+      const nonTableViews = sectionDefinition.views.filter(
+        (viewDefinition) => viewDefinition.id !== "table",
+      );
 
       return {
         hasTableView: tableViews.length > 0,
@@ -129,24 +126,23 @@ export function Navigation(props: NavigationProps) {
     closeSearch();
   }
 
-  const { highlightedTableIndex, onSearchKeyDown, onTableMouseEnter } =
-    useNavigationKeyboardNav({
-      activeTable,
-      isSearchOpen,
-      onCloseSearch: closeSearch,
-      onSelectTable: selectTable,
-      tables,
-    });
+  const { highlightedTableIndex, onSearchKeyDown, onTableMouseEnter } = useNavigationKeyboardNav({
+    activeTable,
+    isSearchOpen,
+    onCloseSearch: closeSearch,
+    onSelectTable: selectTable,
+    tables,
+  });
 
   return (
-      <Sidebar
-        collapsible="offcanvas"
-        variant="sidebar"
-        className={cn(
-          "rounded-l-lg border-r border-border bg-background md:absolute! md:inset-y-0! md:h-full! md:max-h-full!",
-          className,
-        )}
-      >
+    <Sidebar
+      collapsible="offcanvas"
+      variant="sidebar"
+      className={cn(
+        "rounded-l-lg border-r border-border bg-background md:absolute! md:inset-y-0! md:h-full! md:max-h-full!",
+        className,
+      )}
+    >
       <SidebarHeader className="px-4 pt-4 pb-0.5">
         <div className="flex items-center gap-2">
           <PrismaLogo className="h-6 w-auto text-foreground/90" />
@@ -155,200 +151,209 @@ export function Navigation(props: NavigationProps) {
       </SidebarHeader>
 
       <SidebarContent>
-      <SidebarGroup className="px-4 pt-4 pb-2">
+        <SidebarGroup className="px-4 pt-4 pb-2">
+          <Select
+            value={schema}
+            onValueChange={(nextSchema) => {
+              if (!nextSchema) {
+                return;
+              }
 
-        <Select
-          value={schema}
-          onValueChange={(nextSchema) => {
-            if (!nextSchema) {
-              return;
-            }
-
-            onSchemaChange(nextSchema);
-          }}
-        >
-          <SelectTrigger className="w-full text-xs" size="sm">
-            <SelectValue placeholder="Select schema" />
-          </SelectTrigger>
-          <SelectContent>
-            {schemas.map((schemaName) => (
-              <SelectItem key={schemaName} value={schemaName} className="text-xs">
-                {schemaName}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </SidebarGroup>
-
-      {normalizedSections.map(({ hasTableView, nonTableViews, sectionDefinition }) => {
-      const sectionHeaderNode = sectionDefinition.header;
-      const sectionHeaderType =
-        isValidElement(sectionHeaderNode)
-          ? (sectionHeaderNode.type as HeaderWithSearchHandlerType)
-          : null;
-      const headerHandlesSearch = Boolean(sectionHeaderType?.__studioHandlesSearch);
-      const renderedSectionHeader =
-        isValidElement(sectionHeaderNode)
-          ? cloneElement(sectionHeaderNode as ReactElement<{ onSearch?: () => void }>, {
-              onSearch: openSearch,
-            })
-          : sectionHeaderNode;
-
-      return (
-      <Fragment key={sectionDefinition.id}>
-      {nonTableViews.length > 0 ? (
-      <SidebarGroup className="px-2 pb-3">
-        <div className="flex items-center gap-1 pt-4 pb-2 px-4">
-          {renderedSectionHeader ?? (
-            <>
-              <IconTable size={16} className="shrink-0 text-muted-foreground/60" />
-              <span className="text-sm font-medium leading-none">Studio</span>
-            </>
-          )}
-        </div>
-        <SidebarGroupContent className="flex flex-col gap-px px-2 pb-3">
-        {nonTableViews.map((viewDefinition: StudioViewDefinition) => (
-          <button
-            key={viewDefinition.id}
-            type="button"
-            data-active={selectedView === viewDefinition.id ? "true" : "false"}
-            className={sidebarItemClassName}
-            onClick={() => onSelectView(viewDefinition.id)}
+              onSchemaChange(nextSchema);
+            }}
           >
-            {viewDefinition.label}
-          </button>
-        ))}
-        </SidebarGroupContent>
-      </SidebarGroup>
-      ) : null}
+            <SelectTrigger className="w-full text-xs" size="sm">
+              <SelectValue placeholder="Select schema" />
+            </SelectTrigger>
+            <SelectContent>
+              {schemas.map((schemaName) => (
+                <SelectItem key={schemaName} value={schemaName} className="text-xs">
+                  {schemaName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </SidebarGroup>
 
-      {hasTableView ? (
-      <SidebarGroup className="group/tables relative px-2 pb-3" data-search-open={isSearchOpen ? "true" : "false"}>
-        <div className="flex items-center gap-1 pt-4 pb-2 px-4 sticky top-0 backdrop-blur-sm min-h-10">
-          <div
-            className={cn(
-              "flex items-center gap-1 transition-opacity duration-200",
-              isSearchOpen && "opacity-0 pointer-events-none",
-            )}
-          >
-            {renderedSectionHeader ?? (
-              <>
-                <IconTable size={16} className="shrink-0 text-muted-foreground/60" />
-                <h2 className="text-sm font-medium leading-none">Tables</h2>
-              </>
-            )}
-          </div>
+        {normalizedSections.map(({ hasTableView, nonTableViews, sectionDefinition }) => {
+          const sectionHeaderNode = sectionDefinition.header;
+          const sectionHeaderType = isValidElement(sectionHeaderNode)
+            ? (sectionHeaderNode.type as HeaderWithSearchHandlerType)
+            : null;
+          const headerHandlesSearch = Boolean(sectionHeaderType?.__studioHandlesSearch);
+          const renderedSectionHeader = isValidElement(sectionHeaderNode)
+            ? cloneElement(sectionHeaderNode as ReactElement<{ onSearch?: () => void }>, {
+                onSearch: openSearch,
+              })
+            : sectionHeaderNode;
 
-          {!headerHandlesSearch ? (
-          <button
-            aria-label="Search tables"
-            className={cn(
-              "ml-auto h-6 w-6 rounded-sm flex items-center justify-center text-muted-foreground/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-opacity duration-200",
-              isSearchOpen
-                ? "opacity-0 pointer-events-none"
-                : "opacity-0 group-hover/tables:opacity-100 focus:opacity-100 focus-visible:opacity-100",
-            )}
-            onClick={openSearch}
-            type="button"
-          >
-            <IconSearch size={14} />
-          </button>
-          ) : null}
+          return (
+            <Fragment key={sectionDefinition.id}>
+              {nonTableViews.length > 0 ? (
+                <SidebarGroup className="px-2 pb-3">
+                  <div className="flex items-center gap-1 pt-4 pb-2 px-4">
+                    {renderedSectionHeader ?? (
+                      <>
+                        <IconTable size={16} className="shrink-0 text-muted-foreground/60" />
+                        <span className="text-sm font-medium leading-none">Studio</span>
+                      </>
+                    )}
+                  </div>
+                  <SidebarGroupContent className="flex flex-col gap-px px-2 pb-3">
+                    {nonTableViews.map((viewDefinition: StudioViewDefinition) => (
+                      <button
+                        key={viewDefinition.id}
+                        type="button"
+                        data-active={selectedView === viewDefinition.id ? "true" : "false"}
+                        className={sidebarItemClassName}
+                        onClick={() => onSelectView(viewDefinition.id)}
+                      >
+                        {viewDefinition.label}
+                      </button>
+                    ))}
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              ) : null}
 
-          <div
-            data-table-search-input-wrapper
-            className={cn(
-              "absolute right-4 top-1/2 -translate-y-1/2 origin-right transition-[opacity,transform] duration-200 ease-out will-change-transform w-[calc(100%-2rem)]",
-              isSearchOpen
-                ? "opacity-100 scale-x-100"
-                : "opacity-0 scale-x-0 pointer-events-none",
-            )}
-          >
-            <Input
-              aria-label="Search tables"
-              className="h-9 w-full bg-background shadow-none"
-              placeholder="Search tables..."
-              ref={searchInputRef}
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.currentTarget.value)}
-              onKeyDown={onSearchKeyDown}
-              onBlur={(event) => {
-                if (event.currentTarget.value.trim().length > 0) {
-                  return;
-                }
+              {hasTableView ? (
+                <SidebarGroup
+                  className="group/tables relative px-2 pb-3"
+                  data-search-open={isSearchOpen ? "true" : "false"}
+                >
+                  <div className="flex items-center gap-1 pt-4 pb-2 px-4 sticky top-0 backdrop-blur-sm min-h-10">
+                    <div
+                      className={cn(
+                        "flex items-center gap-1 transition-opacity duration-200",
+                        isSearchOpen && "opacity-0 pointer-events-none",
+                      )}
+                    >
+                      {renderedSectionHeader ?? (
+                        <>
+                          <IconTable size={16} className="shrink-0 text-muted-foreground/60" />
+                          <h2 className="text-sm font-medium leading-none">Tables</h2>
+                        </>
+                      )}
+                    </div>
 
-                closeSearch();
-              }}
-            />
-          </div>
-        </div>
+                    {!headerHandlesSearch ? (
+                      <button
+                        aria-label="Search tables"
+                        className={cn(
+                          "ml-auto h-6 w-6 rounded-sm flex items-center justify-center text-muted-foreground/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-opacity duration-200",
+                          isSearchOpen
+                            ? "opacity-0 pointer-events-none"
+                            : "opacity-0 group-hover/tables:opacity-100 focus:opacity-100 focus-visible:opacity-100",
+                        )}
+                        onClick={openSearch}
+                        type="button"
+                      >
+                        <IconSearch size={14} />
+                      </button>
+                    ) : null}
 
-        {hasStartupIntrospectionFailure ? (
-          <div className="px-2 pb-2">
-            <IntrospectionStatusNotice
-              compact
-              description="Studio could not introspect the database."
-              isRetrying={isIntrospecting}
-              message={introspectionError?.message}
-              onRetry={onRetryIntrospection}
-              queryPreview={introspectionError?.queryPreview ?? null}
-              source={introspectionError?.source ?? "unknown"}
-              title="Introspection failed"
-              variant="error"
-            />
-          </div>
-        ) : null}
+                    <div
+                      data-table-search-input-wrapper
+                      className={cn(
+                        "absolute right-4 top-1/2 -translate-y-1/2 origin-right transition-[opacity,transform] duration-200 ease-out will-change-transform w-[calc(100%-2rem)]",
+                        isSearchOpen
+                          ? "opacity-100 scale-x-100"
+                          : "opacity-0 scale-x-0 pointer-events-none",
+                      )}
+                    >
+                      <Input
+                        aria-label="Search tables"
+                        className="h-9 w-full bg-background shadow-none"
+                        placeholder="Search tables..."
+                        ref={searchInputRef}
+                        value={searchTerm}
+                        onChange={(event) => setSearchTerm(event.currentTarget.value)}
+                        onKeyDown={onSearchKeyDown}
+                        onBlur={(event) => {
+                          if (event.currentTarget.value.trim().length > 0) {
+                            return;
+                          }
 
-        {hasRecoverableIntrospectionWarning ? (
-          <div className="px-2 pb-2">
-            <IntrospectionStatusNotice
-              compact
-              description="Using last known schema metadata."
-              isRetrying={isIntrospecting}
-              message={introspectionError?.message}
-              onRetry={onRetryIntrospection}
-              queryPreview={introspectionError?.queryPreview ?? null}
-              source={introspectionError?.source ?? "unknown"}
-              title="Introspection warning"
-              variant="warning"
-            />
-          </div>
-        ) : null}
+                          closeSearch();
+                        }}
+                      />
+                    </div>
+                  </div>
 
-        <nav aria-label="Tables" className="flex flex-col gap-px pb-3 p-2">
-          {tables.map((tableItem, index) => {
-            const isHighlighted = isSearchOpen && index === highlightedTableIndex;
-            const isCurrentTable = activeTable === tableItem.table && selectedView === "table";
+                  {hasStartupIntrospectionFailure ? (
+                    <div className="px-2 pb-2">
+                      <IntrospectionStatusNotice
+                        compact
+                        description="Studio could not introspect the database."
+                        isRetrying={isIntrospecting}
+                        message={introspectionError?.message}
+                        onRetry={onRetryIntrospection}
+                        queryPreview={introspectionError?.queryPreview ?? null}
+                        source={introspectionError?.source ?? "unknown"}
+                        title="Introspection failed"
+                        variant="error"
+                      />
+                    </div>
+                  ) : null}
 
-            return (
-              <button
-                key={tableItem.id}
-                type="button"
-                className={sidebarItemClassName}
-                data-active={isSearchOpen ? (isHighlighted ? "true" : "false") : isCurrentTable ? "true" : "false"}
-                onMouseEnter={() => onTableMouseEnter(index)}
-                onClick={() => selectTable(tableItem.table)}
-              >
-                {tableItem.table}
-              </button>
-            );
-          })}
-          {tables.length === 0 ? (
-            <span className="py-1 px-2 font-mono text-xs text-muted-foreground">
-              {isIntrospecting
-                ? "Loading tables..."
-                : isSearchActive
-                  ? "No matching tables"
-                  : "No tables found"}
-            </span>
-          ) : null}
-        </nav>
-      </SidebarGroup>
-      ) : null}
-      </Fragment>
-      );
-      })}
+                  {hasRecoverableIntrospectionWarning ? (
+                    <div className="px-2 pb-2">
+                      <IntrospectionStatusNotice
+                        compact
+                        description="Using last known schema metadata."
+                        isRetrying={isIntrospecting}
+                        message={introspectionError?.message}
+                        onRetry={onRetryIntrospection}
+                        queryPreview={introspectionError?.queryPreview ?? null}
+                        source={introspectionError?.source ?? "unknown"}
+                        title="Introspection warning"
+                        variant="warning"
+                      />
+                    </div>
+                  ) : null}
+
+                  <nav aria-label="Tables" className="flex flex-col gap-px pb-3 p-2">
+                    {tables.map((tableItem, index) => {
+                      const isHighlighted = isSearchOpen && index === highlightedTableIndex;
+                      const isCurrentTable =
+                        activeTable === tableItem.table && selectedView === "table";
+
+                      return (
+                        <button
+                          key={tableItem.id}
+                          type="button"
+                          className={sidebarItemClassName}
+                          data-active={
+                            isSearchOpen
+                              ? isHighlighted
+                                ? "true"
+                                : "false"
+                              : isCurrentTable
+                                ? "true"
+                                : "false"
+                          }
+                          onMouseEnter={() => onTableMouseEnter(index)}
+                          onClick={() => selectTable(tableItem.table)}
+                        >
+                          {tableItem.table}
+                        </button>
+                      );
+                    })}
+                    {tables.length === 0 ? (
+                      <span className="py-1 px-2 font-mono text-xs text-muted-foreground">
+                        {isIntrospecting
+                          ? "Loading tables..."
+                          : isSearchActive
+                            ? "No matching tables"
+                            : "No tables found"}
+                      </span>
+                    ) : null}
+                  </nav>
+                </SidebarGroup>
+              ) : null}
+            </Fragment>
+          );
+        })}
       </SidebarContent>
-      </Sidebar>
+    </Sidebar>
   );
 }

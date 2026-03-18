@@ -8,9 +8,7 @@ export function setGridInteractionSuppressionWindow(
     return;
   }
 
-  document.body.dataset[GRID_INTERACTION_SUPPRESSION_DATASET_KEY] = String(
-    Date.now() + durationMs,
-  );
+  document.body.dataset[GRID_INTERACTION_SUPPRESSION_DATASET_KEY] = String(Date.now() + durationMs);
 }
 
 export function isGridInteractionSuppressionActive(): boolean {

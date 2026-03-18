@@ -26,8 +26,7 @@ function createDefaultTableUiState(
   return {
     id: scopeKey,
     editingFilter: cloneEditingFilter(
-      defaults?.editingFilter ??
-        createEditingFilterFromApplied(createDefaultFilter()),
+      defaults?.editingFilter ?? createEditingFilterFromApplied(createDefaultFilter()),
     ),
     rowSelectionState: { ...(defaults?.rowSelectionState ?? {}) },
     stagedRows: [...(defaults?.stagedRows ?? [])],
@@ -76,15 +75,11 @@ export function useTableUiState(defaults?: TableUiStateDefaults) {
       return;
     }
 
-    tableUiStateCollection.insert(
-      createDefaultTableUiState(scopeKey, defaults),
-    );
+    tableUiStateCollection.insert(createDefaultTableUiState(scopeKey, defaults));
   }, [defaults, scopeKey, tableUiStateCollection]);
 
   const resolvedState =
-    !scopeKey || tableUiState
-      ? tableUiState
-      : createDefaultTableUiState(scopeKey, defaults);
+    !scopeKey || tableUiState ? tableUiState : createDefaultTableUiState(scopeKey, defaults);
 
   const updateTableUiState = useCallback(
     (updater: (draft: TableUiState) => void) => {

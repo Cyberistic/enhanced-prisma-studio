@@ -10,8 +10,8 @@ import type { StudioBFFRequest } from "@enhanced-prisma-studio/studio-core/data/
 export type StudioAdapter = Adapter;
 
 export interface AdapterProviderConfig {
-    /**
-     * Function to execute studio requests
-     */
-    executeStudioRequest: (payload: { data: StudioBFFRequest }) => Promise<unknown>;
+  /**
+   * Function to execute studio requests
+   */
+  executeStudioRequest: (payload: { data: StudioBFFRequest }) => Promise<unknown>;
 }

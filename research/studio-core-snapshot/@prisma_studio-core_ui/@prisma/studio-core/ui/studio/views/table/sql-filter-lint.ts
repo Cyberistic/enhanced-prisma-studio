@@ -54,10 +54,7 @@ function formatQualifiedTableName(
   return `${quoteIdentifier(dialect, table.schema)}.${quotedTableName}`;
 }
 
-function quoteIdentifier(
-  dialect: SqlEditorDialect,
-  identifier: string,
-): string {
+function quoteIdentifier(dialect: SqlEditorDialect, identifier: string): string {
   if (dialect === "mysql") {
     return `\`${identifier.replaceAll("`", "``")}\``;
   }
@@ -111,21 +108,14 @@ function getWhereClauseExcerpt(args: {
   const normalizedClauseStart = clauseStart >= 0 ? clauseStart + 1 : -1;
   const relativeOffset =
     normalizedClauseStart >= 0
-      ? clamp(
-          diagnosticFrom - normalizedClauseStart,
-          0,
-          normalizedClause.length,
-        )
+      ? clamp(diagnosticFrom - normalizedClauseStart, 0, normalizedClause.length)
       : normalizedClause.length;
   const excerpt = createClauseExcerpt(normalizedClause, relativeOffset);
 
   return excerpt ? `WHERE ${excerpt}` : null;
 }
 
-function createClauseExcerpt(
-  normalizedClause: string,
-  relativeOffset: number,
-): string | null {
+function createClauseExcerpt(normalizedClause: string, relativeOffset: number): string | null {
   if (normalizedClause.length === 0) {
     return null;
   }
@@ -135,10 +125,7 @@ function createClauseExcerpt(
   }
 
   const anchor = clamp(relativeOffset, 0, normalizedClause.length);
-  const start = Math.max(
-    0,
-    Math.min(anchor - 16, normalizedClause.length - 32),
-  );
+  const start = Math.max(0, Math.min(anchor - 16, normalizedClause.length - 32));
   const end = Math.min(normalizedClause.length, start + 32);
   const prefix = start > 0 ? "…" : "";
   const suffix = end < normalizedClause.length ? "…" : "";

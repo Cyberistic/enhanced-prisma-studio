@@ -38,17 +38,14 @@ export function PrismaStudio(props: PrismaStudioProps) {
 
     if (child.type === PrismaProviders) {
       // Walk PrismaProviders' children to find provider markers.
-      Children.forEach(
-        (child.props as { children?: ReactNode }).children,
-        (providerChild) => {
-          if (!isValidElement(providerChild)) return;
-          if (providerChild.type === URLProvider) {
-            urlAdapter = (providerChild.props as { adapter: URLProviderAdapter }).adapter;
-          } else if (providerChild.type === AdapterProvider) {
-            studioAdapter = (providerChild.props as { adapter: StudioAdapter }).adapter;
-          }
-        },
-      );
+      Children.forEach((child.props as { children?: ReactNode }).children, (providerChild) => {
+        if (!isValidElement(providerChild)) return;
+        if (providerChild.type === URLProvider) {
+          urlAdapter = (providerChild.props as { adapter: URLProviderAdapter }).adapter;
+        } else if (providerChild.type === AdapterProvider) {
+          studioAdapter = (providerChild.props as { adapter: StudioAdapter }).adapter;
+        }
+      });
       return;
     }
 
@@ -67,9 +64,7 @@ export function PrismaStudio(props: PrismaStudioProps) {
     }
     content = (
       <URLProvider adapter={urlAdapter}>
-        <AdapterProvider adapter={studioAdapter}>
-          {remaining}
-        </AdapterProvider>
+        <AdapterProvider adapter={studioAdapter}>{remaining}</AdapterProvider>
       </URLProvider>
     );
   }

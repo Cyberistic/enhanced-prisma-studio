@@ -8,11 +8,9 @@ export function rfc3339(date: Date = new Date()): string {
 }
 
 function shortDate(date: Date): string {
-  return [
-    date.getFullYear(),
-    doubleDigits(date.getMonth() + 1),
-    doubleDigits(date.getDate()),
-  ].join("-");
+  return [date.getFullYear(), doubleDigits(date.getMonth() + 1), doubleDigits(date.getDate())].join(
+    "-",
+  );
 }
 
 function time(date: Date): string {

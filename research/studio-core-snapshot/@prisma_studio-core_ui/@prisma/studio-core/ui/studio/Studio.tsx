@@ -53,9 +53,7 @@ export type StudioOperationEvent = StudioOperationEventBase & {
   timestamp: string;
 };
 
-export type StudioEventBase =
-  | StudioLaunchedEventBase
-  | StudioOperationEventBase;
+export type StudioEventBase = StudioLaunchedEventBase | StudioOperationEventBase;
 export type StudioEvent = StudioEventBase & {
   eventId: string;
   timestamp: string;
@@ -84,12 +82,7 @@ export function Studio(props: StudioProps) {
   }
 
   return (
-    <StudioContextProvider
-      adapter={adapter}
-      aiFilter={aiFilter}
-      onEvent={onEvent}
-      theme={theme}
-    >
+    <StudioContextProvider adapter={adapter} aiFilter={aiFilter} onEvent={onEvent} theme={theme}>
       <StudioContent />
     </StudioContextProvider>
   );
@@ -109,17 +102,13 @@ function StudioContent() {
     metadata: { activeTable },
     viewParam,
   } = useNavigation();
-  const { errorState, hasResolvedIntrospection, isRefetching, refetch } =
-    useIntrospection();
+  const { errorState, hasResolvedIntrospection, isRefetching, refetch } = useIntrospection();
 
   const containerClasses = cn("flex flex-col w-full h-full font-sans");
 
   const View = views[viewParam ?? "default"] ?? BasicView;
   const shouldShowStartupIntrospectionRecovery =
-    viewParam === "table" &&
-    activeTable == null &&
-    errorState != null &&
-    !hasResolvedIntrospection;
+    viewParam === "table" && activeTable == null && errorState != null && !hasResolvedIntrospection;
 
   return (
     <div className="ps" style={{ width: "100%", height: "100%" }}>

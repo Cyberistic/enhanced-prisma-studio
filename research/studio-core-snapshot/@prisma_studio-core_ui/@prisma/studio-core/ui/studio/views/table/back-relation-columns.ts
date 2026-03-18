@@ -50,10 +50,7 @@ export function getBackRelationColumns(args: {
 
   candidates.forEach((candidate) => {
     const sourceTableKey = `${candidate.sourceSchema}.${candidate.sourceTable}`;
-    countsBySourceTable.set(
-      sourceTableKey,
-      (countsBySourceTable.get(sourceTableKey) ?? 0) + 1,
-    );
+    countsBySourceTable.set(sourceTableKey, (countsBySourceTable.get(sourceTableKey) ?? 0) + 1);
     countsByDisplayName.set(
       candidate.sourceTable,
       (countsByDisplayName.get(candidate.sourceTable) ?? 0) + 1,
@@ -63,10 +60,8 @@ export function getBackRelationColumns(args: {
   return candidates
     .map((candidate) => {
       const sourceTableKey = `${candidate.sourceSchema}.${candidate.sourceTable}`;
-      const hasDuplicateTableName =
-        (countsByDisplayName.get(candidate.sourceTable) ?? 0) > 1;
-      const hasDuplicateSourceTable =
-        (countsBySourceTable.get(sourceTableKey) ?? 0) > 1;
+      const hasDuplicateTableName = (countsByDisplayName.get(candidate.sourceTable) ?? 0) > 1;
+      const hasDuplicateSourceTable = (countsBySourceTable.get(sourceTableKey) ?? 0) > 1;
 
       let name = candidate.sourceTable;
 
@@ -83,9 +78,7 @@ export function getBackRelationColumns(args: {
     .sort((left, right) => left.name.localeCompare(right.name));
 }
 
-export function isBackRelationColumnMeta(
-  value: unknown,
-): value is BackRelationColumnMeta {
+export function isBackRelationColumnMeta(value: unknown): value is BackRelationColumnMeta {
   return (
     typeof value === "object" &&
     value != null &&

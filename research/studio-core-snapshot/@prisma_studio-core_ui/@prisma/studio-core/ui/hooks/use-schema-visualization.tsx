@@ -48,10 +48,7 @@ export function useSchemaVisualization(): SchemaVisualizationData {
 
     const currentSchemaData = introspection.schemas[activeSchema.name];
 
-    if (
-      !currentSchemaData ||
-      Object.keys(currentSchemaData.tables).length === 0
-    ) {
+    if (!currentSchemaData || Object.keys(currentSchemaData.tables).length === 0) {
       return { tables: [NO_TABLES_NODE], relationships: [] };
     }
 

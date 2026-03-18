@@ -2,11 +2,7 @@ import { sql } from "@codemirror/lang-sql";
 import { linter, lintGutter } from "@codemirror/lint";
 import { Prec } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
-import type {
-  ColumnDef,
-  PaginationState,
-  RowSelectionState,
-} from "@tanstack/react-table";
+import type { ColumnDef, PaginationState, RowSelectionState } from "@tanstack/react-table";
 import CodeMirror from "@uiw/react-codemirror";
 import { Play, Square } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -28,10 +24,7 @@ import { DataGridDraggableHeaderCell } from "../../grid/DataGridDraggableHeaderC
 import { DataGridHeader } from "../../grid/DataGridHeader";
 import { StudioHeader } from "../../StudioHeader";
 import type { ViewProps } from "../View";
-import {
-  getCodeMirrorDialect,
-  toCodeMirrorSqlNamespace,
-} from "./sql-editor-config";
+import { getCodeMirrorDialect, toCodeMirrorSqlNamespace } from "./sql-editor-config";
 import { createSqlEditorKeybindings } from "./sql-editor-keybindings";
 import { createSqlLintSource } from "./sql-lint-source";
 
@@ -147,11 +140,7 @@ const SqlResultGrid = memo(function SqlResultGrid(props: SqlResultGridProps) {
         header({ table, header }) {
           return (props: Omit<CellProps, "children" | "ref">) => {
             return (
-              <DataGridDraggableHeaderCell
-                table={table}
-                header={header}
-                {...props}
-              >
+              <DataGridDraggableHeaderCell table={table} header={header} {...props}>
                 <DataGridHeader header={header} column={column} />
               </DataGridDraggableHeaderCell>
             );
@@ -193,8 +182,7 @@ const SqlResultGrid = memo(function SqlResultGrid(props: SqlResultGridProps) {
 });
 
 export function SqlView(_props: ViewProps) {
-  const { adapter, isDarkMode, onEvent, sqlEditorStateCollection } =
-    useStudio();
+  const { adapter, isDarkMode, onEvent, sqlEditorStateCollection } = useStudio();
   const { data: introspection } = useIntrospection();
   const { pinnedColumnIds, setPinnedColumnIds } = useColumnPinning();
   const initialPersistedSqlDraft = readPersistedSqlDraft({
@@ -212,12 +200,8 @@ export function SqlView(_props: ViewProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [result, setResult] = useState<SqlResultState | null>(null);
-  const [rowSelectionState, setRowSelectionState] = useState<RowSelectionState>(
-    {},
-  );
-  const [paginationState, setPaginationState] = useState<PaginationState>(
-    DEFAULT_PAGINATION_STATE,
-  );
+  const [rowSelectionState, setRowSelectionState] = useState<RowSelectionState>({});
+  const [paginationState, setPaginationState] = useState<PaginationState>(DEFAULT_PAGINATION_STATE);
 
   const persistEditorDraft = useCallback(
     (queryText: string) => {
@@ -274,10 +258,8 @@ export function SqlView(_props: ViewProps) {
   useEffect(() => {
     return () => {
       const pendingEditorValue =
-        editorViewRef.current?.state.doc.toString() ??
-        latestEditorValueRef.current;
-      const hasUnsyncedEditorDocChange =
-        pendingEditorValue !== latestEditorValueRef.current;
+        editorViewRef.current?.state.doc.toString() ?? latestEditorValueRef.current;
+      const hasUnsyncedEditorDocChange = pendingEditorValue !== latestEditorValueRef.current;
 
       if (!hasUserEditedEditorValueRef.current && !hasUnsyncedEditorDocChange) {
         return;
@@ -308,10 +290,7 @@ export function SqlView(_props: ViewProps) {
     });
   }, [sqlEditorDialect, sqlEditorNamespace, sqlEditorSchema.defaultSchema]);
   const lintSourceBundle = useMemo(() => {
-    if (
-      !adapter.capabilities?.sqlEditorLint ||
-      !adapterSupportsSqlLint(adapter)
-    ) {
+    if (!adapter.capabilities?.sqlEditorLint || !adapterSupportsSqlLint(adapter)) {
       return null;
     }
 
@@ -364,10 +343,7 @@ export function SqlView(_props: ViewProps) {
     setIsRunning(true);
     setErrorMessage(null);
 
-    const [error, rawResult] = await adapter.raw(
-      { sql },
-      { abortSignal: abortController.signal },
-    );
+    const [error, rawResult] = await adapter.raw({ sql }, { abortSignal: abortController.signal });
 
     const durationMs =
       consumeBffRequestDurationMsForSignal(abortController.signal) ??
@@ -461,11 +437,7 @@ export function SqlView(_props: ViewProps) {
           size="sm"
           variant={isRunning ? "outline" : "default"}
         >
-          {isRunning ? (
-            <Square className="size-4" />
-          ) : (
-            <Play className="size-4" />
-          )}
+          {isRunning ? <Square className="size-4" /> : <Play className="size-4" />}
           {isRunning ? "Cancel" : "Run SQL"}
         </Button>
       </StudioHeader>
@@ -517,10 +489,7 @@ export function SqlView(_props: ViewProps) {
         ) : null}
       </div>
 
-      <div
-        data-testid="sql-result-grid-container"
-        className="grow min-h-0 flex flex-col"
-      >
+      <div data-testid="sql-result-grid-container" className="grow min-h-0 flex flex-col">
         {result == null ? null : (
           <SqlResultGrid
             isRunning={isRunning}
@@ -538,10 +507,7 @@ export function SqlView(_props: ViewProps) {
   );
 }
 
-function findFirstDefinedValue(
-  rows: Record<string, unknown>[],
-  columnId: string,
-): unknown {
+function findFirstDefinedValue(rows: Record<string, unknown>[], columnId: string): unknown {
   for (const row of rows) {
     const value = row[columnId];
     if (value !== null && value !== undefined) {
@@ -552,10 +518,7 @@ function findFirstDefinedValue(
   return undefined;
 }
 
-function createSqlResultColumnMetadata(
-  name: string,
-  sampleValue: unknown,
-): Column {
+function createSqlResultColumnMetadata(name: string, sampleValue: unknown): Column {
   const isArray = Array.isArray(sampleValue);
   const dataTypeGroup = inferDataTypeGroup(sampleValue);
   const dataTypeName = inferDataTypeName(sampleValue);
@@ -644,9 +607,7 @@ function adapterSupportsSqlLint(adapter: Adapter): adapter is Adapter & {
 }
 
 function readPersistedSqlDraft(args: {
-  sqlEditorStateCollection: ReturnType<
-    typeof useStudio
-  >["sqlEditorStateCollection"];
+  sqlEditorStateCollection: ReturnType<typeof useStudio>["sqlEditorStateCollection"];
 }): string | null {
   const { sqlEditorStateCollection } = args;
   const inCollection = sqlEditorStateCollection.get(SQL_EDITOR_DRAFT_ID);
@@ -676,9 +637,7 @@ function readPersistedSqlDraft(args: {
       return null;
     }
 
-    const draftRow = (parsedStorageState as Record<string, unknown>)[
-      `s:${SQL_EDITOR_DRAFT_ID}`
-    ];
+    const draftRow = (parsedStorageState as Record<string, unknown>)[`s:${SQL_EDITOR_DRAFT_ID}`];
 
     if (typeof draftRow !== "object" || draftRow == null) {
       return null;

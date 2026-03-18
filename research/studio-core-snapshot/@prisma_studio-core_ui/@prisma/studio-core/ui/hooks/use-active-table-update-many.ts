@@ -35,9 +35,7 @@ export function useActiveTableUpdateMany() {
         throw new Error("Active table collection is not available");
       }
 
-      const rowIds = params.updates.map((update) =>
-        String(update.row.__ps_rowid ?? ""),
-      );
+      const rowIds = params.updates.map((update) => String(update.row.__ps_rowid ?? ""));
 
       if (rowIds.some((rowId) => rowId.length === 0)) {
         throw new Error("Active table collection is not available");

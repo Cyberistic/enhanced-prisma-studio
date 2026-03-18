@@ -74,12 +74,9 @@ export function useIntrospection() {
       });
 
       if (!hasEmittedLaunchEventRef.current) {
-        const tableCount = Object.values(result.schemas).reduce(
-          (sum, schema) => {
-            return sum + Object.keys(schema.tables).length;
-          },
-          0,
-        );
+        const tableCount = Object.values(result.schemas).reduce((sum, schema) => {
+          return sum + Object.keys(schema.tables).length;
+        }, 0);
 
         onEvent({
           name: "studio_launched",
@@ -119,11 +116,7 @@ export function useIntrospection() {
       query: queryResult.error.query,
       queryPreview: getQueryPreview(queryResult.error.query),
     };
-  }, [
-    adapter.capabilities?.sqlDialect,
-    adapter.defaultSchema,
-    queryResult.error,
-  ]);
+  }, [adapter.capabilities?.sqlDialect, adapter.defaultSchema, queryResult.error]);
 
   return {
     ...queryResult,

@@ -1,8 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import dotenv from "dotenv";
-
 import { createSQLiteBunSqlProvider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/bun-sql";
 import { createSQLiteCloudflareD1Provider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/cloudflare-d1";
 import { createSQLiteDrizzleProvider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/drizzle";
@@ -31,11 +29,8 @@ type ProviderSnapshot = {
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const testSuiteRoot = path.resolve(scriptDir, "../../..");
-const workspaceRoot = path.resolve(testSuiteRoot, "../..");
 
-dotenv.config({ path: path.join(workspaceRoot, "apps/web/.env") });
-
-const sqliteUrl = `file:${path.join(testSuiteRoot, "tmp", "sqlite", "provider-test.db")}`;
+const sqliteUrl = `file:${path.join(testSuiteRoot, "test-suite", "tmp", "sqlite", "provider-test.db")}`;
 
 function normalizeSnapshot(raw: {
   introspectResult: any;
@@ -65,7 +60,10 @@ function normalizeSnapshot(raw: {
   };
 }
 
-async function captureProviderSnapshot(provider: ProviderRecord, executeStudioRequest: (payload: any) => Promise<unknown>) {
+async function captureProviderSnapshot(
+  provider: ProviderRecord,
+  executeStudioRequest: (payload: any) => Promise<unknown>,
+) {
   const adapter = provider.create({
     env: provider.env,
     executeStudioRequest,
@@ -147,10 +145,7 @@ async function main() {
   ];
 
   const baselineProvider = providers[0]!;
-  const baselineSnapshot = await captureProviderSnapshot(
-    baselineProvider,
-    executeStudioRequest,
-  );
+  const baselineSnapshot = await captureProviderSnapshot(baselineProvider, executeStudioRequest);
 
   const report: Array<{ details?: string; name: string; ok: boolean }> = [];
   report.push({ name: baselineProvider.name, ok: true });

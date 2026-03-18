@@ -21,12 +21,7 @@ import {
   YAxis,
 } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorBoundary } from "../../error-boundary";
 import { StudioHeader } from "../studio-header";
 
@@ -306,17 +301,7 @@ function Chart(props: ChartProps) {
         title,
         type,
       }),
-    [
-      column,
-      limit,
-      mode,
-      relationLabelColumn,
-      schemaTables,
-      table,
-      timeBucket,
-      title,
-      type,
-    ],
+    [column, limit, mode, relationLabelColumn, schemaTables, table, timeBucket, title, type],
   );
   const [data, setData] = useState<ChartDatum[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -335,10 +320,7 @@ function Chart(props: ChartProps) {
     async function loadData() {
       setErrorMessage(null);
 
-      const [error, result] = await adapter.raw(
-        { sql },
-        { abortSignal: abortController.signal },
-      );
+      const [error, result] = await adapter.raw({ sql }, { abortSignal: abortController.signal });
 
       if (disposed) {
         return;
@@ -487,7 +469,7 @@ function Chart(props: ChartProps) {
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
-                    tickFormatter={(v: string) => v.length > 14 ? `${v.slice(0, 13)}…` : v}
+                    tickFormatter={(v: string) => (v.length > 14 ? `${v.slice(0, 13)}…` : v)}
                     width={80}
                   />
                   <Tooltip wrapperStyle={{ fontSize: 11 }} />
@@ -571,23 +553,13 @@ export function EvilStatsView(props: {
   schema: string;
   table: string | null;
 }) {
-  const {
-    adapter,
-    isNavigationOpen,
-    onToggleNavigation,
-    schema,
-    schemaTables,
-    table,
-  } = props;
+  const { adapter, isNavigationOpen, onToggleNavigation, schema, schemaTables, table } = props;
   const tableCount = Object.keys(schemaTables).length;
 
   return (
     <ErrorBoundary>
       <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
-        <StudioHeader
-          isNavigationOpen={isNavigationOpen}
-          onToggleNavigation={onToggleNavigation}
-        >
+        <StudioHeader isNavigationOpen={isNavigationOpen} onToggleNavigation={onToggleNavigation}>
           <div className="text-xs text-muted-foreground">
             EvilStats · schema: <span className="font-mono text-foreground/80">{schema}</span>
             <span className="mx-1 text-foreground/40">·</span>
@@ -599,181 +571,181 @@ export function EvilStatsView(props: {
 
         <div className="flex-1 min-h-0 overflow-auto p-3">
           <div className="grid min-h-0 gap-3 grid-cols-2 lg:grid-cols-4">
-              {/* Todos */}
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="pie"
-                table="todos"
-                column="completed"
-                title="Completion Rate"
-                limit={6}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="radial"
-                table="todos"
-                column="priority"
-                title="Priority Distribution"
-                limit={6}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="bar-h"
-                mode="top-related"
-                table="todos"
-                column="userId"
-                relationLabelColumn="name"
-                title="Todos by Author"
-                limit={8}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="radar"
-                mode="top-related"
-                table="todos"
-                column="projectId"
-                relationLabelColumn="name"
-                title="Todos by Project"
-                limit={8}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="line"
-                mode="time-series"
-                table="todos"
-                column="dueDate"
-                timeBucket="day"
-                title="Upcoming Due Dates"
-                limit={14}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="bar"
-                mode="time-series"
-                table="todos"
-                column="createdAt"
-                timeBucket="month"
-                title="Todo Creation by Month"
-                limit={12}
-              />
+            {/* Todos */}
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="pie"
+              table="todos"
+              column="completed"
+              title="Completion Rate"
+              limit={6}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="radial"
+              table="todos"
+              column="priority"
+              title="Priority Distribution"
+              limit={6}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="bar-h"
+              mode="top-related"
+              table="todos"
+              column="userId"
+              relationLabelColumn="name"
+              title="Todos by Author"
+              limit={8}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="radar"
+              mode="top-related"
+              table="todos"
+              column="projectId"
+              relationLabelColumn="name"
+              title="Todos by Project"
+              limit={8}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="line"
+              mode="time-series"
+              table="todos"
+              column="dueDate"
+              timeBucket="day"
+              title="Upcoming Due Dates"
+              limit={14}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="bar"
+              mode="time-series"
+              table="todos"
+              column="createdAt"
+              timeBucket="month"
+              title="Todo Creation by Month"
+              limit={12}
+            />
 
-              {/* Users */}
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="pie-full"
-                table="users"
-                column="role"
-                title="User Roles"
-                limit={6}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="line"
-                mode="time-series"
-                table="users"
-                column="createdAt"
-                timeBucket="month"
-                title="User Growth"
-                limit={12}
-              />
+            {/* Users */}
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="pie-full"
+              table="users"
+              column="role"
+              title="User Roles"
+              limit={6}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="line"
+              mode="time-series"
+              table="users"
+              column="createdAt"
+              timeBucket="month"
+              title="User Growth"
+              limit={12}
+            />
 
-              {/* Projects */}
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="bar"
-                table="projects"
-                column="status"
-                title="Project Status"
-                limit={6}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="radial"
-                table="projects"
-                column="status"
-                title="Project Health"
-                limit={6}
-              />
+            {/* Projects */}
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="bar"
+              table="projects"
+              column="status"
+              title="Project Status"
+              limit={6}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="radial"
+              table="projects"
+              column="status"
+              title="Project Health"
+              limit={6}
+            />
 
-              {/* Comments */}
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="bar-h"
-                mode="top-related"
-                table="comments"
-                column="userId"
-                relationLabelColumn="name"
-                title="Top Commenters"
-                limit={8}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="line"
-                mode="time-series"
-                table="comments"
-                column="createdAt"
-                timeBucket="day"
-                title="Comment Frequency"
-                limit={21}
-              />
+            {/* Comments */}
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="bar-h"
+              mode="top-related"
+              table="comments"
+              column="userId"
+              relationLabelColumn="name"
+              title="Top Commenters"
+              limit={8}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="line"
+              mode="time-series"
+              table="comments"
+              column="createdAt"
+              timeBucket="day"
+              title="Comment Frequency"
+              limit={21}
+            />
 
-              {/* Tags */}
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="radar"
-                mode="top-related"
-                table="todoTags"
-                column="tagId"
-                relationLabelColumn="name"
-                title="Tag Usage (Radar)"
-                limit={8}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="pie"
-                mode="top-related"
-                table="todoTags"
-                column="tagId"
-                relationLabelColumn="name"
-                title="Tag Distribution"
-                limit={5}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="bar-h"
-                mode="top-related"
-                table="comments"
-                column="todoId"
-                relationLabelColumn="title"
-                title="Most Discussed Todos"
-                limit={5}
-              />
-              <Chart
-                adapter={adapter}
-                schemaTables={schemaTables}
-                type="pie-full"
-                mode="top-related"
-                table="todos"
-                column="projectId"
-                relationLabelColumn="name"
-                title="Work Distribution"
-                limit={8}
-              />
+            {/* Tags */}
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="radar"
+              mode="top-related"
+              table="todoTags"
+              column="tagId"
+              relationLabelColumn="name"
+              title="Tag Usage (Radar)"
+              limit={8}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="pie"
+              mode="top-related"
+              table="todoTags"
+              column="tagId"
+              relationLabelColumn="name"
+              title="Tag Distribution"
+              limit={5}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="bar-h"
+              mode="top-related"
+              table="comments"
+              column="todoId"
+              relationLabelColumn="title"
+              title="Most Discussed Todos"
+              limit={5}
+            />
+            <Chart
+              adapter={adapter}
+              schemaTables={schemaTables}
+              type="pie-full"
+              mode="top-related"
+              table="todos"
+              column="projectId"
+              relationLabelColumn="name"
+              title="Work Distribution"
+              limit={8}
+            />
           </div>
         </div>
       </div>

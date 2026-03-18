@@ -79,11 +79,7 @@ export function buildClipboardText(args: {
 
     const values: string[] = [];
 
-    for (
-      let columnIndex = range.columnStart;
-      columnIndex <= range.columnEnd;
-      columnIndex++
-    ) {
+    for (let columnIndex = range.columnStart; columnIndex <= range.columnEnd; columnIndex++) {
       const columnId = columnIds[columnIndex];
 
       if (!columnId) {
@@ -113,10 +109,7 @@ export function buildPasteChanges(args: {
   }
 
   const matrixRowCount = matrix.length;
-  const matrixColumnCount = Math.max(
-    1,
-    ...matrix.map((row) => Math.max(1, row.length)),
-  );
+  const matrixColumnCount = Math.max(1, ...matrix.map((row) => Math.max(1, row.length)));
 
   const selectionRowCount = range.rowEnd - range.rowStart + 1;
   const selectionColumnCount = range.columnEnd - range.columnStart + 1;
@@ -124,9 +117,7 @@ export function buildPasteChanges(args: {
   const fillSelectedRange = matrixRowCount === 1 && matrixColumnCount === 1;
 
   const targetRowCount = fillSelectedRange ? selectionRowCount : matrixRowCount;
-  const targetColumnCount = fillSelectedRange
-    ? selectionColumnCount
-    : matrixColumnCount;
+  const targetColumnCount = fillSelectedRange ? selectionColumnCount : matrixColumnCount;
 
   const changes: GridPasteChange[] = [];
 
@@ -137,11 +128,7 @@ export function buildPasteChanges(args: {
       continue;
     }
 
-    for (
-      let columnOffset = 0;
-      columnOffset < targetColumnCount;
-      columnOffset++
-    ) {
+    for (let columnOffset = 0; columnOffset < targetColumnCount; columnOffset++) {
       const columnIndex = range.columnStart + columnOffset;
       const columnId = columnIds[columnIndex];
 
@@ -154,8 +141,7 @@ export function buildPasteChanges(args: {
       }
 
       const sourceRow = matrix[fillSelectedRange ? 0 : rowOffset] ?? [];
-      const rawValue =
-        sourceRow[fillSelectedRange ? 0 : columnOffset] ?? sourceRow[0] ?? "";
+      const rawValue = sourceRow[fillSelectedRange ? 0 : columnOffset] ?? sourceRow[0] ?? "";
 
       changes.push({
         columnId,

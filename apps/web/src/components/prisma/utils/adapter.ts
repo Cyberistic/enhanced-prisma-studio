@@ -43,7 +43,10 @@ export function createKyselyStudioAdapter(args: {
           return [[null, firstResult], [toError(secondError)!]] as const;
         }
 
-        return [[null, firstResult], [null, secondResult ?? []]] as const;
+        return [
+          [null, firstResult],
+          [null, secondResult ?? []],
+        ] as const;
       },
       executeTransaction: async (queries: readonly PrismaStudioQuery[]) => {
         const [error, result] = (await executeStudioRequest({

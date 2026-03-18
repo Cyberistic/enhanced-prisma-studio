@@ -37,9 +37,7 @@ export function clampFocusedCell(args: {
     return getInitialFocusedCell(args);
   }
 
-  const columnId = columnIds.includes(focusedCell.columnId)
-    ? focusedCell.columnId
-    : columnIds[0];
+  const columnId = columnIds.includes(focusedCell.columnId) ? focusedCell.columnId : columnIds[0];
 
   if (!columnId) {
     return null;
@@ -83,14 +81,12 @@ export function moveFocusedCell(args: {
     case "left":
       return {
         ...clampedCell,
-        columnId:
-          args.columnIds[clamp(columnIndex - 1, 0, args.columnIds.length - 1)]!,
+        columnId: args.columnIds[clamp(columnIndex - 1, 0, args.columnIds.length - 1)]!,
       };
     case "right":
       return {
         ...clampedCell,
-        columnId:
-          args.columnIds[clamp(columnIndex + 1, 0, args.columnIds.length - 1)]!,
+        columnId: args.columnIds[clamp(columnIndex + 1, 0, args.columnIds.length - 1)]!,
       };
   }
 }
@@ -102,13 +98,7 @@ export function getFocusedCellScrollLeft(args: {
   focusedColumnId: string;
   viewportWidth: number;
 }): number {
-  const {
-    columnIds,
-    columnWidths,
-    currentScrollLeft,
-    focusedColumnId,
-    viewportWidth,
-  } = args;
+  const { columnIds, columnWidths, currentScrollLeft, focusedColumnId, viewportWidth } = args;
   const sanitizedScrollLeft = Math.max(0, currentScrollLeft);
   const sanitizedViewportWidth = Math.max(0, viewportWidth);
   const columnIndex = columnIds.indexOf(focusedColumnId);

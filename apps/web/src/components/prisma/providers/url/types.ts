@@ -6,26 +6,26 @@
  */
 
 export interface URLParams {
-    schema?: string;
-    table?: string | null;
-    view?: string;
-    pinnedColumns?: string;
-    sortOrder?: string;
+  schema?: string;
+  table?: string | null;
+  view?: string;
+  pinnedColumns?: string;
+  sortOrder?: string;
 }
 
 export interface URLProviderAdapter {
-    /**
-     * Get current URL parameters
-     */
-    getParams(): URLParams;
+  /**
+   * Get current URL parameters
+   */
+  getParams(): URLParams;
 
-    /**
-     * Update URL parameters
-     */
-    setParams(params: Partial<URLParams>): void;
+  /**
+   * Update URL parameters
+   */
+  setParams(params: Partial<URLParams>): void;
 
-    /**
-     * Subscribe to parameter changes
-     */
-    onParamsChange(callback: (params: URLParams) => void): () => void;
+  /**
+   * Subscribe to parameter changes
+   */
+  onParamsChange(callback: (params: URLParams) => void): () => void;
 }

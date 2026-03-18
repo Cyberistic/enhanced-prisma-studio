@@ -24,12 +24,8 @@ function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
  * Hook that Nuqs will call to read & write URL state.
  */
 function useHashAdapter() {
-  const rawHash =
-    typeof window !== "undefined" ? window.location.hash.slice(1) : "";
-  const [storedRawHash, setStoredRawHash] = useUiState<string>(
-    HASH_STATE_KEY,
-    rawHash,
-  );
+  const rawHash = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
+  const [storedRawHash, setStoredRawHash] = useUiState<string>(HASH_STATE_KEY, rawHash);
 
   const updateHashState = (nextRawHash: string) => {
     setStoredRawHash(nextRawHash);
@@ -79,10 +75,7 @@ function useHashAdapter() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const searchParams = useMemo(
-    () => new URLSearchParams(storedRawHash),
-    [storedRawHash],
-  );
+  const searchParams = useMemo(() => new URLSearchParams(storedRawHash), [storedRawHash]);
 
   return { searchParams, updateUrl, getSearchParamsSnapshot };
 }
@@ -90,6 +83,4 @@ function useHashAdapter() {
 /**
  * The adapter provider component you wrap your app in.
  */
-export const NuqsHashAdapter = createAdapterProvider(
-  useHashAdapter,
-) as FC<PropsWithChildren>;
+export const NuqsHashAdapter = createAdapterProvider(useHashAdapter) as FC<PropsWithChildren>;

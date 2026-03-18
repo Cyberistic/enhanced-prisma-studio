@@ -36,14 +36,7 @@ export function RelationLink(props: {
   targetSchema: string | null | undefined;
   targetTable: string | null | undefined;
 }) {
-  const {
-    createUrl,
-    filterColumn,
-    filterValue,
-    introspection,
-    targetSchema,
-    targetTable,
-  } = props;
+  const { createUrl, filterColumn, filterValue, introspection, targetSchema, targetTable } = props;
 
   if (targetSchema == null || targetTable == null || filterColumn == null) {
     return null;

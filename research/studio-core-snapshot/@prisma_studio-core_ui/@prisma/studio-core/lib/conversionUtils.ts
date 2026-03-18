@@ -1,11 +1,6 @@
 import type { Column, FilterOperator } from "@/data";
 
-const TEXT_MATCH_OPERATORS = new Set<FilterOperator>([
-  "like",
-  "not like",
-  "ilike",
-  "not ilike",
-]);
+const TEXT_MATCH_OPERATORS = new Set<FilterOperator>(["like", "not like", "ilike", "not ilike"]);
 
 export function coerceToValue(
   column: Column | undefined,
@@ -22,11 +17,7 @@ export function coerceToValue(
     return value.toLowerCase() === "null" ? null : value;
   }
 
-  if (
-    column?.datatype.isArray &&
-    operator != null &&
-    !TEXT_MATCH_OPERATORS.has(operator)
-  ) {
+  if (column?.datatype.isArray && operator != null && !TEXT_MATCH_OPERATORS.has(operator)) {
     try {
       const parsed = JSON.parse(value) as unknown;
 
@@ -73,11 +64,7 @@ export function coerceToString(
     return "";
   }
 
-  if (
-    column?.datatype.isArray &&
-    operator != null &&
-    !TEXT_MATCH_OPERATORS.has(operator)
-  ) {
+  if (column?.datatype.isArray && operator != null && !TEXT_MATCH_OPERATORS.has(operator)) {
     try {
       return JSON.stringify(value);
     } catch {

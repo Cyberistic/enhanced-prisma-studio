@@ -1,13 +1,4 @@
-import {
-  Check,
-  ChevronDown,
-  Code2,
-  Database,
-  FilterIcon,
-  Loader2,
-  Search,
-  X,
-} from "lucide-react";
+import { Check, ChevronDown, Code2, Database, FilterIcon, Loader2, Search, X } from "lucide-react";
 import {
   type ChangeEvent,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -33,11 +24,7 @@ import type {
 
 import { coerceToString, coerceToValue } from "../../../../lib/conversionUtils";
 import { Input } from "../../../components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "../../../components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 import {
   Tooltip,
   TooltipContent,
@@ -58,10 +45,7 @@ import {
   isFilterOperator,
 } from "../../../hooks/filter-utils";
 import { cn } from "../../../lib/utils";
-import {
-  buildSqlFilterLintStatement,
-  getSqlFilterLintFailureMessage,
-} from "./sql-filter-lint";
+import { buildSqlFilterLintStatement, getSqlFilterLintFailureMessage } from "./sql-filter-lint";
 import { applyAiTableFilterRequest } from "./table-ai-filter";
 
 const DEFAULT_FILTER_OPERATORS: FilterOperator[] = [
@@ -221,9 +205,7 @@ function wrapFilterPillTooltip(args: {
   );
 }
 
-export function InlineTableFilterAddButton(
-  props: InlineTableFilterAddButtonProps,
-) {
+export function InlineTableFilterAddButton(props: InlineTableFilterAddButtonProps) {
   const {
     aiFilter,
     aiFocusRequestKey = 0,
@@ -319,10 +301,7 @@ export function InlineTableFilterAddButton(
   function handleColumnSelect(columnName: string) {
     const nextFilter = {
       ...editingFilter,
-      filters: [
-        ...editingFilter.filters,
-        createEditingColumnFilter(columnName),
-      ],
+      filters: [...editingFilter.filters, createEditingColumnFilter(columnName)],
     };
 
     setEditingFilter(nextFilter);
@@ -341,10 +320,8 @@ export function InlineTableFilterAddButton(
     setIsOpen(false);
   }
 
-  const isAiPromptActive =
-    isAiExpanded || aiPrompt.trim().length > 0 || isApplyingAiFilter;
-  const showAiSubmitAction =
-    aiPrompt.trim().length > 0 && !isApplyingAiFilter && isAiFilterVisible;
+  const isAiPromptActive = isAiExpanded || aiPrompt.trim().length > 0 || isApplyingAiFilter;
+  const showAiSubmitAction = aiPrompt.trim().length > 0 && !isApplyingAiFilter && isAiFilterVisible;
 
   const filterMenuTrigger = (
     <PopoverTrigger asChild>
@@ -359,9 +336,7 @@ export function InlineTableFilterAddButton(
           isAiFilterVisible
             ? "border-r border-border/70 hover:bg-accent/50"
             : "rounded-md border border-input shadow-sm hover:bg-accent",
-          !isAiFilterVisible &&
-            totalEditingFilters > 0 &&
-            "border-primary ring-1 ring-primary/15",
+          !isAiFilterVisible && totalEditingFilters > 0 && "border-primary ring-1 ring-primary/15",
         )}
         onClick={(event) => {
           if (!disabled) {
@@ -419,10 +394,7 @@ export function InlineTableFilterAddButton(
   return (
     <div
       data-testid="table-ai-filter-control"
-      className={cn(
-        "flex min-w-0 items-center",
-        isAiFilterVisible && isAiPromptActive && "flex-1",
-      )}
+      className={cn("flex min-w-0 items-center", isAiFilterVisible && isAiPromptActive && "flex-1")}
     >
       <Popover open={isOpen} onOpenChange={handlePopoverOpenChange}>
         {isAiFilterVisible ? (
@@ -547,8 +519,7 @@ export function InlineTableFilterAddButton(
             </div>
           </div>
           <div className="max-h-[280px] overflow-y-auto p-1.5">
-            {visibleColumns.length === 0 &&
-            !matchesSqlFilterOption(searchTerm) ? (
+            {visibleColumns.length === 0 && !matchesSqlFilterOption(searchTerm) ? (
               <div className="px-2.5 py-4 text-xs text-muted-foreground">
                 No columns match this search.
               </div>
@@ -580,9 +551,7 @@ export function InlineTableFilterAddButton(
                   >
                     <span className="flex min-w-0 items-center gap-2.5">
                       <Database className="size-3.5 text-muted-foreground" />
-                      <span className="truncate text-sm font-medium">
-                        {column.name}
-                      </span>
+                      <span className="truncate text-sm font-medium">{column.name}</span>
                     </span>
                     <span className="truncate pl-3 text-xs text-muted-foreground">
                       {getFilterColumnDatatypeLabel(column)}
@@ -598,9 +567,7 @@ export function InlineTableFilterAddButton(
   );
 }
 
-export function InlineTableFiltersHeaderRow(
-  props: InlineTableFiltersHeaderRowProps,
-) {
+export function InlineTableFiltersHeaderRow(props: InlineTableFiltersHeaderRowProps) {
   const {
     applyEditingFilter,
     disabled = false,
@@ -630,9 +597,7 @@ export function InlineTableFiltersHeaderRow(
   function removeNodeAtIndex(index: number) {
     const nextFilter = {
       ...editingFilter,
-      filters: editingFilter.filters.filter(
-        (_filter, currentIndex) => currentIndex !== index,
-      ),
+      filters: editingFilter.filters.filter((_filter, currentIndex) => currentIndex !== index),
     };
 
     setEditingFilter(nextFilter);
@@ -650,11 +615,7 @@ export function InlineTableFiltersHeaderRow(
   }
 
   function handleBlockedKeyCapture(event: ReactKeyboardEvent<HTMLDivElement>) {
-    if (
-      !disabled ||
-      event.key === "Tab" ||
-      !isInteractiveFilterTarget(event.target)
-    ) {
+    if (!disabled || event.key === "Tab" || !isInteractiveFilterTarget(event.target)) {
       return;
     }
 
@@ -672,10 +633,7 @@ export function InlineTableFiltersHeaderRow(
       onKeyDownCapture={handleBlockedKeyCapture}
       onMouseDownCapture={handleBlockedMouseCapture}
     >
-      <div
-        data-testid="table-filter-pill-list"
-        className="flex flex-wrap items-center gap-1.5"
-      >
+      <div data-testid="table-filter-pill-list" className="flex flex-wrap items-center gap-1.5">
         {editingFilter.filters.map((filterNode, index) =>
           filterNode.kind === "ColumnFilter" ? (
             <InlineTableFilterPill
@@ -713,9 +671,7 @@ export function InlineTableFiltersHeaderRow(
 function isInteractiveFilterTarget(target: EventTarget | null) {
   return (
     target instanceof Element &&
-    target.closest(
-      "button, input, textarea, [role='button'], [role='combobox']",
-    ) != null
+    target.closest("button, input, textarea, [role='button'], [role='combobox']") != null
   );
 }
 
@@ -727,14 +683,7 @@ function InlineTableFilterPill(props: {
   onUpdate: (filter: EditingColumnFilter) => void;
   table: Table;
 }) {
-  const {
-    applyEditingFilter,
-    availableOperators,
-    filter,
-    onRemove,
-    onUpdate,
-    table,
-  } = props;
+  const { applyEditingFilter, availableOperators, filter, onRemove, onUpdate, table } = props;
   const [isEditing, setIsEditing] = useState(filter.operator === "");
   const [isDraftFilter, setIsDraftFilter] = useState(filter.operator === "");
   const [isOperatorOpen, setIsOperatorOpen] = useState(false);
@@ -911,9 +860,7 @@ function InlineTableFilterPill(props: {
       aria-invalid={savedSyntaxIssue ? true : undefined}
       className={cn(
         "inline-flex max-w-full items-stretch overflow-hidden rounded-full border bg-background text-xs leading-none font-sans shadow-sm",
-        savedSyntaxIssue
-          ? "border-amber-400 ring-1 ring-amber-300/80"
-          : "border-table-border",
+        savedSyntaxIssue ? "border-amber-400 ring-1 ring-amber-300/80" : "border-table-border",
       )}
       data-filter-ai-query={filter.aiSource?.query}
       data-filter-origin={filter.aiSource ? "ai" : "manual"}
@@ -922,14 +869,9 @@ function InlineTableFilterPill(props: {
     >
       <div className="flex h-6 min-h-0 min-w-0 items-center gap-1.5 border-r border-table-border px-2 py-0">
         <Database
-          className={cn(
-            "size-3.5 shrink-0",
-            savedSyntaxIssue ? "text-amber-500" : "text-primary",
-          )}
+          className={cn("size-3.5 shrink-0", savedSyntaxIssue ? "text-amber-500" : "text-primary")}
         />
-        <span className="truncate font-semibold leading-none">
-          {filter.column}
-        </span>
+        <span className="truncate font-semibold leading-none">{filter.column}</span>
       </div>
       <Popover
         open={isOperatorUnset || isOperatorOpen}
@@ -1013,9 +955,7 @@ function InlineTableFilterPill(props: {
                         className="flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground"
                         onClick={() => handleOperatorSelect(option.value)}
                       >
-                        <span className="text-sm font-medium">
-                          {option.label}
-                        </span>
+                        <span className="text-sm font-medium">{option.label}</span>
                         <span className="text-xs text-muted-foreground">
                           {option.value.toUpperCase()}
                         </span>
@@ -1072,11 +1012,7 @@ function InlineTableFilterPill(props: {
           onRemove();
         }}
       >
-        {isEditing ? (
-          <Check className="size-3.5" />
-        ) : (
-          <X className="size-3.5" />
-        )}
+        {isEditing ? <Check className="size-3.5" /> : <X className="size-3.5" />}
       </button>
     </div>
   );
@@ -1096,18 +1032,9 @@ function InlineTableSqlFilterPill(props: {
   sqlFilterLint?: SqlFilterLintSupport | null;
   table: Table;
 }) {
-  const {
-    applyEditingFilter,
-    filter,
-    onRemove,
-    onUpdate,
-    sqlFilterLint,
-    table,
-  } = props;
+  const { applyEditingFilter, filter, onRemove, onUpdate, sqlFilterLint, table } = props;
   const [isEditing, setIsEditing] = useState(filter.sql.trim().length === 0);
-  const [isDraftFilter, setIsDraftFilter] = useState(
-    filter.sql.trim().length === 0,
-  );
+  const [isDraftFilter, setIsDraftFilter] = useState(filter.sql.trim().length === 0);
   const pillRef = useRef<HTMLDivElement | null>(null);
   const lintRequestStateRef = useRef<{
     abortController: AbortController | null;
@@ -1119,9 +1046,7 @@ function InlineTableSqlFilterPill(props: {
   const latestFilterRef = useRef(filter);
   const valueInputRef = useRef<HTMLInputElement | null>(null);
   const syntaxIssue = getEditingFilterSyntaxIssue(filter, table.columns);
-  const savedSyntaxIssue = !isEditing
-    ? getEditingFilterIssue(filter, table.columns)
-    : null;
+  const savedSyntaxIssue = !isEditing ? getEditingFilterIssue(filter, table.columns) : null;
   const displayValue = filter.sql.trim().length > 0 ? filter.sql : "Empty";
   const sqlLintRequestKey = useMemo(() => {
     if (!sqlFilterLint || syntaxIssue) {
@@ -1257,10 +1182,7 @@ function InlineTableSqlFilterPill(props: {
         },
       )
       .then((result) => {
-        if (
-          abortController.signal.aborted ||
-          lintRequestStateRef.current.requestId !== requestId
-        ) {
+        if (abortController.signal.aborted || lintRequestStateRef.current.requestId !== requestId) {
           return;
         }
 
@@ -1316,9 +1238,7 @@ function InlineTableSqlFilterPill(props: {
       aria-invalid={savedSyntaxIssue ? true : undefined}
       className={cn(
         "inline-flex max-w-full items-stretch overflow-hidden rounded-full border bg-background text-xs leading-none font-sans shadow-sm",
-        savedSyntaxIssue
-          ? "border-amber-400 ring-1 ring-amber-300/80"
-          : "border-table-border",
+        savedSyntaxIssue ? "border-amber-400 ring-1 ring-amber-300/80" : "border-table-border",
       )}
       data-filter-ai-query={filter.aiSource?.query}
       data-filter-origin={filter.aiSource ? "ai" : "manual"}
@@ -1327,10 +1247,7 @@ function InlineTableSqlFilterPill(props: {
     >
       <div className="flex h-6 min-h-0 items-center gap-1.5 border-r border-table-border px-2 py-0">
         <Code2
-          className={cn(
-            "size-3.5 shrink-0",
-            savedSyntaxIssue ? "text-amber-500" : "text-primary",
-          )}
+          className={cn("size-3.5 shrink-0", savedSyntaxIssue ? "text-amber-500" : "text-primary")}
         />
         <span className="font-semibold leading-none">SQL</span>
       </div>
@@ -1390,11 +1307,7 @@ function InlineTableSqlFilterPill(props: {
           onRemove();
         }}
       >
-        {isEditing ? (
-          <Check className="size-3.5" />
-        ) : (
-          <X className="size-3.5" />
-        )}
+        {isEditing ? <Check className="size-3.5" /> : <X className="size-3.5" />}
       </button>
     </div>
   );

@@ -41,12 +41,7 @@ export function IntrospectionStatusNotice(props: IntrospectionStatusNoticeProps)
         className,
       )}
     >
-      <div
-        className={cn(
-          "gap-3",
-          compact ? "flex items-start justify-between" : "flex flex-col",
-        )}
-      >
+      <div className={cn("gap-3", compact ? "flex items-start justify-between" : "flex flex-col")}>
         <div className="min-w-0">
           <div className="flex items-center gap-2 font-medium">
             <IconAlertCircle size={14} />

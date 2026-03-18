@@ -1,9 +1,6 @@
 import type { PrismaStudioQuery, RawQueryable } from "../types";
 
-export async function executeSqlQuery(
-  queryable: RawQueryable,
-  query: PrismaStudioQuery,
-) {
+export async function executeSqlQuery(queryable: RawQueryable, query: PrismaStudioQuery) {
   const rows = (await queryable.$queryRawUnsafe(
     query.sql,
     ...(query.parameters as unknown[]),
@@ -31,8 +28,7 @@ export async function executeSqlQuery(
       if (typeof columnValue === "string") {
         try {
           transformedRow[columnName] = JSON.parse(columnValue);
-        } catch {
-        }
+        } catch {}
       }
     }
 

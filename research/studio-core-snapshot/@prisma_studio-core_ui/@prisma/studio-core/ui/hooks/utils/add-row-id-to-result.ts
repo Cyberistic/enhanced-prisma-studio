@@ -11,11 +11,7 @@ function getRowId(row: Record<string, unknown>, table: Table) {
   return JSON.stringify(id);
 }
 
-function addRowIdToRow(args: {
-  row: Record<string, unknown>;
-  table: Table;
-  orderIndex?: number;
-}) {
+function addRowIdToRow(args: { row: Record<string, unknown>; table: Table; orderIndex?: number }) {
   const { row, table, orderIndex } = args;
 
   return {
@@ -30,10 +26,7 @@ type AdapterResult = {
   rows?: Record<string, unknown>[];
 };
 
-export function addRowIdToResult<T extends AdapterResult>(
-  result: T,
-  table: Table,
-) {
+export function addRowIdToResult<T extends AdapterResult>(result: T, table: Table) {
   const { row, rows } = result;
 
   if (row !== undefined) {

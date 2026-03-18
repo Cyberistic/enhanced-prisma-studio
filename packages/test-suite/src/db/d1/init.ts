@@ -3,32 +3,17 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
-import dotenv from "dotenv";
-
 const execFileAsync = promisify(execFile);
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const testSuiteRoot = path.resolve(scriptDir, "../../..");
 const workspaceRoot = path.resolve(testSuiteRoot, "../..");
 
-dotenv.config({
-  override: true,
-  path: path.join(workspaceRoot, "apps/web/.env"),
-});
-
-if (!process.env.CLOUDFLARE_API_TOKEN || !process.env.CLOUDFLARE_ACCOUNT_ID) {
-  dotenv.config({
-    override: true,
-    path: path.join(process.cwd(), "apps/web/.env"),
-  });
-}
-
 const d1DbName = process.env.D1_TEST_DB_NAME ?? "eps-provider-test";
 const schemaFilePath = path.join(testSuiteRoot, "src", "db", "d1", "schema.sql");
 const seedFilePath = path.join(testSuiteRoot, "src", "db", "d1", "seed.sql");
 const cloudflareApiToken =
-  process.env.CLOUDFLARE_API_TOKEN ??
-  process.env.VITE_CLOUDFLARE_API_TOKEN;
+  process.env.CLOUDFLARE_API_TOKEN ?? process.env.VITE_CLOUDFLARE_API_TOKEN;
 
 async function ensureRemoteDatabase() {
   const listResult = await execFileAsync("bunx", ["wrangler", "d1", "list", "--json"], {

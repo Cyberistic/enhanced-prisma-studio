@@ -1,6 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
-import { serializeError, type StudioBFFRequest } from "@enhanced-prisma-studio/studio-core/data/bff";
+import {
+  serializeError,
+  type StudioBFFRequest,
+} from "@enhanced-prisma-studio/studio-core/data/bff";
 
 import type { DataRow, RawQueryable } from "../types";
 import { executeSqlQuery } from "./sql";
@@ -27,9 +30,15 @@ export const executeStudioRequest = createServerFn({ method: "POST" })
 
         try {
           const secondResult = await executeSqlQuery(prisma, secondQuery);
-          return [[null, firstResult], [null, secondResult]] as const;
+          return [
+            [null, firstResult],
+            [null, secondResult],
+          ] as const;
         } catch (secondError) {
-          return [[null, firstResult], [serializeError(secondError), undefined]] as const;
+          return [
+            [null, firstResult],
+            [serializeError(secondError), undefined],
+          ] as const;
         }
       } catch (firstError) {
         return [[serializeError(firstError)]] as const;
@@ -38,16 +47,18 @@ export const executeStudioRequest = createServerFn({ method: "POST" })
 
     if (data.procedure === "transaction") {
       try {
-        const transactionResults = (await prisma.$transaction(async (transactionClient: unknown) => {
-          const resultSets: DataRow[][] = [];
+        const transactionResults = (await prisma.$transaction(
+          async (transactionClient: unknown) => {
+            const resultSets: DataRow[][] = [];
 
-          for (const query of data.queries) {
-            const rows = await executeSqlQuery(transactionClient as RawQueryable, query);
-            resultSets.push(rows);
-          }
+            for (const query of data.queries) {
+              const rows = await executeSqlQuery(transactionClient as RawQueryable, query);
+              resultSets.push(rows);
+            }
 
-          return resultSets;
-        })) as DataRow[][];
+            return resultSets;
+          },
+        )) as DataRow[][];
 
         return [null, transactionResults] as const;
       } catch (error) {

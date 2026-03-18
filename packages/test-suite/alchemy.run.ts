@@ -7,14 +7,14 @@ const app = await alchemy("enhanced-prisma-studio-test-suite");
 const dbName = process.env.D1_TEST_DB_NAME ?? "eps-provider-test";
 
 await Exec("prisma-generate-db", {
-  command: "bunx prisma generate",
-  cwd: "../db",
-  memoize: { patterns: ["../db/prisma/schema/schema.prisma"] },
+  command: "bunx prisma generate --schema ./prisma/schema/schema.prisma",
+  cwd: ".",
+  memoize: { patterns: ["./prisma/schema/schema.prisma"] },
 });
 
 await Exec("prisma-push-db", {
-  command: "bunx prisma db push --accept-data-loss",
-  cwd: "../db",
+  command: "bunx prisma db push --schema ./prisma/schema/schema.prisma --accept-data-loss",
+  cwd: ".",
   env: {
     DATABASE_URL: `file:${process.cwd()}/tmp/prisma-local.db`,
   },

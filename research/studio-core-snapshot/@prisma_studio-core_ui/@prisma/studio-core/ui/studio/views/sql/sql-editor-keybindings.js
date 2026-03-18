@@ -1,12 +1,12 @@
 export function createSqlEditorKeybindings(args) {
-    const { runSql } = args;
-    return [
-        {
-            key: "Mod-Enter",
-            run: () => {
-                runSql();
-                return true;
-            },
-        },
-    ];
+  const { runSql } = args;
+  return [
+    {
+      key: "Mod-Enter",
+      run: () => {
+        runSql();
+        return true;
+      },
+    },
+  ];
 }

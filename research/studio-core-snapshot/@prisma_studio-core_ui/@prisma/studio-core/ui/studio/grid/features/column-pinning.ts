@@ -14,13 +14,8 @@ export function getColumnPinningStyles(
   const isPinnedCell = kind === "cell" && (isLeftPinned || isRightPinned);
   const headerLayerClass = kind === "header" ? "z-10" : undefined;
   const cellHoverClass =
-    kind === "cell"
-      ? isPinnedCell
-        ? "group-hover:!bg-muted"
-        : "group-hover:bg-muted"
-      : undefined;
-  const regularCellLayerClass =
-    kind === "cell" && !isPinned ? "relative z-0" : undefined;
+    kind === "cell" ? (isPinnedCell ? "group-hover:!bg-muted" : "group-hover:bg-muted") : undefined;
+  const regularCellLayerClass = kind === "cell" && !isPinned ? "relative z-0" : undefined;
   const pinnedCellLayerClass = isPinnedCell
     ? column.id === "__ps_select"
       ? "z-30"
@@ -35,9 +30,7 @@ export function getColumnPinningStyles(
   return {
     className: cn(
       cellHoverClass,
-      kind === "cell" &&
-        isPinned &&
-        "group-odd:!bg-table-cell-odd group-even:!bg-table-cell-even",
+      kind === "cell" && isPinned && "group-odd:!bg-table-cell-odd group-even:!bg-table-cell-even",
       kind === "header" && "select-none touch-none sticky top-0 bg-table-head",
       "group border-r border-b border-table-border",
       "overflow-hidden whitespace-nowrap text-ellipsis",

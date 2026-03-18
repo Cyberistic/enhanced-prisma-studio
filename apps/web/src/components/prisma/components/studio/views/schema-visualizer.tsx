@@ -20,12 +20,7 @@ import ReactFlow, {
 } from "reactflow";
 
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 import "reactflow/dist/style.css";
@@ -56,11 +51,7 @@ type TableNodeData = {
   onOpenTable?: (tableName: string) => void;
 };
 
-function IconWithTooltip(props: {
-  className?: string;
-  icon: React.ReactNode;
-  tooltip: string;
-}) {
+function IconWithTooltip(props: { className?: string; icon: React.ReactNode; tooltip: string }) {
   const { className, icon, tooltip } = props;
 
   return (
@@ -103,7 +94,9 @@ const TableNode = memo(function TableNode(props: NodeProps<TableNodeData>) {
         <IconWithTooltip
           key="nullable"
           className="flex size-5 items-center justify-center rounded-full bg-muted p-0.5 text-muted-foreground"
-          icon={<span className="inline-flex size-4 items-center justify-center text-center">?</span>}
+          icon={
+            <span className="inline-flex size-4 items-center justify-center text-center">?</span>
+          }
           tooltip="Nullable"
         />,
       );
@@ -141,7 +134,8 @@ const TableNode = memo(function TableNode(props: NodeProps<TableNodeData>) {
         <div
           className={cn(
             "flex items-center justify-between border-b border-border px-4 py-3",
-            isNoTablesNode && "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
+            isNoTablesNode &&
+              "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
           )}
         >
           <div className="font-semibold">{data.label}</div>
@@ -168,7 +162,10 @@ const TableNode = memo(function TableNode(props: NodeProps<TableNodeData>) {
             data.fields.map((field) => (
               <div
                 key={`${data.label}.${field.name}`}
-                className={cn("flex items-center gap-2 py-2 text-sm", field.isPrimary && "text-primary")}
+                className={cn(
+                  "flex items-center gap-2 py-2 text-sm",
+                  field.isPrimary && "text-primary",
+                )}
               >
                 <div className="flex min-w-[calc(1.25rem*2+0.25rem)] items-center gap-1">
                   {getFieldIcons(field).map((icon, index) => (
@@ -176,7 +173,9 @@ const TableNode = memo(function TableNode(props: NodeProps<TableNodeData>) {
                   ))}
                 </div>
                 <span className="max-w-44 flex-1 truncate">{field.name}</span>
-                <span className="truncate font-mono text-xs text-muted-foreground">{field.type}</span>
+                <span className="truncate font-mono text-xs text-muted-foreground">
+                  {field.type}
+                </span>
               </div>
             ))
           )}
@@ -302,7 +301,8 @@ export function SchemaVisualizer(props: {
   }, [validRelationships]);
 
   const onConnect = useCallback(
-    (connection: Connection | Edge) => setEdges((currentEdges) => addEdge(connection, currentEdges)),
+    (connection: Connection | Edge) =>
+      setEdges((currentEdges) => addEdge(connection, currentEdges)),
     [],
   );
 

@@ -19,13 +19,7 @@ export interface ComputeColumnVirtualizationWindowArgs {
 export function computeColumnVirtualizationWindow(
   args: ComputeColumnVirtualizationWindowArgs,
 ): ColumnVirtualizationWindow {
-  const {
-    columnWidths,
-    minColumnCount,
-    overscanPx,
-    scrollLeft,
-    viewportWidth,
-  } = args;
+  const { columnWidths, minColumnCount, overscanPx, scrollLeft, viewportWidth } = args;
   const columnCount = columnWidths.length;
 
   if (columnCount === 0) {
@@ -40,15 +34,9 @@ export function computeColumnVirtualizationWindow(
     };
   }
 
-  const sanitizedViewportWidth = Number.isFinite(viewportWidth)
-    ? viewportWidth
-    : 0;
-  const sanitizedScrollLeft = Number.isFinite(scrollLeft)
-    ? Math.max(0, scrollLeft)
-    : 0;
-  const sanitizedOverscan = Number.isFinite(overscanPx)
-    ? Math.max(0, overscanPx)
-    : 0;
+  const sanitizedViewportWidth = Number.isFinite(viewportWidth) ? viewportWidth : 0;
+  const sanitizedScrollLeft = Number.isFinite(scrollLeft) ? Math.max(0, scrollLeft) : 0;
+  const sanitizedOverscan = Number.isFinite(overscanPx) ? Math.max(0, overscanPx) : 0;
 
   if (sanitizedViewportWidth <= 0 || columnCount < minColumnCount) {
     return fullWindow(columnWidths);
@@ -81,10 +69,7 @@ export function computeColumnVirtualizationWindow(
   }
 
   let endIndex = startIndex;
-  while (
-    endIndex < columnCount - 1 &&
-    startOffsets[endIndex + 1]! < windowEnd
-  ) {
+  while (endIndex < columnCount - 1 && startOffsets[endIndex + 1]! < windowEnd) {
     endIndex++;
   }
 
@@ -95,8 +80,7 @@ export function computeColumnVirtualizationWindow(
   const hiddenStartCount = startIndex;
   const hiddenEndCount = Math.max(0, columnCount - 1 - endIndex);
   const hiddenStartWidth = startOffsets[startIndex] ?? 0;
-  const hiddenEndWidth =
-    runningOffset - (endOffsets[endIndex] ?? runningOffset);
+  const hiddenEndWidth = runningOffset - (endOffsets[endIndex] ?? runningOffset);
 
   return {
     enabled: true,

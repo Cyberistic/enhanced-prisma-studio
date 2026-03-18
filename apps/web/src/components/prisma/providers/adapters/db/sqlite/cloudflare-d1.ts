@@ -1,13 +1,12 @@
-import { serializeError, type StudioBFFRequest } from "@enhanced-prisma-studio/studio-core/data/bff";
+import {
+  serializeError,
+  type StudioBFFRequest,
+} from "@enhanced-prisma-studio/studio-core/data/bff";
 
 import { createKyselyStudioAdapter } from "../../kysely-adapter";
 import { requireEnv, type SQLiteProviderFactory } from "./types";
 
-const REQUIRED_ENV = [
-  "CLOUDFLARE_ACCOUNT_ID",
-  "CLOUDFLARE_API_TOKEN",
-  "D1_DATABASE_ID",
-] as const;
+const REQUIRED_ENV = ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "D1_DATABASE_ID"] as const;
 
 export const createSQLiteCloudflareD1Provider: SQLiteProviderFactory = (config) => {
   requireEnv(config.env, REQUIRED_ENV, "sqlite/cloudflare-d1");
@@ -69,9 +68,7 @@ export const createSQLiteCloudflareD1Provider: SQLiteProviderFactory = (config) 
     );
   }
 
-  async function executeWithIntrospectionFallback(
-    request: StudioBFFRequest,
-  ): Promise<unknown> {
+  async function executeWithIntrospectionFallback(request: StudioBFFRequest): Promise<unknown> {
     if (request.procedure === "query") {
       const sql = request.query.sql;
       const hasParams = request.query.parameters.length > 0;
@@ -105,10 +102,16 @@ export const createSQLiteCloudflareD1Provider: SQLiteProviderFactory = (config) 
       })) as readonly [unknown, unknown?];
 
       if (secondResult[0]) {
-        return [[null, firstResult[1] ?? []], [secondResult[0], undefined]] as const;
+        return [
+          [null, firstResult[1] ?? []],
+          [secondResult[0], undefined],
+        ] as const;
       }
 
-      return [[null, firstResult[1] ?? []], [null, secondResult[1] ?? []]] as const;
+      return [
+        [null, firstResult[1] ?? []],
+        [null, secondResult[1] ?? []],
+      ] as const;
     }
 
     return config.executeStudioRequest({ data: request });

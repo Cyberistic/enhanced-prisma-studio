@@ -16,24 +16,12 @@ export interface RawInputProps {
 }
 
 export function RawInput(props: RawInputProps) {
-  const {
-    column,
-    context,
-    onNavigate,
-    onSubmit,
-    readonly,
-    showSaveAction,
-    value,
-  } = props;
+  const { column, context, onNavigate, onSubmit, readonly, showSaveAction, value } = props;
   const { defaultValue, isRequired, nullable } = column;
 
   const valueAsString = value == null ? "" : String(value);
   const emptyValue =
-    context === "insert" && defaultValue != null
-      ? undefined
-      : nullable
-        ? null
-        : "";
+    context === "insert" && defaultValue != null ? undefined : nullable ? null : "";
 
   const { handleOnChange, value: inputValue } = useInput({
     initialValue: valueAsString,

@@ -10,11 +10,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  arrayMove,
-  horizontalListSortingStrategy,
-  SortableContext,
-} from "@dnd-kit/sortable";
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import type {
   Cell as ReactTableCellModel,
   ColumnDef,
@@ -206,14 +202,8 @@ export interface DataGridProps {
   focusedCell?: GridFocusedCell | null;
   selectionScopeKey?: string;
   columnDefs: ColumnDef<Record<string, unknown>, unknown>[];
-  getBeforeHeaderRows?(
-    this: void,
-    table: ReactTable<Record<string, unknown>>,
-  ): ReactNode;
-  getBeforeRows?(
-    this: void,
-    table: ReactTable<Record<string, unknown>>,
-  ): ReactNode;
+  getBeforeHeaderRows?(this: void, table: ReactTable<Record<string, unknown>>): ReactNode;
+  getBeforeRows?(this: void, table: ReactTable<Record<string, unknown>>): ReactNode;
   isFetching: boolean;
   isProcessing: boolean;
   onFocusedCellChange?: (focusedCell: GridFocusedCell | null) => void;
@@ -230,10 +220,7 @@ export interface DataGridProps {
   rows: Record<string, unknown>[];
   rowSelectionState: RowSelectionState;
   sortingState?: SortOrderItem[];
-  canWriteToCell?: (params: {
-    columnId: string;
-    row: Record<string, unknown>;
-  }) => boolean;
+  canWriteToCell?: (params: { columnId: string; row: Record<string, unknown> }) => boolean;
 }
 
 export function getColumnDefinitionIdentityKey(
@@ -264,10 +251,7 @@ function getColumnOrderFromDefs(
     .filter((columnId) => columnId.length > 0);
 }
 
-function normalizePinnedColumnIds(
-  columnIds: string[],
-  validDataColumnIds: string[],
-): string[] {
+function normalizePinnedColumnIds(columnIds: string[], validDataColumnIds: string[]): string[] {
   const validColumnIdSet = new Set(validDataColumnIds);
   const seen = new Set<string>();
   const normalized: string[] = [];
@@ -296,9 +280,7 @@ function buildColumnPinningState(dataPinnedColumnIds: string[]) {
 }
 
 function getDataPinnedColumnIds(pinning: ColumnPinningState): string[] {
-  return (pinning.left ?? []).filter(
-    (columnId) => columnId !== ROW_SELECTOR_COLUMN_ID,
-  );
+  return (pinning.left ?? []).filter((columnId) => columnId !== ROW_SELECTOR_COLUMN_ID);
 }
 
 function arraysAreEqual(left: string[], right: string[]): boolean {
@@ -315,10 +297,7 @@ function arraysAreEqual(left: string[], right: string[]): boolean {
   return true;
 }
 
-function pinningStatesAreEqual(
-  left: ColumnPinningState,
-  right: ColumnPinningState,
-): boolean {
+function pinningStatesAreEqual(left: ColumnPinningState, right: ColumnPinningState): boolean {
   return (
     arraysAreEqual(left.left ?? [], right.left ?? []) &&
     arraysAreEqual(left.right ?? [], right.right ?? [])
@@ -452,10 +431,7 @@ export function resolveColumnDragReorder(
     );
 
     return {
-      didReorder: !arraysAreEqual(
-        reorderedLeftDataPinnedColumnIds,
-        leftDataPinnedColumnIds,
-      ),
+      didReorder: !arraysAreEqual(reorderedLeftDataPinnedColumnIds, leftDataPinnedColumnIds),
       nextColumnOrder,
       nextColumnPinning: {
         left: [ROW_SELECTOR_COLUMN_ID, ...reorderedLeftDataPinnedColumnIds],
@@ -484,10 +460,7 @@ export function resolveColumnDragReorder(
     );
 
     return {
-      didReorder: !arraysAreEqual(
-        reorderedRightPinnedColumnIds,
-        rightPinnedColumnIds,
-      ),
+      didReorder: !arraysAreEqual(reorderedRightPinnedColumnIds, rightPinnedColumnIds),
       nextColumnOrder,
       nextColumnPinning: {
         left: columnPinning.left ?? [],
@@ -586,9 +559,7 @@ export function resolveDirectionalColumnDragTarget(
   }
 
   const nextIndex =
-    deltaX > 0
-      ? Math.min(zoneColumnIds.length - 1, activeIndex + 1)
-      : Math.max(0, activeIndex - 1);
+    deltaX > 0 ? Math.min(zoneColumnIds.length - 1, activeIndex + 1) : Math.max(0, activeIndex - 1);
 
   if (nextIndex === activeIndex) {
     return null;
@@ -602,10 +573,7 @@ function normalizeColumnPinningState(
   validDataColumnIds: string[],
 ): ColumnPinningState {
   return buildColumnPinningState(
-    normalizePinnedColumnIds(
-      getDataPinnedColumnIds(pinning),
-      validDataColumnIds,
-    ),
+    normalizePinnedColumnIds(getDataPinnedColumnIds(pinning), validDataColumnIds),
   );
 }
 
@@ -658,11 +626,10 @@ export function DataGrid(props: DataGridProps) {
     () => clampColumnSizingState(columnSizing),
     [columnSizing],
   );
-  const [selectionState, setSelectionState] =
-    useUiState<GridSelectionMachineState>(
-      `datagrid:${gridScope}:selection-state`,
-      GRID_SELECTION_MACHINE_INITIAL_STATE,
-    );
+  const [selectionState, setSelectionState] = useUiState<GridSelectionMachineState>(
+    `datagrid:${gridScope}:selection-state`,
+    GRID_SELECTION_MACHINE_INITIAL_STATE,
+  );
   const selectionStart = getCellSelectionAnchor(selectionState);
   const selectionEnd = getCellSelectionFocus(selectionState);
   const selectionRange = getCellSelectionRange(selectionState);
@@ -679,9 +646,7 @@ export function DataGrid(props: DataGridProps) {
   } | null>(null);
   const rowSelectionAnchorRef = useRef<number | null>(null);
   const rowSelectionDragRef = useRef(false);
-  const previousSelectionScopeKeyRef = useRef<string | undefined>(
-    selectionScopeKey,
-  );
+  const previousSelectionScopeKeyRef = useRef<string | undefined>(selectionScopeKey);
   const sorting = useMemo(() => toSortingState(sortingState), [sortingState]);
   const columnDefinitionIdentityKey = useMemo(
     () => getColumnDefinitionIdentityKey(columnDefs),
@@ -690,29 +655,21 @@ export function DataGrid(props: DataGridProps) {
   const initialColumnOrderRef = useRef<string[]>([]);
   const previousColumnDefinitionIdentityKeyRef = useRef("");
 
-  if (
-    previousColumnDefinitionIdentityKeyRef.current !==
-    columnDefinitionIdentityKey
-  ) {
-    previousColumnDefinitionIdentityKeyRef.current =
-      columnDefinitionIdentityKey;
+  if (previousColumnDefinitionIdentityKeyRef.current !== columnDefinitionIdentityKey) {
+    previousColumnDefinitionIdentityKeyRef.current = columnDefinitionIdentityKey;
     initialColumnOrderRef.current = getColumnOrderFromDefs(columnDefs);
   }
 
   const initialColumnOrder = initialColumnOrderRef.current;
   const validDataColumnIds = useMemo(
-    () =>
-      initialColumnOrder.filter(
-        (columnId) => columnId !== ROW_SELECTOR_COLUMN_ID,
-      ),
+    () => initialColumnOrder.filter((columnId) => columnId !== ROW_SELECTOR_COLUMN_ID),
     [initialColumnOrder],
   );
   const normalizedPropPinnedColumnIds = useMemo(
     () => normalizePinnedColumnIds(pinnedColumnIds ?? [], validDataColumnIds),
     [pinnedColumnIds, validDataColumnIds],
   );
-  const normalizedPropPinnedColumnIdsKey =
-    normalizedPropPinnedColumnIds.join("|");
+  const normalizedPropPinnedColumnIdsKey = normalizedPropPinnedColumnIds.join("|");
   const defaultColumnPinning = useMemo(
     () =>
       pinnedColumnIds == null
@@ -743,9 +700,7 @@ export function DataGrid(props: DataGridProps) {
       return;
     }
 
-    const nextPinningState = buildColumnPinningState(
-      normalizedPropPinnedColumnIds,
-    );
+    const nextPinningState = buildColumnPinningState(normalizedPropPinnedColumnIds);
     if (!pinningStatesAreEqual(columnPinning, nextPinningState)) {
       setColumnPinning(nextPinningState);
     }
@@ -774,12 +729,12 @@ export function DataGrid(props: DataGridProps) {
   }, [columnSizing, normalizedColumnSizing, setColumnSizing]);
 
   const tableRef = useRef<HTMLTableElement | null>(null);
-  const pendingLayoutAnimationSnapshotRef =
-    useRef<GridLayoutAnimationSnapshot | null>(null);
+  const pendingLayoutAnimationSnapshotRef = useRef<GridLayoutAnimationSnapshot | null>(null);
   const layoutAnimationFrameRef = useRef<number | null>(null);
   const layoutAnimationCleanupTimeoutRef = useRef<number | null>(null);
-  const [layoutAnimationState, setLayoutAnimationState] =
-    useState<GridLayoutAnimationState | null>(null);
+  const [layoutAnimationState, setLayoutAnimationState] = useState<GridLayoutAnimationState | null>(
+    null,
+  );
 
   const clearGridLayoutAnimation = useCallback(() => {
     if (layoutAnimationFrameRef.current != null) {
@@ -802,17 +757,14 @@ export function DataGrid(props: DataGridProps) {
     }
 
     clearGridLayoutAnimation();
-    pendingLayoutAnimationSnapshotRef.current =
-      captureGridLayoutAnimationSnapshot(tableElement);
+    pendingLayoutAnimationSnapshotRef.current = captureGridLayoutAnimationSnapshot(tableElement);
   }, [clearGridLayoutAnimation]);
 
   const handleColumnPinningChange = useCallback<OnChangeFn<ColumnPinningState>>(
     (updaterOrValue) => {
       setColumnPinning((current) => {
         const nextPinningState =
-          typeof updaterOrValue === "function"
-            ? updaterOrValue(current)
-            : updaterOrValue;
+          typeof updaterOrValue === "function" ? updaterOrValue(current) : updaterOrValue;
         const normalizedNextPinningState = normalizeColumnPinningState(
           nextPinningState,
           validDataColumnIds,
@@ -825,9 +777,7 @@ export function DataGrid(props: DataGridProps) {
             getDataPinnedColumnIds(normalizedNextPinningState),
           )
         ) {
-          onPinnedColumnIdsChange(
-            getDataPinnedColumnIds(normalizedNextPinningState),
-          );
+          onPinnedColumnIdsChange(getDataPinnedColumnIds(normalizedNextPinningState));
         }
 
         if (!pinningStatesAreEqual(current, normalizedNextPinningState)) {
@@ -839,27 +789,18 @@ export function DataGrid(props: DataGridProps) {
           : normalizedNextPinningState;
       });
     },
-    [
-      onPinnedColumnIdsChange,
-      queueGridLayoutAnimation,
-      setColumnPinning,
-      validDataColumnIds,
-    ],
+    [onPinnedColumnIdsChange, queueGridLayoutAnimation, setColumnPinning, validDataColumnIds],
   );
 
   const getHeaderCellMetrics = useCallback(
-    (
-      headerId: string,
-    ): { metrics: ActiveColumnDragMetrics | null; width: number } => {
+    (headerId: string): { metrics: ActiveColumnDragMetrics | null; width: number } => {
       const tableElement = tableRef.current;
 
       if (!tableElement) {
         return { metrics: null, width: DEFAULT_GRID_COLUMN_SIZE };
       }
 
-      const headerElements = tableElement.querySelectorAll<HTMLElement>(
-        "th[data-grid-header-id]",
-      );
+      const headerElements = tableElement.querySelectorAll<HTMLElement>("th[data-grid-header-id]");
       const matchedHeaderElement = Array.from(headerElements).find(
         (headerElement) => headerElement.dataset.gridHeaderId === headerId,
       );
@@ -908,12 +849,8 @@ export function DataGrid(props: DataGridProps) {
       return false;
     }
 
-    const currentPointerY =
-      dragMetrics.centerY + activeColumnDragDeltaRef.current.y;
-    return (
-      currentPointerY < dragMetrics.top - 4 ||
-      currentPointerY > dragMetrics.bottom + 4
-    );
+    const currentPointerY = dragMetrics.centerY + activeColumnDragDeltaRef.current.y;
+    return currentPointerY < dragMetrics.top - 4 || currentPointerY > dragMetrics.bottom + 4;
   }, []);
 
   const handleDragOver = useCallback(
@@ -926,19 +863,14 @@ export function DataGrid(props: DataGridProps) {
         overId: over ? String(over.id) : null,
       });
       const shouldEnablePreview = Boolean(
-        dragDropTarget.compatibleOverId &&
-        dragDropTarget.compatibleOverId !== activeId,
+        dragDropTarget.compatibleOverId && dragDropTarget.compatibleOverId !== activeId,
       );
       setIsColumnReorderPreviewEnabled((current) =>
         current === shouldEnablePreview ? current : shouldEnablePreview,
       );
 
-      if (
-        dragDropTarget.compatibleOverId &&
-        dragDropTarget.compatibleOverId !== activeId
-      ) {
-        lastCompatibleColumnDragOverIdRef.current =
-          dragDropTarget.compatibleOverId;
+      if (dragDropTarget.compatibleOverId && dragDropTarget.compatibleOverId !== activeId) {
+        lastCompatibleColumnDragOverIdRef.current = dragDropTarget.compatibleOverId;
         return;
       }
 
@@ -964,9 +896,7 @@ export function DataGrid(props: DataGridProps) {
         overId: over ? String(over.id) : null,
       });
       let overId = dragDropTarget.resolvedDropTargetId;
-      const hasExplicitIncompatibleOver = Boolean(
-        over && !dragDropTarget.compatibleOverId,
-      );
+      const hasExplicitIncompatibleOver = Boolean(over && !dragDropTarget.compatibleOverId);
 
       if ((!overId || overId === activeId) && !hasExplicitIncompatibleOver) {
         overId = resolveDirectionalColumnDragTarget({
@@ -1006,14 +936,9 @@ export function DataGrid(props: DataGridProps) {
         validDataColumnIds,
       );
       const currentPinnedColumnIds = getDataPinnedColumnIds(columnPinning);
-      const nextPinnedColumnIds = getDataPinnedColumnIds(
-        normalizedNextPinningState,
-      );
+      const nextPinnedColumnIds = getDataPinnedColumnIds(normalizedNextPinningState);
 
-      if (
-        onPinnedColumnIdsChange &&
-        !arraysAreEqual(currentPinnedColumnIds, nextPinnedColumnIds)
-      ) {
+      if (onPinnedColumnIdsChange && !arraysAreEqual(currentPinnedColumnIds, nextPinnedColumnIds)) {
         onPinnedColumnIdsChange(nextPinnedColumnIds);
       }
 
@@ -1052,16 +977,13 @@ export function DataGrid(props: DataGridProps) {
     scrollLeft: 0,
     width: 0,
   });
-  const [contextMenuTarget, setContextMenuTarget] =
-    useState<GridContextMenuTarget | null>(null);
-  const [activeColumnDragState, setActiveColumnDragState] =
-    useState<ActiveColumnDragState | null>(null);
-  const [isColumnReorderPreviewEnabled, setIsColumnReorderPreviewEnabled] =
-    useState(true);
-  const lastCompatibleColumnDragOverIdRef = useRef<string | null>(null);
-  const activeColumnDragMetricsRef = useRef<ActiveColumnDragMetrics | null>(
+  const [contextMenuTarget, setContextMenuTarget] = useState<GridContextMenuTarget | null>(null);
+  const [activeColumnDragState, setActiveColumnDragState] = useState<ActiveColumnDragState | null>(
     null,
   );
+  const [isColumnReorderPreviewEnabled, setIsColumnReorderPreviewEnabled] = useState(true);
+  const lastCompatibleColumnDragOverIdRef = useRef<string | null>(null);
+  const activeColumnDragMetricsRef = useRef<ActiveColumnDragMetrics | null>(null);
   const activeColumnDragDeltaRef = useRef({ x: 0, y: 0 });
   const autoScrolledFocusedCellRef = useRef<GridFocusedCell | null>(null);
 
@@ -1162,9 +1084,7 @@ export function DataGrid(props: DataGridProps) {
     onColumnOrderChange: setColumnOrder,
     onColumnPinningChange: handleColumnPinningChange,
     onColumnSizingChange: (updaterOrValue) =>
-      setColumnSizing((previous) =>
-        resolveColumnSizingStateUpdate(previous, updaterOrValue),
-      ),
+      setColumnSizing((previous) => resolveColumnSizingStateUpdate(previous, updaterOrValue)),
     onPaginationChange,
     onRowSelectionChange,
     onSortingChange: (updaterOrValue) =>
@@ -1197,10 +1117,7 @@ export function DataGrid(props: DataGridProps) {
     0,
     centerViewport.width - leftPinnedWidth - rightPinnedWidth,
   );
-  const centerViewportScrollLeft = Math.max(
-    0,
-    centerViewport.scrollLeft - leftPinnedWidth,
-  );
+  const centerViewportScrollLeft = Math.max(0, centerViewport.scrollLeft - leftPinnedWidth);
   const centerColumnWindow = computeColumnVirtualizationWindow({
     columnWidths: centerVisibleLeafColumns.map((column) => column.getSize()),
     minColumnCount: COLUMN_VIRTUALIZATION_MIN_COLUMN_COUNT,
@@ -1217,13 +1134,7 @@ export function DataGrid(props: DataGridProps) {
   }, [visibleLeafColumns]);
 
   const columnIndexById = useMemo(
-    () =>
-      new Map(
-        selectableColumnIds.map((columnId, columnIndex) => [
-          columnId,
-          columnIndex,
-        ]),
-      ),
+    () => new Map(selectableColumnIds.map((columnId, columnIndex) => [columnId, columnIndex])),
     [selectableColumnIds],
   );
   const selectableColumnsKey = selectableColumnIds.join("|");
@@ -1236,10 +1147,7 @@ export function DataGrid(props: DataGridProps) {
       return items;
     }
 
-    return items.slice(
-      centerColumnWindow.startIndex,
-      centerColumnWindow.endIndex + 1,
-    );
+    return items.slice(centerColumnWindow.startIndex, centerColumnWindow.endIndex + 1);
   }
 
   const getSingleCellClipboardText = useCallback(
@@ -1272,11 +1180,7 @@ export function DataGrid(props: DataGridProps) {
 
   const getRowClipboardText = useCallback(
     (rowIndex: number): string => {
-      if (
-        rows.length === 0 ||
-        selectableColumnIds.length === 0 ||
-        lastSelectableColumnIndex < 0
-      ) {
+      if (rows.length === 0 || selectableColumnIds.length === 0 || lastSelectableColumnIndex < 0) {
         return "";
       }
 
@@ -1374,19 +1278,14 @@ export function DataGrid(props: DataGridProps) {
       const endTarget = document.elementFromPoint(event.clientX, event.clientY);
       const endCell =
         endTarget instanceof Element
-          ? endTarget.closest<HTMLElement>(
-              "td[data-grid-row-index][data-grid-column-id]",
-            )
+          ? endTarget.closest<HTMLElement>("td[data-grid-row-index][data-grid-column-id]")
           : null;
 
       const endRowIndex = Number(endCell?.dataset.gridRowIndex);
       const endColumnId = endCell?.dataset.gridColumnId;
-      const endColumnIndex =
-        endColumnId != null ? columnIndexById.get(endColumnId) : undefined;
+      const endColumnIndex = endColumnId != null ? columnIndexById.get(endColumnId) : undefined;
       const endCoordinate =
-        Number.isInteger(endRowIndex) &&
-        endColumnId != null &&
-        endColumnIndex != null
+        Number.isInteger(endRowIndex) && endColumnId != null && endColumnIndex != null
           ? {
               rowIndex: endRowIndex,
               columnId: endColumnId,
@@ -1394,10 +1293,7 @@ export function DataGrid(props: DataGridProps) {
             }
           : null;
 
-      if (
-        endCoordinate &&
-        !isSameCoordinate(pointerSelection.anchor, endCoordinate)
-      ) {
+      if (endCoordinate && !isSameCoordinate(pointerSelection.anchor, endCoordinate)) {
         clearNativeTextSelection();
         setCellSelection(pointerSelection.base, endCoordinate);
         return;
@@ -1432,9 +1328,7 @@ export function DataGrid(props: DataGridProps) {
         return;
       }
 
-      const text = hasRowSelection
-        ? getSelectedRowClipboardText()
-        : getSelectedClipboardText();
+      const text = hasRowSelection ? getSelectedRowClipboardText() : getSelectedClipboardText();
 
       if (!text) {
         return;
@@ -1517,13 +1411,8 @@ export function DataGrid(props: DataGridProps) {
   ]);
 
   const setRowSelection = useCallback(
-    (
-      updater:
-        | RowSelectionState
-        | ((previous: RowSelectionState) => RowSelectionState),
-    ) => {
-      const nextSelection =
-        typeof updater === "function" ? updater(rowSelectionState) : updater;
+    (updater: RowSelectionState | ((previous: RowSelectionState) => RowSelectionState)) => {
+      const nextSelection = typeof updater === "function" ? updater(rowSelectionState) : updater;
 
       onRowSelectionChange(nextSelection);
       setSelectionState((previous) =>
@@ -1568,12 +1457,7 @@ export function DataGrid(props: DataGridProps) {
     if (hasRowSelection) {
       onRowSelectionChange({});
     }
-  }, [
-    hasRowSelection,
-    onRowSelectionChange,
-    resetRowSelectionInteractionState,
-    setSelectionState,
-  ]);
+  }, [hasRowSelection, onRowSelectionChange, resetRowSelectionInteractionState, setSelectionState]);
 
   const selectSingleRowMode = useCallback(
     (args: { rowId: string; rowIndex: number; drag: boolean }) => {
@@ -1598,12 +1482,7 @@ export function DataGrid(props: DataGridProps) {
     if (hasRowSelection) {
       setRowSelection({});
     }
-  }, [
-    hasRowSelection,
-    resetSelectionInteractionState,
-    selectionScopeKey,
-    setRowSelection,
-  ]);
+  }, [hasRowSelection, resetSelectionInteractionState, selectionScopeKey, setRowSelection]);
 
   useEffect(() => {
     if (!hasAnySelection(selectionState) && !hasRowSelection) {
@@ -1637,11 +1516,7 @@ export function DataGrid(props: DataGridProps) {
 
       event.preventDefault();
 
-      const nextRowIndex = clamp(
-        selectionEnd.rowIndex + rowDelta,
-        0,
-        Math.max(0, rows.length - 1),
-      );
+      const nextRowIndex = clamp(selectionEnd.rowIndex + rowDelta, 0, Math.max(0, rows.length - 1));
       const nextColumnIndex = clamp(
         selectionEnd.columnIndex + columnDelta,
         0,
@@ -1755,10 +1630,7 @@ export function DataGrid(props: DataGridProps) {
       scrollContainer.querySelectorAll<HTMLElement>(
         `td[data-grid-visual-row-index="${focusedCell.rowIndex}"][data-grid-column-id]`,
       ),
-    ).find(
-      (cellElement) =>
-        cellElement.dataset.gridColumnId === focusedCell.columnId,
-    );
+    ).find((cellElement) => cellElement.dataset.gridColumnId === focusedCell.columnId);
 
     if (!focusedCellElement) {
       return;
@@ -1766,10 +1638,7 @@ export function DataGrid(props: DataGridProps) {
 
     focusedCellElement.scrollIntoView(FOCUSED_CELL_SCROLL_OPTIONS);
 
-    if (
-      nextScrollLeft != null &&
-      Math.abs(nextScrollLeft - scrollContainer.scrollLeft) >= 1
-    ) {
+    if (nextScrollLeft != null && Math.abs(nextScrollLeft - scrollContainer.scrollLeft) >= 1) {
       scrollContainer.scrollLeft = nextScrollLeft;
       scrollContainer.dispatchEvent(new Event("scroll"));
     }
@@ -1801,10 +1670,7 @@ export function DataGrid(props: DataGridProps) {
       const nextWidth = scrollContainer.clientWidth;
 
       setCenterViewport((current) => {
-        if (
-          current.scrollLeft === nextScrollLeft &&
-          current.width === nextWidth
-        ) {
+        if (current.scrollLeft === nextScrollLeft && current.width === nextWidth) {
           return current;
         }
 
@@ -1841,10 +1707,7 @@ export function DataGrid(props: DataGridProps) {
     }
 
     return () => {
-      if (
-        animationFrameId !== null &&
-        typeof window.cancelAnimationFrame === "function"
-      ) {
+      if (animationFrameId !== null && typeof window.cancelAnimationFrame === "function") {
         window.cancelAnimationFrame(animationFrameId);
       }
 
@@ -1867,12 +1730,9 @@ export function DataGrid(props: DataGridProps) {
         return;
       }
 
-      const thresholdPx = getInfiniteScrollThresholdPx(
-        scrollContainer.clientHeight,
-      );
+      const thresholdPx = getInfiniteScrollThresholdPx(scrollContainer.clientHeight);
       const distanceFromBottom =
-        scrollContainer.scrollHeight -
-        (scrollContainer.scrollTop + scrollContainer.clientHeight);
+        scrollContainer.scrollHeight - (scrollContainer.scrollTop + scrollContainer.clientHeight);
 
       if (distanceFromBottom > thresholdPx) {
         return;
@@ -1889,13 +1749,7 @@ export function DataGrid(props: DataGridProps) {
     return () => {
       scrollContainer.removeEventListener("scroll", handleInfiniteScroll);
     };
-  }, [
-    hasMoreInfiniteRows,
-    infiniteScrollEnabled,
-    isFetching,
-    isProcessing,
-    onLoadMoreRows,
-  ]);
+  }, [hasMoreInfiniteRows, infiniteScrollEnabled, isFetching, isProcessing, onLoadMoreRows]);
 
   const toCellCoordinate = useCallback(
     (rowIndex: number, columnId: string): GridCellCoordinate | null => {
@@ -1959,8 +1813,7 @@ export function DataGrid(props: DataGridProps) {
 
       const visibleRows = table.getRowModel().rows;
       const allRowsSelected =
-        visibleRows.length > 0 &&
-        visibleRows.every((row) => rowSelectionState[row.id] === true);
+        visibleRows.length > 0 && visibleRows.every((row) => rowSelectionState[row.id] === true);
 
       if (allRowsSelected) {
         clearRowSelectionMode();
@@ -1973,11 +1826,7 @@ export function DataGrid(props: DataGridProps) {
   );
 
   const handleRowSelectionMouseDown = useCallback(
-    (
-      event: ReactMouseEvent<unknown>,
-      rowIndex: number,
-      rowId: string,
-    ): void => {
+    (event: ReactMouseEvent<unknown>, rowIndex: number, rowId: string): void => {
       const isPrimaryButton = event.button === 0;
       const isSecondaryButton = event.button === 2;
 
@@ -2027,12 +1876,7 @@ export function DataGrid(props: DataGridProps) {
 
       selectSingleRowMode({ rowId, rowIndex, drag: isPrimaryButton });
     },
-    [
-      clearCellSelectionState,
-      rowSelectionState,
-      selectSingleRowMode,
-      setRowSelection,
-    ],
+    [clearCellSelectionState, rowSelectionState, selectSingleRowMode, setRowSelection],
   );
 
   const handleRowSelectionMouseEnter = useCallback(
@@ -2053,11 +1897,7 @@ export function DataGrid(props: DataGridProps) {
   );
 
   const handleRowSelectionContextMenu = useCallback(
-    (
-      event: ReactMouseEvent<unknown>,
-      rowIndex: number,
-      rowId: string,
-    ): void => {
+    (event: ReactMouseEvent<unknown>, rowIndex: number, rowId: string): void => {
       event.stopPropagation();
       clearCellSelectionState();
 
@@ -2149,9 +1989,7 @@ export function DataGrid(props: DataGridProps) {
         return null;
       }
 
-      const cell = target.closest<HTMLElement>(
-        "td[data-grid-row-index][data-grid-column-id]",
-      );
+      const cell = target.closest<HTMLElement>("td[data-grid-row-index][data-grid-column-id]");
 
       if (!cell) {
         return null;
@@ -2206,11 +2044,7 @@ export function DataGrid(props: DataGridProps) {
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [
-    handleRowSelectionMouseEnter,
-    toCellCoordinateFromTarget,
-    updateSelectionFromPointer,
-  ]);
+  }, [handleRowSelectionMouseEnter, toCellCoordinateFromTarget, updateSelectionFromPointer]);
 
   function renderHeaderCell(
     header: ReactTableHeaderModel<Record<string, unknown>, unknown>,
@@ -2220,27 +2054,20 @@ export function DataGrid(props: DataGridProps) {
     }
 
     const headerPinningStyles = getColumnPinningStyles(header.column, "header");
-    const headerAnimation =
-      layoutAnimationState?.deltas[`header:${header.column.id}`];
+    const headerAnimation = layoutAnimationState?.deltas[`header:${header.column.id}`];
     const headerStyle = {
       ...headerPinningStyles.style,
       ...(headerAnimation
         ? {
             "--ps-pinning-translate-x":
-              layoutAnimationState.phase === "from"
-                ? `${headerAnimation.x}px`
-                : "0px",
+              layoutAnimationState.phase === "from" ? `${headerAnimation.x}px` : "0px",
             "--ps-pinning-translate-y":
-              layoutAnimationState.phase === "from"
-                ? `${headerAnimation.y}px`
-                : "0px",
+              layoutAnimationState.phase === "from" ? `${headerAnimation.y}px` : "0px",
           }
         : null),
     } as CSSProperties;
     type Header = ComponentType<Omit<CellProps, "children" | "ref">>;
-    const Header = header.column.columnDef.header(
-      header.getContext(),
-    ) as Header;
+    const Header = header.column.columnDef.header(header.getContext()) as Header;
 
     return (
       <Header
@@ -2250,9 +2077,7 @@ export function DataGrid(props: DataGridProps) {
           headerPinningStyles.className,
           header.column.id === ROW_SELECTOR_COLUMN_ID && "cursor-pointer",
         )}
-        data-pinning-animating={
-          headerAnimation ? layoutAnimationState.phase : undefined
-        }
+        data-pinning-animating={headerAnimation ? layoutAnimationState.phase : undefined}
         data-grid-header-id={header.id}
         data-grid-header-column-id={header.column.id}
         style={headerStyle}
@@ -2281,20 +2106,15 @@ export function DataGrid(props: DataGridProps) {
     type Cell = ComponentType<Omit<CellProps, "children" | "ref">>;
     const Cell = cell.column.columnDef.cell(cell.getContext()) as Cell;
     const pinningStyles = getColumnPinningStyles(cell.column, "cell");
-    const cellAnimation =
-      layoutAnimationState?.deltas[`cell:${rowIndex}:${cell.column.id}`];
+    const cellAnimation = layoutAnimationState?.deltas[`cell:${rowIndex}:${cell.column.id}`];
     const cellStyle = {
       ...pinningStyles.style,
       ...(cellAnimation
         ? {
             "--ps-pinning-translate-x":
-              layoutAnimationState.phase === "from"
-                ? `${cellAnimation.x}px`
-                : "0px",
+              layoutAnimationState.phase === "from" ? `${cellAnimation.x}px` : "0px",
             "--ps-pinning-translate-y":
-              layoutAnimationState.phase === "from"
-                ? `${cellAnimation.y}px`
-                : "0px",
+              layoutAnimationState.phase === "from" ? `${cellAnimation.y}px` : "0px",
           }
         : null),
     } as CSSProperties;
@@ -2311,8 +2131,7 @@ export function DataGrid(props: DataGridProps) {
         rowIndex,
       });
     const isFocused =
-      focusedCell?.rowIndex === visualRowIndex &&
-      focusedCell.columnId === cell.column.id;
+      focusedCell?.rowIndex === visualRowIndex && focusedCell.columnId === cell.column.id;
 
     return (
       <Cell
@@ -2320,8 +2139,7 @@ export function DataGrid(props: DataGridProps) {
         {...pinningStyles}
         className={cn(
           pinningStyles.className,
-          isRowSelectorCell &&
-            "group-odd:bg-table-cell-odd group-even:bg-table-cell-even",
+          isRowSelectorCell && "group-odd:bg-table-cell-odd group-even:bg-table-cell-even",
           isRowSelected &&
             "group-odd:!bg-table-row-selected-odd group-even:!bg-table-row-selected-even",
           isSelected && "!bg-primary/15 ring-1 ring-inset ring-primary/30",
@@ -2332,9 +2150,7 @@ export function DataGrid(props: DataGridProps) {
         data-grid-row-index={rowIndex}
         data-grid-visual-row-index={visualRowIndex}
         data-grid-cell-context-target="true"
-        data-pinning-animating={
-          cellAnimation ? layoutAnimationState.phase : undefined
-        }
+        data-pinning-animating={cellAnimation ? layoutAnimationState.phase : undefined}
         data-focused={isFocused || undefined}
         data-row-select-cell={isRowSelectorCell || undefined}
         data-selected={isSelected || undefined}
@@ -2439,30 +2255,27 @@ export function DataGrid(props: DataGridProps) {
     table,
   ]);
 
-  const handleGridContextMenuCapture = useCallback(
-    (event: ReactMouseEvent<HTMLDivElement>) => {
-      const target = event.target instanceof Element ? event.target : null;
-      const cell = target?.closest<HTMLElement>(
-        "td[data-grid-row-index][data-grid-column-id][data-grid-cell-context-target='true']",
-      );
+  const handleGridContextMenuCapture = useCallback((event: ReactMouseEvent<HTMLDivElement>) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const cell = target?.closest<HTMLElement>(
+      "td[data-grid-row-index][data-grid-column-id][data-grid-cell-context-target='true']",
+    );
 
-      if (!cell) {
-        setContextMenuTarget(null);
-        return;
-      }
+    if (!cell) {
+      setContextMenuTarget(null);
+      return;
+    }
 
-      const rowIndex = Number(cell.dataset.gridRowIndex);
-      const columnId = cell.dataset.gridColumnId;
+    const rowIndex = Number(cell.dataset.gridRowIndex);
+    const columnId = cell.dataset.gridColumnId;
 
-      if (!Number.isInteger(rowIndex) || !columnId) {
-        setContextMenuTarget(null);
-        return;
-      }
+    if (!Number.isInteger(rowIndex) || !columnId) {
+      setContextMenuTarget(null);
+      return;
+    }
 
-      setContextMenuTarget({ columnId, rowIndex });
-    },
-    [],
-  );
+    setContextMenuTarget({ columnId, rowIndex });
+  }, []);
 
   const handleContextMenuCopyAction = useCallback(() => {
     setGridInteractionSuppressionWindow();
@@ -2484,9 +2297,7 @@ export function DataGrid(props: DataGridProps) {
         className="flex-1 w-0 h-0 min-h-0 min-w-full flex flex-col relative bg-background/50"
       >
         <div>
-          {displayLoader && (
-            <DataGridLoadingBar className="absolute -top-px left-0 right-0" />
-          )}
+          {displayLoader && <DataGridLoadingBar className="absolute -top-px left-0 right-0" />}
         </div>
         <ContextMenu>
           <ContextMenuTrigger asChild>
@@ -2526,20 +2337,14 @@ export function DataGrid(props: DataGridProps) {
                       const rightHeaders = headerGroup.headers.filter(
                         (header) => header.column.getIsPinned() === "right",
                       );
-                      const visibleCenterHeaders =
-                        getVirtualizedCenterSlice(centerHeaders);
+                      const visibleCenterHeaders = getVirtualizedCenterSlice(centerHeaders);
                       const sortableLeftHeaderIds = leftHeaders
-                        .filter(
-                          (header) =>
-                            header.column.id !== ROW_SELECTOR_COLUMN_ID,
-                        )
+                        .filter((header) => header.column.id !== ROW_SELECTOR_COLUMN_ID)
                         .map((header) => header.id);
                       const sortableCenterHeaderIds = visibleCenterHeaders.map(
                         (header) => header.id,
                       );
-                      const sortableRightHeaderIds = rightHeaders.map(
-                        (header) => header.id,
-                      );
+                      const sortableRightHeaderIds = rightHeaders.map((header) => header.id);
 
                       return (
                         <TableRow key={headerGroup.id}>
@@ -2549,36 +2354,34 @@ export function DataGrid(props: DataGridProps) {
                           >
                             {leftHeaders.map(renderHeaderCell)}
                           </SortableContext>
-                          {centerColumnWindow.hiddenStartWidth > 0 &&
-                            centerHeaders.length > 0 && (
-                              <TableHead
-                                key={`${headerGroup.id}-virtual-start`}
-                                aria-hidden="true"
-                                className="p-0 border-r border-b border-table-border bg-table-head pointer-events-none"
-                                style={{
-                                  minWidth: `${centerColumnWindow.hiddenStartWidth}px`,
-                                  width: `${centerColumnWindow.hiddenStartWidth}px`,
-                                }}
-                              />
-                            )}
+                          {centerColumnWindow.hiddenStartWidth > 0 && centerHeaders.length > 0 && (
+                            <TableHead
+                              key={`${headerGroup.id}-virtual-start`}
+                              aria-hidden="true"
+                              className="p-0 border-r border-b border-table-border bg-table-head pointer-events-none"
+                              style={{
+                                minWidth: `${centerColumnWindow.hiddenStartWidth}px`,
+                                width: `${centerColumnWindow.hiddenStartWidth}px`,
+                              }}
+                            />
+                          )}
                           <SortableContext
                             items={sortableCenterHeaderIds}
                             strategy={horizontalListSortingStrategy}
                           >
                             {visibleCenterHeaders.map(renderHeaderCell)}
                           </SortableContext>
-                          {centerColumnWindow.hiddenEndWidth > 0 &&
-                            centerHeaders.length > 0 && (
-                              <TableHead
-                                key={`${headerGroup.id}-virtual-end`}
-                                aria-hidden="true"
-                                className="p-0 border-r border-b border-table-border bg-table-head pointer-events-none"
-                                style={{
-                                  minWidth: `${centerColumnWindow.hiddenEndWidth}px`,
-                                  width: `${centerColumnWindow.hiddenEndWidth}px`,
-                                }}
-                              />
-                            )}
+                          {centerColumnWindow.hiddenEndWidth > 0 && centerHeaders.length > 0 && (
+                            <TableHead
+                              key={`${headerGroup.id}-virtual-end`}
+                              aria-hidden="true"
+                              className="p-0 border-r border-b border-table-border bg-table-head pointer-events-none"
+                              style={{
+                                minWidth: `${centerColumnWindow.hiddenEndWidth}px`,
+                                width: `${centerColumnWindow.hiddenEndWidth}px`,
+                              }}
+                            />
+                          )}
                           <SortableContext
                             items={sortableRightHeaderIds}
                             strategy={horizontalListSortingStrategy}
@@ -2596,8 +2399,7 @@ export function DataGrid(props: DataGridProps) {
                         const leftCells = row.getLeftVisibleCells();
                         const centerCells = row.getCenterVisibleCells();
                         const rightCells = row.getRightVisibleCells();
-                        const visibleCenterCells =
-                          getVirtualizedCenterSlice(centerCells);
+                        const visibleCenterCells = getVirtualizedCenterSlice(centerCells);
 
                         return (
                           <TableRow
@@ -2608,39 +2410,33 @@ export function DataGrid(props: DataGridProps) {
                               "odd:bg-table-cell-odd even:bg-table-cell-even/50",
                             )}
                           >
-                            {leftCells.map((cell) =>
-                              renderGridCell({ cell, row, rowIndex }),
+                            {leftCells.map((cell) => renderGridCell({ cell, row, rowIndex }))}
+                            {centerColumnWindow.hiddenStartWidth > 0 && centerCells.length > 0 && (
+                              <TableCell
+                                key={`${row.id}-virtual-start`}
+                                aria-hidden="true"
+                                className="relative z-0 p-0 border-r border-b border-table-border pointer-events-none group-odd:!bg-table-cell-odd group-even:!bg-table-cell-even"
+                                style={{
+                                  minWidth: `${centerColumnWindow.hiddenStartWidth}px`,
+                                  width: `${centerColumnWindow.hiddenStartWidth}px`,
+                                }}
+                              />
                             )}
-                            {centerColumnWindow.hiddenStartWidth > 0 &&
-                              centerCells.length > 0 && (
-                                <TableCell
-                                  key={`${row.id}-virtual-start`}
-                                  aria-hidden="true"
-                                  className="relative z-0 p-0 border-r border-b border-table-border pointer-events-none group-odd:!bg-table-cell-odd group-even:!bg-table-cell-even"
-                                  style={{
-                                    minWidth: `${centerColumnWindow.hiddenStartWidth}px`,
-                                    width: `${centerColumnWindow.hiddenStartWidth}px`,
-                                  }}
-                                />
-                              )}
                             {visibleCenterCells.map((cell) =>
                               renderGridCell({ cell, row, rowIndex }),
                             )}
-                            {centerColumnWindow.hiddenEndWidth > 0 &&
-                              centerCells.length > 0 && (
-                                <TableCell
-                                  key={`${row.id}-virtual-end`}
-                                  aria-hidden="true"
-                                  className="relative z-0 p-0 border-r border-b border-table-border pointer-events-none group-odd:!bg-table-cell-odd group-even:!bg-table-cell-even"
-                                  style={{
-                                    minWidth: `${centerColumnWindow.hiddenEndWidth}px`,
-                                    width: `${centerColumnWindow.hiddenEndWidth}px`,
-                                  }}
-                                />
-                              )}
-                            {rightCells.map((cell) =>
-                              renderGridCell({ cell, row, rowIndex }),
+                            {centerColumnWindow.hiddenEndWidth > 0 && centerCells.length > 0 && (
+                              <TableCell
+                                key={`${row.id}-virtual-end`}
+                                aria-hidden="true"
+                                className="relative z-0 p-0 border-r border-b border-table-border pointer-events-none group-odd:!bg-table-cell-odd group-even:!bg-table-cell-even"
+                                style={{
+                                  minWidth: `${centerColumnWindow.hiddenEndWidth}px`,
+                                  width: `${centerColumnWindow.hiddenEndWidth}px`,
+                                }}
+                              />
                             )}
+                            {rightCells.map((cell) => renderGridCell({ cell, row, rowIndex }))}
                           </TableRow>
                         );
                       })
@@ -2671,9 +2467,7 @@ export function DataGrid(props: DataGridProps) {
                         width: `${activeColumnDragState.width}px`,
                       }}
                     >
-                      <span className="truncate">
-                        {activeColumnDragState.columnId}
-                      </span>
+                      <span className="truncate">{activeColumnDragState.columnId}</span>
                     </div>
                   ) : null}
                 </DragOverlay>
@@ -2709,25 +2503,21 @@ export function DataGrid(props: DataGridProps) {
         )}
 
         <AnimatePresence mode="wait">
-          {table.getRowModel().rows?.length === 0 &&
-            !isFetching &&
-            !isProcessing && (
-              <motion.div
-                className="flex items-center justify-center absolute -inset-0 pointer-events-none"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <div className="flex flex-col gap-1 text-center">
-                  <div className="text-sm text-muted-foreground">
-                    No results found
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    It doesn&apos;t look like you have any data in this table.
-                  </div>
+          {table.getRowModel().rows?.length === 0 && !isFetching && !isProcessing && (
+            <motion.div
+              className="flex items-center justify-center absolute -inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="flex flex-col gap-1 text-center">
+                <div className="text-sm text-muted-foreground">No results found</div>
+                <div className="text-xs text-muted-foreground">
+                  It doesn&apos;t look like you have any data in this table.
                 </div>
-              </motion.div>
-            )}
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </>
@@ -2784,13 +2574,8 @@ function clearNativeTextSelection(): void {
   selection.removeAllRanges();
 }
 
-function isSameCoordinate(
-  left: GridCellCoordinate,
-  right: GridCellCoordinate,
-): boolean {
-  return (
-    left.rowIndex === right.rowIndex && left.columnIndex === right.columnIndex
-  );
+function isSameCoordinate(left: GridCellCoordinate, right: GridCellCoordinate): boolean {
+  return left.rowIndex === right.rowIndex && left.columnIndex === right.columnIndex;
 }
 
 function getArrowSelectionDelta(key: string): {

@@ -4,32 +4,30 @@
  * This function return an RFC3339 formatted string in the user's local time zone.
  */
 export function rfc3339(date = new Date()) {
-    return `${shortDate(date)}T${time(date)}${timezoneOffset(date)}`;
+  return `${shortDate(date)}T${time(date)}${timezoneOffset(date)}`;
 }
 function shortDate(date) {
-    return [
-        date.getFullYear(),
-        doubleDigits(date.getMonth() + 1),
-        doubleDigits(date.getDate()),
-    ].join("-");
+  return [date.getFullYear(), doubleDigits(date.getMonth() + 1), doubleDigits(date.getDate())].join(
+    "-",
+  );
 }
 function time(date) {
-    return [
-        doubleDigits(date.getHours()),
-        doubleDigits(date.getMinutes()),
-        doubleDigits(date.getSeconds()),
-    ].join(":");
+  return [
+    doubleDigits(date.getHours()),
+    doubleDigits(date.getMinutes()),
+    doubleDigits(date.getSeconds()),
+  ].join(":");
 }
 function timezoneOffset(date) {
-    const offsetMinutes = date.getTimezoneOffset();
-    if (!offsetMinutes) {
-        return "Z";
-    }
-    const absoluteOffsetMinutes = Math.abs(offsetMinutes);
-    const absoluteOffsetHours = Math.floor(absoluteOffsetMinutes / 60);
-    const absoluteOffsetMinutesInHour = absoluteOffsetMinutes % 60;
-    return `${offsetMinutes > 0 ? "-" : "+"}${doubleDigits(absoluteOffsetHours)}:${doubleDigits(absoluteOffsetMinutesInHour)}`;
+  const offsetMinutes = date.getTimezoneOffset();
+  if (!offsetMinutes) {
+    return "Z";
+  }
+  const absoluteOffsetMinutes = Math.abs(offsetMinutes);
+  const absoluteOffsetHours = Math.floor(absoluteOffsetMinutes / 60);
+  const absoluteOffsetMinutesInHour = absoluteOffsetMinutes % 60;
+  return `${offsetMinutes > 0 ? "-" : "+"}${doubleDigits(absoluteOffsetHours)}:${doubleDigits(absoluteOffsetMinutesInHour)}`;
 }
 function doubleDigits(value) {
-    return String(value).padStart(2, "0");
+  return String(value).padStart(2, "0");
 }

@@ -27,11 +27,7 @@ export interface AdapterProviderProps {
 export function AdapterProvider(props: AdapterProviderProps) {
   const { adapter, children } = props;
 
-  return (
-    <AdapterContext.Provider value={adapter}>
-      {children}
-    </AdapterContext.Provider>
-  );
+  return <AdapterContext.Provider value={adapter}>{children}</AdapterContext.Provider>;
 }
 
 /**
@@ -40,9 +36,7 @@ export function AdapterProvider(props: AdapterProviderProps) {
 export function useAdapter(): StudioAdapter {
   const context = useContext(AdapterContext);
   if (!context) {
-    throw new Error(
-      "useAdapter must be used within an AdapterProvider component"
-    );
+    throw new Error("useAdapter must be used within an AdapterProvider component");
   }
   return context;
 }

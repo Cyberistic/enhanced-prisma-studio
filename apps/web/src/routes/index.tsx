@@ -36,9 +36,7 @@ function HomeComponent() {
               <CardTitle>{user?.name ?? "No users yet"}</CardTitle>
               <Badge variant="secondary">{user?.email}</Badge>
             </div>
-            <CardDescription>
-              {user?.todos.length ?? 0} recent todos
-            </CardDescription>
+            <CardDescription>{user?.todos.length ?? 0} recent todos</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="divide-y">

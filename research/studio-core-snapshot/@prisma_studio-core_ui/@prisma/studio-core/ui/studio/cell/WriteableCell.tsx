@@ -1,8 +1,4 @@
-import {
-  type MouseEvent as ReactMouseEvent,
-  type ReactNode,
-  useState,
-} from "react";
+import { type MouseEvent as ReactMouseEvent, type ReactNode, useState } from "react";
 
 import {
   PopoverCell,
@@ -65,10 +61,7 @@ export function WriteableCell(props: WriteableCellProps) {
       <Cell
         {...containerProps}
         onClick={composeOpenHandler(containerProps?.onClick, openEditor)}
-        onDoubleClick={composeOpenHandler(
-          containerProps?.onDoubleClick,
-          openEditor,
-        )}
+        onDoubleClick={composeOpenHandler(containerProps?.onDoubleClick, openEditor)}
         withContextMenu={false}
       >
         {content}
@@ -77,10 +70,7 @@ export function WriteableCell(props: WriteableCellProps) {
   }
 
   return (
-    <PopoverCell
-      open={open}
-      onOpenChange={(nextOpen) => !nextOpen && closeEditor()}
-    >
+    <PopoverCell open={open} onOpenChange={(nextOpen) => !nextOpen && closeEditor()}>
       <PopoverCellTrigger asChild>
         <Cell {...containerProps} withContextMenu={false}>
           {content}

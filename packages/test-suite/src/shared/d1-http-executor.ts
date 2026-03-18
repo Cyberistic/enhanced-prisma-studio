@@ -1,4 +1,7 @@
-import { serializeError, type StudioBFFRequest } from "@enhanced-prisma-studio/studio-core/data/bff";
+import {
+  serializeError,
+  type StudioBFFRequest,
+} from "@enhanced-prisma-studio/studio-core/data/bff";
 
 type D1HttpResponse = {
   errors?: Array<{ message?: string }>;
@@ -76,9 +79,15 @@ export function createD1StudioRequestExecutor(args: {
             params: [...secondQuery.parameters],
             sql: secondQuery.sql,
           });
-          return [[null, firstRows], [null, secondRows]] as const;
+          return [
+            [null, firstRows],
+            [null, secondRows],
+          ] as const;
         } catch (secondError) {
-          return [[null, firstRows], [serializeError(secondError), undefined]] as const;
+          return [
+            [null, firstRows],
+            [serializeError(secondError), undefined],
+          ] as const;
         }
       } catch (firstError) {
         return [[serializeError(firstError)]] as const;

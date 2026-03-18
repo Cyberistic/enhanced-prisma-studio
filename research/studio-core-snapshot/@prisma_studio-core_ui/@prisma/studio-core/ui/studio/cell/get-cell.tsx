@@ -42,9 +42,7 @@ export function getCell(props: GetCellProps) {
     }
 
     if (isArray) {
-      return (
-        <span className="text-muted-foreground">{DEFAULT_ARRAY_DISPLAY}</span>
-      );
+      return <span className="text-muted-foreground">{DEFAULT_ARRAY_DISPLAY}</span>;
     }
 
     if (group === "string") {
@@ -60,9 +58,7 @@ export function getCell(props: GetCellProps) {
     }
 
     if (group === "boolean") {
-      return (
-        <span className="text-muted-foreground">{String(DEFAULT_BOOLEAN)}</span>
-      );
+      return <span className="text-muted-foreground">{String(DEFAULT_BOOLEAN)}</span>;
     }
 
     if (group === "json") {
@@ -77,21 +73,14 @@ export function getCell(props: GetCellProps) {
   }
 
   if (isArray && value === DEFAULT_JSON) {
-    return (
-      <HighlightSearchMatch
-        searchTerm={searchTerm}
-        text={DEFAULT_ARRAY_DISPLAY}
-      />
-    );
+    return <HighlightSearchMatch searchTerm={searchTerm} text={DEFAULT_ARRAY_DISPLAY} />;
   }
 
   if (isArray || group === "json") {
     return (
       <HighlightSearchMatch
         searchTerm={searchTerm}
-        text={
-          isObjectType(value) ? JSON.stringify(value, null, 2) : String(value)
-        }
+        text={isObjectType(value) ? JSON.stringify(value, null, 2) : String(value)}
       />
     );
   }
@@ -105,21 +94,14 @@ export function getCell(props: GetCellProps) {
   }
 
   if (group === "boolean") {
-    return (
-      <HighlightSearchMatch
-        searchTerm={searchTerm}
-        text={String(Boolean(value))}
-      />
-    );
+    return <HighlightSearchMatch searchTerm={searchTerm} text={String(Boolean(value))} />;
   }
 
   if (group === "raw") {
     return (
       <HighlightSearchMatch
         searchTerm={searchTerm}
-        text={
-          isObjectType(value) ? JSON.stringify(value, null, 2) : String(value)
-        }
+        text={isObjectType(value) ? JSON.stringify(value, null, 2) : String(value)}
       />
     );
   }
@@ -134,9 +116,5 @@ function NullCell() {
 }
 
 function EmptyStringCell() {
-  return (
-    <span className="italic text-muted-foreground select-none">
-      (empty string)
-    </span>
-  );
+  return <span className="italic text-muted-foreground select-none">(empty string)</span>;
 }

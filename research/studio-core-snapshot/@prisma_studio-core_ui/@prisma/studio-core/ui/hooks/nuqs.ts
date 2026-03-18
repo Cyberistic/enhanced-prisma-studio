@@ -68,17 +68,11 @@ export function useQueryState<T>(
   options: UseQueryStateOptions<T> & {
     defaultValue: T;
   },
-): UseQueryStateReturn<
-  NonNullable<ReturnType<typeof options.parse>>,
-  typeof options.defaultValue
->;
+): UseQueryStateReturn<NonNullable<ReturnType<typeof options.parse>>, typeof options.defaultValue>;
 export function useQueryState<T>(
   key: StateKey,
   options: UseQueryStateOptions<T>,
-): UseQueryStateReturn<
-  NonNullable<ReturnType<typeof options.parse>>,
-  undefined
->;
+): UseQueryStateReturn<NonNullable<ReturnType<typeof options.parse>>, undefined>;
 export function useQueryState(
   key: StateKey,
   options: Options & {
@@ -89,9 +83,7 @@ export function useQueryState(
   key: StateKey,
   options: Pick<UseQueryStateOptions<string>, keyof Options>,
 ): UseQueryStateReturn<string, undefined>;
-export function useQueryState(
-  key: StateKey,
-): UseQueryStateReturn<string, undefined>;
+export function useQueryState(key: StateKey): UseQueryStateReturn<string, undefined>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useQueryState(key: StateKey, options?: any): any {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

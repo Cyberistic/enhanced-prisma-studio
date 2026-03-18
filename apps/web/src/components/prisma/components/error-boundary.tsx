@@ -44,15 +44,11 @@ export class ErrorBoundary extends Component<Props, State> {
           <div>
             <h2 className="mb-2 text-sm font-semibold text-foreground">Something went wrong</h2>
             <p className="mb-4 max-w-md text-xs text-muted-foreground">
-              {this.state.error.message || "An unexpected error occurred. Try refreshing or selecting another view."}
+              {this.state.error.message ||
+                "An unexpected error occurred. Try refreshing or selecting another view."}
             </p>
           </div>
-          <Button
-            className="gap-2"
-            onClick={this.retry}
-            size="sm"
-            variant="outline"
-          >
+          <Button className="gap-2" onClick={this.retry} size="sm" variant="outline">
             <RotateCcw className="size-4" />
             Try Again
           </Button>

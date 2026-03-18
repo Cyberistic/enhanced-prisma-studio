@@ -3,9 +3,7 @@ import type { SerializedError } from "@enhanced-prisma-studio/studio-core/data/b
 
 export type DataRow = Record<string, unknown>;
 
-export type SerializedEither<T> =
-  | readonly [SerializedError, undefined?]
-  | readonly [null, T];
+export type SerializedEither<T> = readonly [SerializedError, undefined?] | readonly [null, T];
 
 export type QueryResponse = SerializedEither<DataRow[]>;
 export type SequenceResponse =

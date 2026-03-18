@@ -68,10 +68,7 @@ import { Link, RelationLink } from "../../cell/Link";
 import { WriteableCell } from "../../cell/WriteableCell";
 import { useRegisterCommandPaletteActions } from "../../CommandPalette";
 import { type TableUiState, useStudio } from "../../context";
-import type {
-  GridCellCoordinate,
-  GridPasteChange,
-} from "../../grid/cell-selection";
+import type { GridCellCoordinate, GridPasteChange } from "../../grid/cell-selection";
 import { DataGrid } from "../../grid/DataGrid";
 import { DataGridDraggableHeaderCell } from "../../grid/DataGridDraggableHeaderCell";
 import { DataGridHeader } from "../../grid/DataGridHeader";
@@ -88,10 +85,7 @@ import {
   type GridSelectionMachineState,
   transitionGridSelectionMachine,
 } from "../../grid/selection-state-machine";
-import {
-  type CellEditNavigationDirection,
-  getInput,
-} from "../../input/get-input";
+import { type CellEditNavigationDirection, getInput } from "../../input/get-input";
 import {
   TABLE_GRID_FOCUS_REQUEST_UI_STATE_KEY,
   type TableGridFocusRequestUiState,
@@ -99,18 +93,9 @@ import {
 import { StudioHeader } from "../../StudioHeader";
 import { ViewProps } from "../View";
 import { createActiveTableCommandPaletteActions } from "./active-table-command-actions";
-import {
-  type BackRelationColumnMeta,
-  getBackRelationColumns,
-} from "./back-relation-columns";
-import {
-  getNextInfinitePageRowTarget,
-  INFINITE_SCROLL_BATCH_SIZE,
-} from "./infinite-scroll";
-import {
-  InlineTableFilterAddButton,
-  InlineTableFiltersHeaderRow,
-} from "./InlineTableFilters";
+import { type BackRelationColumnMeta, getBackRelationColumns } from "./back-relation-columns";
+import { getNextInfinitePageRowTarget, INFINITE_SCROLL_BATCH_SIZE } from "./infinite-scroll";
+import { InlineTableFilterAddButton, InlineTableFiltersHeaderRow } from "./InlineTableFilters";
 import {
   buildCellSelectionExportTable,
   buildRowSelectionExportTable,
@@ -135,21 +120,14 @@ export function ActiveTableView(_props: ViewProps) {
     setPageIndexParam,
     setSearchParam,
   } = useNavigation();
-  const supportsFullTableSearch =
-    adapter.capabilities?.fullTableSearch === true;
-  const selectionScopeKey = activeTable
-    ? `${activeTable.schema}.${activeTable.name}`
-    : undefined;
+  const supportsFullTableSearch = adapter.capabilities?.fullTableSearch === true;
+  const selectionScopeKey = activeTable ? `${activeTable.schema}.${activeTable.name}` : undefined;
   const { pinnedColumnIds, setPinnedColumnIds } = useColumnPinning();
   const searchTerm = searchParam ?? "";
   const activeRowSearchTerm = supportsFullTableSearch ? searchTerm : "";
   const { sortingState, setSortingState } = useSorting();
-  const {
-    isInfiniteScrollEnabled,
-    paginationState,
-    setInfiniteScrollEnabled,
-    setPaginationState,
-  } = usePagination();
+  const { isInfiniteScrollEnabled, paginationState, setInfiniteScrollEnabled, setPaginationState } =
+    usePagination();
   const [loadedInfinitePageCount, setLoadedInfinitePageCount] = useState(1);
   const {
     appliedFilter,
@@ -163,9 +141,7 @@ export function ActiveTableView(_props: ViewProps) {
       getInfiniteScrollResetKey({
         activeRowSearchTerm,
         filter: appliedFilter,
-        pageSize: isInfiniteScrollEnabled
-          ? INFINITE_SCROLL_BATCH_SIZE
-          : paginationState.pageSize,
+        pageSize: isInfiniteScrollEnabled ? INFINITE_SCROLL_BATCH_SIZE : paginationState.pageSize,
         selectionScopeKey,
         sortingState,
       }),
@@ -179,8 +155,7 @@ export function ActiveTableView(_props: ViewProps) {
     ],
   );
 
-  const { data: introspection, refetch: refetchIntrospection } =
-    useIntrospection();
+  const { data: introspection, refetch: refetchIntrospection } = useIntrospection();
   const sqlEditorSchema = useMemo(() => {
     return createSqlEditorSchemaFromIntrospection({
       defaultSchema: adapter.defaultSchema,
@@ -189,10 +164,7 @@ export function ActiveTableView(_props: ViewProps) {
     });
   }, [adapter.capabilities?.sqlDialect, adapter.defaultSchema, introspection]);
   const sqlFilterLint = useMemo(() => {
-    if (
-      !adapter.capabilities?.sqlEditorLint ||
-      !adapterSupportsSqlLint(adapter)
-    ) {
+    if (!adapter.capabilities?.sqlEditorLint || !adapterSupportsSqlLint(adapter)) {
       return null;
     }
 
@@ -237,13 +209,7 @@ export function ActiveTableView(_props: ViewProps) {
     }
 
     return data;
-  }, [
-    data,
-    infiniteScrollResetKey,
-    isFetching,
-    isInfiniteScrollEnabled,
-    stableInfiniteData,
-  ]);
+  }, [data, infiniteScrollResetKey, isFetching, isInfiniteScrollEnabled, stableInfiniteData]);
 
   useEffect(() => {
     if (!isInfiniteScrollEnabled || !data) {
@@ -271,20 +237,10 @@ export function ActiveTableView(_props: ViewProps) {
         key: infiniteScrollResetKey,
       };
     });
-  }, [
-    data,
-    infiniteScrollResetKey,
-    isFetching,
-    isInfiniteScrollEnabled,
-    stableInfiniteData,
-  ]);
+  }, [data, infiniteScrollResetKey, isFetching, isInfiniteScrollEnabled, stableInfiniteData]);
 
-  const {
-    deleteSelection,
-    isSelecting,
-    rowSelectionState,
-    setRowSelectionState,
-  } = useSelection(visibleData);
+  const { deleteSelection, isSelecting, rowSelectionState, setRowSelectionState } =
+    useSelection(visibleData);
   const { tableUiState, updateTableUiState } = useTableUiState({
     editingFilter,
   });
@@ -295,30 +251,20 @@ export function ActiveTableView(_props: ViewProps) {
       tableId: null,
     },
   );
-  const [gridSelectionState, setGridSelectionState] =
-    useUiState<GridSelectionMachineState>(
-      selectionScopeKey
-        ? `datagrid:${selectionScopeKey}:selection-state`
-        : undefined,
-      GRID_SELECTION_MACHINE_INITIAL_STATE,
-    );
-  const [gridFocusedCell, setGridFocusedCell] =
-    useUiState<GridFocusedCell | null>(
-      selectionScopeKey
-        ? `datagrid:${selectionScopeKey}:focused-cell`
-        : undefined,
-      null,
-    );
+  const [gridSelectionState, setGridSelectionState] = useUiState<GridSelectionMachineState>(
+    selectionScopeKey ? `datagrid:${selectionScopeKey}:selection-state` : undefined,
+    GRID_SELECTION_MACHINE_INITIAL_STATE,
+  );
+  const [gridFocusedCell, setGridFocusedCell] = useUiState<GridFocusedCell | null>(
+    selectionScopeKey ? `datagrid:${selectionScopeKey}:focused-cell` : undefined,
+    null,
+  );
   const [gridColumnOrder] = useUiState<string[]>(
-    selectionScopeKey
-      ? `datagrid:${selectionScopeKey}:column-order`
-      : undefined,
+    selectionScopeKey ? `datagrid:${selectionScopeKey}:column-order` : undefined,
     [],
   );
   const [gridColumnPinning] = useUiState<ColumnPinningState>(
-    selectionScopeKey
-      ? `datagrid:${selectionScopeKey}:column-pinning`
-      : undefined,
+    selectionScopeKey ? `datagrid:${selectionScopeKey}:column-pinning` : undefined,
     {
       left: ["__ps_select"],
       right: [],
@@ -332,33 +278,25 @@ export function ActiveTableView(_props: ViewProps) {
     supportsFullTableSearch,
   });
   const rows = useMemo(() => visibleData?.rows ?? [], [visibleData?.rows]);
-  const stagedRows = useMemo(
-    () => tableUiState?.stagedRows ?? [],
-    [tableUiState?.stagedRows],
-  );
+  const stagedRows = useMemo(() => tableUiState?.stagedRows ?? [], [tableUiState?.stagedRows]);
   const stagedUpdates = useMemo(
     () => tableUiState?.stagedUpdates ?? [],
     [tableUiState?.stagedUpdates],
   );
-  const [activeEditorCellKey, setActiveEditorCellKey] = useState<string | null>(
-    null,
-  );
+  const [activeEditorCellKey, setActiveEditorCellKey] = useState<string | null>(null);
   const [aiFocusRequestKey, setAiFocusRequestKey] = useState(0);
   const [gridFocusRequestId, setGridFocusRequestId] = useState(0);
   const [isSelectionExportOpen, setSelectionExportOpen] = useState(false);
-  const [includeSelectionExportHeader, setIncludeSelectionExportHeader] =
-    useState(true);
+  const [includeSelectionExportHeader, setIncludeSelectionExportHeader] = useState(true);
   const [discardWiggleCount, setDiscardWiggleCount] = useState(0);
   const [isSaveDialogOpen, setSaveDialogOpen] = useState(false);
   const [isDiscardDialogOpen, setDiscardDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const selectedRowCount =
-    Object.values(rowSelectionState).filter(Boolean).length;
+  const selectedRowCount = Object.values(rowSelectionState).filter(Boolean).length;
   const cellSelectionRange = getCellSelectionRange(gridSelectionState);
   const hasSelectionExport = cellSelectionRange != null || selectedRowCount > 0;
   const deleteSelectionLabel = getDeleteSelectionLabel(selectedRowCount);
-  const deleteConfirmationPrompt =
-    getDeleteConfirmationPrompt(selectedRowCount);
+  const deleteConfirmationPrompt = getDeleteConfirmationPrompt(selectedRowCount);
   const discardConfirmationPrompt = getDiscardConfirmationPrompt(
     getStagedCellCount({
       stagedRows,
@@ -368,35 +306,26 @@ export function ActiveTableView(_props: ViewProps) {
   const pendingInfinitePageRowTargetRef = useRef<number | null>(null);
   const observedInfiniteFetchRef = useRef(false);
   const previousInfiniteScrollResetKeyRef = useRef(infiniteScrollResetKey);
-  const setStagedRows = useCallback<
-    Dispatch<SetStateAction<Record<string, unknown>[]>>
-  >(
+  const setStagedRows = useCallback<Dispatch<SetStateAction<Record<string, unknown>[]>>>(
     (updater) => {
       updateTableUiState((draft) => {
         const previous = draft.stagedRows ?? [];
-        draft.stagedRows =
-          typeof updater === "function" ? updater(previous) : updater;
+        draft.stagedRows = typeof updater === "function" ? updater(previous) : updater;
       });
     },
     [updateTableUiState],
   );
-  const setStagedUpdates = useCallback<
-    Dispatch<SetStateAction<NonNullable<typeof stagedUpdates>>>
-  >(
+  const setStagedUpdates = useCallback<Dispatch<SetStateAction<NonNullable<typeof stagedUpdates>>>>(
     (updater) => {
       updateTableUiState((draft) => {
         const previous = draft.stagedUpdates ?? [];
-        draft.stagedUpdates =
-          typeof updater === "function" ? updater(previous) : updater;
+        draft.stagedUpdates = typeof updater === "function" ? updater(previous) : updater;
       });
     },
     [updateTableUiState],
   );
   const stagedUpdateMap = useMemo(
-    () =>
-      new Map(
-        stagedUpdates.map((stagedUpdate) => [stagedUpdate.rowId, stagedUpdate]),
-      ),
+    () => new Map(stagedUpdates.map((stagedUpdate) => [stagedUpdate.rowId, stagedUpdate])),
     [stagedUpdates],
   );
   const displayRows = useMemo(
@@ -435,12 +364,7 @@ export function ActiveTableView(_props: ViewProps) {
 
   useEffect(() => {
     setActiveEditorCellKey(null);
-  }, [
-    activeTable?.name,
-    activeTable?.schema,
-    paginationState.pageIndex,
-    paginationState.pageSize,
-  ]);
+  }, [activeTable?.name, activeTable?.schema, paginationState.pageIndex, paginationState.pageSize]);
 
   useEffect(() => {
     if (previousInfiniteScrollResetKeyRef.current === infiniteScrollResetKey) {
@@ -485,12 +409,7 @@ export function ActiveTableView(_props: ViewProps) {
     if (discardWiggleCount !== 0) {
       setDiscardWiggleCount(0);
     }
-  }, [
-    discardWiggleCount,
-    hasStagedChanges,
-    isDiscardDialogOpen,
-    isSaveDialogOpen,
-  ]);
+  }, [discardWiggleCount, hasStagedChanges, isDiscardDialogOpen, isSaveDialogOpen]);
 
   useEffect(() => {
     if (!hasSelectionExport && isSelectionExportOpen) {
@@ -512,8 +431,7 @@ export function ActiveTableView(_props: ViewProps) {
     isInfiniteScrollEnabled &&
     hasMoreRowsToLoad(visibleData?.filteredRowCount ?? Infinity, rows.length);
   const canGoToPreviousPage = paginationState.pageIndex > 0;
-  const canGoToNextPage =
-    pageCount != null && paginationState.pageIndex < pageCount - 1;
+  const canGoToNextPage = pageCount != null && paginationState.pageIndex < pageCount - 1;
   useLayoutEffect(() => {
     const pendingRowTarget = pendingInfinitePageRowTargetRef.current;
 
@@ -536,9 +454,7 @@ export function ActiveTableView(_props: ViewProps) {
       observedInfiniteFetchRef.current = false;
     }
   }, [hasMoreInfiniteRows, isFetching, rows.length]);
-  const activeTableId = activeTable
-    ? `${activeTable.schema}.${activeTable.name}`
-    : null;
+  const activeTableId = activeTable ? `${activeTable.schema}.${activeTable.name}` : null;
   const backRelationColumns = useMemo(
     () =>
       getBackRelationColumns({
@@ -555,10 +471,7 @@ export function ActiveTableView(_props: ViewProps) {
       }),
     [activeTable?.columns, backRelationColumns],
   );
-  const fallbackSelectionExportColumnIds = useMemo(
-    () => defaultColumnIds,
-    [defaultColumnIds],
-  );
+  const fallbackSelectionExportColumnIds = useMemo(() => defaultColumnIds, [defaultColumnIds]);
   const selectionExportColumnIds = useMemo(
     () =>
       getSelectionExportColumnIds({
@@ -643,9 +556,7 @@ export function ActiveTableView(_props: ViewProps) {
       previousInfiniteScrollResetKeyRef.current = getInfiniteScrollResetKey({
         activeRowSearchTerm,
         filter: appliedFilter,
-        pageSize: enabled
-          ? INFINITE_SCROLL_BATCH_SIZE
-          : paginationState.pageSize,
+        pageSize: enabled ? INFINITE_SCROLL_BATCH_SIZE : paginationState.pageSize,
         selectionScopeKey,
         sortingState,
       });
@@ -688,12 +599,7 @@ export function ActiveTableView(_props: ViewProps) {
     observedInfiniteFetchRef.current = false;
     pendingInfinitePageRowTargetRef.current = nextRowTarget;
     setLoadedInfinitePageCount((current) => current + 1);
-  }, [
-    hasMoreInfiniteRows,
-    isInfiniteScrollEnabled,
-    loadedInfinitePageCount,
-    rows.length,
-  ]);
+  }, [hasMoreInfiniteRows, isInfiniteScrollEnabled, loadedInfinitePageCount, rows.length]);
   const handleFocusedCellChange = useCallback(
     (focusedCell: GridFocusedCell | null) => {
       if (!isGridFocusedCell(focusedCell)) {
@@ -738,13 +644,7 @@ export function ActiveTableView(_props: ViewProps) {
         });
       }
     },
-    [
-      activeTable,
-      aiFilter,
-      applyEditingFilter,
-      introspection.filterOperators,
-      setEditingFilter,
-    ],
+    [activeTable, aiFilter, applyEditingFilter, introspection.filterOperators, setEditingFilter],
   );
   const focusAiPaletteFilter = useCallback(() => {
     setAiFocusRequestKey((current) => current + 1);
@@ -829,9 +729,7 @@ export function ActiveTableView(_props: ViewProps) {
     setDeleteDialogOpen(false);
   }
 
-  function buildSerializedSelectionExport(
-    format: SelectionExportFormat,
-  ): string {
+  function buildSerializedSelectionExport(format: SelectionExportFormat): string {
     if (!selectionExportTable) {
       return "";
     }
@@ -1003,9 +901,7 @@ export function ActiveTableView(_props: ViewProps) {
           columnId: params.columnId,
           rowIndex: params.rowIndex,
         });
-        setActiveEditorCellKey((current) =>
-          current === params.editorCellKey ? null : current,
-        );
+        setActiveEditorCellKey((current) => (current === params.editorCellKey ? null : current));
       });
     },
     [handleFocusedCellChange],
@@ -1051,19 +947,13 @@ export function ActiveTableView(_props: ViewProps) {
 
     lastAppliedNavigationGridFocusRequestRef.current = requestToken;
     setGridFocusRequestId((previous) => previous + 1);
-  }, [
-    activeTableId,
-    tableGridFocusRequest.requestId,
-    tableGridFocusRequest.tableId,
-  ]);
+  }, [activeTableId, tableGridFocusRequest.requestId, tableGridFocusRequest.tableId]);
 
   useLayoutEffect(() => {
     if (previousActiveEditorCellKeyRef.current && !activeEditorCellKey) {
-      document
-        .querySelector<HTMLElement>('[data-grid-scroll-container="true"]')
-        ?.focus({
-          preventScroll: true,
-        });
+      document.querySelector<HTMLElement>('[data-grid-scroll-container="true"]')?.focus({
+        preventScroll: true,
+      });
       setGridFocusRequestId((previous) => previous + 1);
     }
 
@@ -1080,11 +970,7 @@ export function ActiveTableView(_props: ViewProps) {
         return;
       }
 
-      if (
-        document.querySelector(
-          '[role="dialog"]:not([data-studio-cell-editor="true"])',
-        )
-      ) {
+      if (document.querySelector('[role="dialog"]:not([data-studio-cell-editor="true"])')) {
         return;
       }
 
@@ -1112,8 +998,7 @@ export function ActiveTableView(_props: ViewProps) {
 
       if (
         event.repeat &&
-        now - lastFocusedCellNavigationAtRef.current <
-          FOCUSED_CELL_REPEAT_DELAY_MS
+        now - lastFocusedCellNavigationAtRef.current < FOCUSED_CELL_REPEAT_DELAY_MS
       ) {
         event.preventDefault();
         return;
@@ -1189,10 +1074,7 @@ export function ActiveTableView(_props: ViewProps) {
     stagedRows.length,
   ]);
 
-  function canWriteToCell(params: {
-    columnId: string;
-    row: Record<string, unknown>;
-  }): boolean {
+  function canWriteToCell(params: { columnId: string; row: Record<string, unknown> }): boolean {
     if (!activeTable) {
       return false;
     }
@@ -1249,9 +1131,7 @@ export function ActiveTableView(_props: ViewProps) {
       return;
     }
 
-    setStagedUpdates((previous) =>
-      upsertStagedRowUpdates(previous, [...rowChangesById.values()]),
-    );
+    setStagedUpdates((previous) => upsertStagedRowUpdates(previous, [...rowChangesById.values()]));
 
     toast.success(
       `Bulk paste staged for ${rowChangesById.size} row${rowChangesById.size === 1 ? "" : "s"}`,
@@ -1269,11 +1149,7 @@ export function ActiveTableView(_props: ViewProps) {
         header({ table, header }) {
           return (props: Omit<CellProps, "children" | "ref">) => {
             return (
-              <DataGridDraggableHeaderCell
-                table={table}
-                header={header}
-                {...props}
-              >
+              <DataGridDraggableHeaderCell table={table} header={header} {...props}>
                 <DataGridHeader
                   header={header}
                   column={column}
@@ -1298,10 +1174,7 @@ export function ActiveTableView(_props: ViewProps) {
             const stagedUpdate = stagedUpdateMap.get(rowId);
             const isCellStaged = Boolean(
               stagedUpdate &&
-              Object.prototype.hasOwnProperty.call(
-                stagedUpdate.changes,
-                column.name,
-              ),
+              Object.prototype.hasOwnProperty.call(stagedUpdate.changes, column.name),
             );
             const isFocused =
               resolvedFocusedCell?.rowIndex === visualRowIndex &&
@@ -1311,10 +1184,7 @@ export function ActiveTableView(_props: ViewProps) {
               return (
                 <Cell
                   {...props}
-                  className={cn(
-                    props.className,
-                    isFocused && focusedCellClassName,
-                  )}
+                  className={cn(props.className, isFocused && focusedCellClassName)}
                   data-focused={isFocused || undefined}
                   data-grid-visual-row-index={visualRowIndex}
                   withContextMenu={false}
@@ -1410,11 +1280,7 @@ export function ActiveTableView(_props: ViewProps) {
       header({ table, header }) {
         return (props: Omit<CellProps, "children" | "ref">) => {
           return (
-            <DataGridDraggableHeaderCell
-              table={table}
-              header={header}
-              {...props}
-            >
+            <DataGridDraggableHeaderCell table={table} header={header} {...props}>
               <BackRelationHeaderCell name={column.name} />
             </DataGridDraggableHeaderCell>
           );
@@ -1482,11 +1348,7 @@ export function ActiveTableView(_props: ViewProps) {
 
   const columnDefs: (ColumnDef<Record<string, unknown>> & {
     disableDragging?: boolean;
-  })[] = [
-    ...concreteColumnDefs,
-    ...virtualColumnDefs,
-    ...backRelationColumnDefs,
-  ];
+  })[] = [...concreteColumnDefs, ...virtualColumnDefs, ...backRelationColumnDefs];
 
   if (!activeTable) {
     return null;
@@ -1495,9 +1357,7 @@ export function ActiveTableView(_props: ViewProps) {
   return (
     <>
       <StudioHeader
-        className={
-          editingFilter.filters.length > 0 ? "border-b-0 pb-2" : undefined
-        }
+        className={editingFilter.filters.length > 0 ? "border-b-0 pb-2" : undefined}
         endContent={
           <Button
             aria-label="Refresh table"
@@ -1506,10 +1366,7 @@ export function ActiveTableView(_props: ViewProps) {
             onClick={() => void reload()}
             disabled={isFetching}
           >
-            <RefreshCw
-              data-icon="inline-start"
-              className={cn(isFetching && "animate-spin")}
-            />
+            <RefreshCw data-icon="inline-start" className={cn(isFetching && "animate-spin")} />
           </Button>
         }
       >
@@ -1574,9 +1431,7 @@ export function ActiveTableView(_props: ViewProps) {
               <DropdownMenuCheckboxItem
                 checked={includeSelectionExportHeader}
                 className="rounded-lg font-sans text-sm font-medium"
-                onCheckedChange={(checked) =>
-                  setIncludeSelectionExportHeader(checked === true)
-                }
+                onCheckedChange={(checked) => setIncludeSelectionExportHeader(checked === true)}
                 onSelect={(event) => {
                   event.preventDefault();
                 }}
@@ -1641,11 +1496,7 @@ export function ActiveTableView(_props: ViewProps) {
           </>
         )}
         {isSelecting && selectedRowCount > 0 && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setDeleteDialogOpen(true)}
-          >
+          <Button variant="secondary" size="sm" onClick={() => setDeleteDialogOpen(true)}>
             {deleteSelectionLabel}
           </Button>
         )}
@@ -1781,11 +1632,7 @@ interface EditableGridRow {
 
 const STAGED_ROW_DRAFT_ID_KEY = "__ps_draft_id";
 
-function createEditorCellKey(args: {
-  columnId: string;
-  rowKey: string;
-  rowKind: EditableRowKind;
-}) {
+function createEditorCellKey(args: { columnId: string; rowKey: string; rowKind: EditableRowKind }) {
   return `${args.rowKind}:${args.rowKey}:${args.columnId}`;
 }
 
@@ -1798,9 +1645,7 @@ function createEmptyStagedRowDraft(): Record<string, unknown> {
 function getStagedRowDraftId(row: Record<string, unknown>, rowIndex: number) {
   const draftId = row[STAGED_ROW_DRAFT_ID_KEY];
 
-  return typeof draftId === "string" && draftId.length > 0
-    ? draftId
-    : `draft-${rowIndex}`;
+  return typeof draftId === "string" && draftId.length > 0 ? draftId : `draft-${rowIndex}`;
 }
 
 function stripDraftMetadataFromStagedRows(rows: Record<string, unknown>[]) {
@@ -1811,10 +1656,7 @@ function stripDraftMetadataFromStagedRows(rows: Record<string, unknown>[]) {
   });
 }
 
-function getEditableColumnIds(
-  columns: Record<string, Column> | undefined,
-  readonly: boolean,
-) {
+function getEditableColumnIds(columns: Record<string, Column> | undefined, readonly: boolean) {
   return Object.values(columns ?? {})
     .filter((column) => isWritableColumn(column, readonly))
     .sort(compareColumnsForEditing)
@@ -1836,9 +1678,7 @@ function buildEditorRows(args: {
     })),
     ...displayRows.map((row, rowIndex) => ({
       row,
-      rowKey: String(
-        persistedRows[rowIndex]?.__ps_rowid ?? row.__ps_rowid ?? "",
-      ),
+      rowKey: String(persistedRows[rowIndex]?.__ps_rowid ?? row.__ps_rowid ?? ""),
       rowKind: "persisted" as const,
     })),
   ];
@@ -1852,11 +1692,8 @@ function getAdjacentEditorTarget(args: {
   rowKind: EditableRowKind;
   rows: EditableGridRow[];
 }) {
-  const { columnId, direction, editableColumnIds, rowKey, rowKind, rows } =
-    args;
-  const rowIndex = rows.findIndex(
-    (row) => row.rowKey === rowKey && row.rowKind === rowKind,
-  );
+  const { columnId, direction, editableColumnIds, rowKey, rowKind, rows } = args;
+  const rowIndex = rows.findIndex((row) => row.rowKey === rowKey && row.rowKind === rowKind);
   const columnIndex = editableColumnIds.indexOf(columnId);
 
   if (rowIndex === -1 || columnIndex === -1) {
@@ -1954,9 +1791,7 @@ function BackRelationHeaderCell(props: { name: string }) {
 
   return (
     <div className="flex h-full min-w-0 items-center px-2">
-      <span className="min-w-0 truncate font-mono text-xs text-foreground/90">
-        {name}
-      </span>
+      <span className="min-w-0 truncate font-mono text-xs text-foreground/90">{name}</span>
     </div>
   );
 }
@@ -1972,9 +1807,7 @@ function upsertStagedCellUpdate(
 ) {
   const { columnName, row, rowId, value } = args;
   const nextStagedUpdates = [...stagedUpdates];
-  const existingIndex = nextStagedUpdates.findIndex(
-    (stagedUpdate) => stagedUpdate.rowId === rowId,
-  );
+  const existingIndex = nextStagedUpdates.findIndex((stagedUpdate) => stagedUpdate.rowId === rowId);
   const existing = nextStagedUpdates[existingIndex];
   const baseRow = existing?.row ?? row;
   const nextChanges = { ...(existing?.changes ?? {}) };
@@ -2059,9 +1892,7 @@ function getStagedCellCount(args: {
 }) {
   const { stagedRows, stagedUpdates } = args;
   const stagedRowCellCount = stagedRows.reduce((count, row) => {
-    const draftCellCount = Object.keys(row).filter(
-      (key) => key !== STAGED_ROW_DRAFT_ID_KEY,
-    ).length;
+    const draftCellCount = Object.keys(row).filter((key) => key !== STAGED_ROW_DRAFT_ID_KEY).length;
 
     return count + Math.max(draftCellCount, 1);
   }, 0);
@@ -2154,13 +1985,7 @@ function handleBinaryDialogKeyDown(args: {
   primaryRef: { current: HTMLButtonElement | null };
   secondaryRef: { current: HTMLButtonElement | null };
 }) {
-  const {
-    event,
-    onPrimaryAction,
-    onSecondaryAction,
-    primaryRef,
-    secondaryRef,
-  } = args;
+  const { event, onPrimaryAction, onSecondaryAction, primaryRef, secondaryRef } = args;
 
   if (
     event.key !== "ArrowLeft" &&
@@ -2173,8 +1998,7 @@ function handleBinaryDialogKeyDown(args: {
   }
 
   const activeElement = document.activeElement;
-  const activeAction =
-    activeElement === secondaryRef.current ? "secondary" : "primary";
+  const activeAction = activeElement === secondaryRef.current ? "secondary" : "primary";
 
   if (event.key === "Enter") {
     event.preventDefault();
@@ -2291,12 +2115,7 @@ interface ActiveTableRowSearchControlProps {
 }
 
 function ActiveTableRowSearchControl(props: ActiveTableRowSearchControlProps) {
-  const {
-    disabled = false,
-    onBlockedInteraction,
-    rowSearch,
-    supportsFullTableSearch,
-  } = props;
+  const { disabled = false, onBlockedInteraction, rowSearch, supportsFullTableSearch } = props;
   const {
     closeRowSearch,
     isRowSearchOpen,
@@ -2365,18 +2184,13 @@ function ActiveTableRowSearchControl(props: ActiveTableRowSearchControlProps) {
         data-row-search-input-wrapper
         className={cn(
           "absolute right-0 top-1/2 -translate-y-1/2 origin-right transition-[opacity,transform] duration-200 ease-out will-change-transform w-56 z-10",
-          isRowSearchOpen
-            ? "opacity-100 scale-x-100"
-            : "opacity-0 scale-x-0 pointer-events-none",
+          isRowSearchOpen ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0 pointer-events-none",
         )}
       >
         <Input
           aria-disabled={disabled || undefined}
           aria-label="Global search"
-          className={cn(
-            "h-9 w-full bg-background shadow-none",
-            disabled && "opacity-70",
-          )}
+          className={cn("h-9 w-full bg-background shadow-none", disabled && "opacity-70")}
           onMouseDown={handleBlockedMouseDown}
           onBlur={(event) => {
             if (disabled) {
@@ -2442,9 +2256,7 @@ function getPageCount(
     return;
   }
 
-  const pageCount = Number(
-    (BigInt(rowCount) + BigInt(pageSize) - BigInt(1)) / BigInt(pageSize),
-  );
+  const pageCount = Number((BigInt(rowCount) + BigInt(pageSize) - BigInt(1)) / BigInt(pageSize));
 
   return Number.isSafeInteger(pageCount) ? pageCount : Number.MAX_SAFE_INTEGER;
 }
@@ -2456,13 +2268,7 @@ function getInfiniteScrollResetKey(args: {
   selectionScopeKey: string | undefined;
   sortingState: ReturnType<typeof useSorting>["sortingState"];
 }): string {
-  const {
-    activeRowSearchTerm,
-    filter,
-    pageSize,
-    selectionScopeKey,
-    sortingState,
-  } = args;
+  const { activeRowSearchTerm, filter, pageSize, selectionScopeKey, sortingState } = args;
 
   return JSON.stringify({
     activeRowSearchTerm,

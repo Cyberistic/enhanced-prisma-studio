@@ -7,10 +7,7 @@ import type {
   AdapterQueryDetails,
   AdapterUpdateDetails,
 } from "../adapter";
-import {
-  buildFullTableSearchPlan,
-  getFullTableSearchExpression,
-} from "../full-table-search";
+import { buildFullTableSearchPlan, getFullTableSearchExpression } from "../full-table-search";
 import {
   applyInferredRowFilters,
   applyTransformations,
@@ -38,13 +35,9 @@ export function getSelectQuery(
     table: { columns, name: tableName },
   } = details;
 
-  const builder =
-    getSQLiteBuilder<Record<string, Record<string, unknown>>>(requirements);
+  const builder = getSQLiteBuilder<Record<string, Record<string, unknown>>>(requirements);
 
-  const appliedFilterExpression = getSelectFilterExpression(
-    filter.filters,
-    columns,
-  );
+  const appliedFilterExpression = getSelectFilterExpression(filter.filters, columns);
   const fullTableSearchPlan = buildFullTableSearchPlan({
     searchTerm: fullTableSearchTerm,
     table: details.table,
@@ -67,12 +60,7 @@ export function getSelectQuery(
     .selectFrom(tableName)
     .where(combinedWhereExpression)
     .select((eb) =>
-      eb
-        .cast<BigIntString>(
-          eb.fn.coalesce(eb.fn.countAll(), sql.lit(0)),
-          "text",
-        )
-        .as(COUNT_REF),
+      eb.cast<BigIntString>(eb.fn.coalesce(eb.fn.countAll(), sql.lit(0)), "text").as(COUNT_REF),
     );
 
   return compile(
@@ -89,12 +77,7 @@ export function getSelectQuery(
         >,
       )
       .select(Object.keys(columns))
-      .$call((qb) =>
-        sortOrder.reduce(
-          (qb, item) => qb.orderBy(item.column, item.direction),
-          qb,
-        ),
-      )
+      .$call((qb) => sortOrder.reduce((qb, item) => qb.orderBy(item.column, item.direction), qb))
       .limit(pageSize)
       // we're injecting the offset value here to avoid serialization complexity (`bigint` is a no-go for `JSON.stringify`).
       .offset(sql.lit(BigInt(pageIndex) * BigInt(pageSize))),
@@ -144,8 +127,7 @@ export function getDeleteQuery(
     table: { columns, name: tableName },
   } = details;
 
-  const builder =
-    getSQLiteBuilder<Record<string, Record<string, unknown>>>(requirements);
+  const builder = getSQLiteBuilder<Record<string, Record<string, unknown>>>(requirements);
 
   return compile(
     builder
@@ -168,8 +150,7 @@ export function getInsertQuery(
     rows,
   } = details;
 
-  const builder =
-    getSQLiteBuilder<Record<string, Record<string, unknown>>>(requirements);
+  const builder = getSQLiteBuilder<Record<string, Record<string, unknown>>>(requirements);
 
   return compile(
     builder
@@ -200,8 +181,7 @@ export function getUpdateQuery(
     table: { columns, name: tableName },
   } = details;
 
-  const builder =
-    getSQLiteBuilder<Record<string, Record<string, unknown>>>(requirements);
+  const builder = getSQLiteBuilder<Record<string, Record<string, unknown>>>(requirements);
 
   return compile(
     builder

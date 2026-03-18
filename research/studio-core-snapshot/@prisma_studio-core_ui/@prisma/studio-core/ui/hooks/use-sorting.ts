@@ -46,18 +46,13 @@ export function useSorting() {
 
   // Update URL when sorting changes from the UI
   const handleSortingChange = useCallback(
-    (
-      newState: SortOrderItem[] | ((old: SortOrderItem[]) => SortOrderItem[]),
-    ) => {
-      const resolvedState =
-        typeof newState === "function" ? newState(sortingState) : newState;
+    (newState: SortOrderItem[] | ((old: SortOrderItem[]) => SortOrderItem[])) => {
+      const resolvedState = typeof newState === "function" ? newState(sortingState) : newState;
 
       // Serialize sorting state to URL parameter
       const sortString =
         resolvedState.length > 0
-          ? resolvedState
-              .map((item) => `${item.column}:${item.direction}`)
-              .join(",")
+          ? resolvedState.map((item) => `${item.column}:${item.direction}`).join(",")
           : null;
 
       void (async () => {
@@ -77,9 +72,7 @@ export function useSorting() {
   };
 }
 
-function getPrimaryKeyDefaultSorting(
-  activeTable: Table | undefined,
-): SortOrderItem[] {
+function getPrimaryKeyDefaultSorting(activeTable: Table | undefined): SortOrderItem[] {
   if (!activeTable) {
     return [];
   }

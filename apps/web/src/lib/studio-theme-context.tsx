@@ -14,7 +14,9 @@ export function StudioThemeProvider(props: {
   children: ReactNode;
   value: StudioThemeContextValue;
 }) {
-  return <StudioThemeContext.Provider value={props.value}>{props.children}</StudioThemeContext.Provider>;
+  return (
+    <StudioThemeContext.Provider value={props.value}>{props.children}</StudioThemeContext.Provider>
+  );
 }
 
 export function useStudioThemeContext() {

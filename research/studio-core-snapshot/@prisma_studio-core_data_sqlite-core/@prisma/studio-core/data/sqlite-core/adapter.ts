@@ -23,16 +23,8 @@ import {
 import { asQuery, type Query, type QueryResult } from "../query";
 import { createSqlEditorSchemaFromIntrospection } from "../sql-editor-schema";
 import type { Either } from "../type-utils";
-import {
-  determineColumnAffinity,
-  SQLITE_AFFINITY_TO_METADATA,
-} from "./datatype";
-import {
-  getDeleteQuery,
-  getInsertQuery,
-  getSelectQuery,
-  getUpdateQuery,
-} from "./dml";
+import { determineColumnAffinity, SQLITE_AFFINITY_TO_METADATA } from "./datatype";
+import { getDeleteQuery, getInsertQuery, getSelectQuery, getUpdateQuery } from "./dml";
 import { getTablesQuery, mockTablesQuery } from "./introspection";
 import { lintSQLiteWithExplainFallback } from "./sql-lint";
 
@@ -53,30 +45,22 @@ const filterOperators = [
   "not like",
 ] satisfies FilterOperator[];
 
-export function createSQLiteAdapter(
-  requirements: SQLIteAdapterRequirements,
-): Adapter {
+export function createSQLiteAdapter(requirements: SQLIteAdapterRequirements): Adapter {
   const { executor, ...otherRequirements } = requirements;
   const fullTableSearchState = createFullTableSearchExecutionState();
   let canUseExecutorLintTransport = typeof executor.lintSql === "function";
-  const createSQLiteAdapterError = (
-    args: Parameters<typeof createAdapterError>[0],
-  ) => createAdapterError({ ...args, adapterSource: "sqlite" });
+  const createSQLiteAdapterError = (args: Parameters<typeof createAdapterError>[0]) =>
+    createAdapterError({ ...args, adapterSource: "sqlite" });
 
   async function executeUpdateTransaction(
     updates: AdapterUpdateDetails[],
     options: Parameters<NonNullable<Adapter["update"]>>[1],
   ): Promise<Either<AdapterError, AdapterUpdateManyResult>> {
-    const queries = updates.map((update) =>
-      getUpdateQuery(update, otherRequirements),
-    );
+    const queries = updates.map((update) => getUpdateQuery(update, otherRequirements));
 
     try {
       if (typeof executor.executeTransaction === "function") {
-        const [error, results] = await executor.executeTransaction(
-          queries,
-          options,
-        );
+        const [error, results] = await executor.executeTransaction(queries, options);
 
         if (error) {
           return createSQLiteAdapterError({ error, query: queries[0] });
@@ -133,10 +117,7 @@ export function createSQLiteAdapter(
     try {
       const tablesQuery = getTablesQuery(requirements);
 
-      const [tablesError, tables] = await executor.execute(
-        tablesQuery,
-        options,
-      );
+      const [tablesError, tables] = await executor.execute(tablesQuery, options);
 
       if (tablesError) {
         return createSQLiteAdapterError({
@@ -160,10 +141,7 @@ export function createSQLiteAdapter(
       sqlEditorLint: true,
     },
 
-    async delete(
-      details,
-      options,
-    ): Promise<Either<AdapterError, AdapterDeleteResult>> {
+    async delete(details, options): Promise<Either<AdapterError, AdapterDeleteResult>> {
       try {
         const query = getDeleteQuery(details, otherRequirements);
 
@@ -180,10 +158,7 @@ export function createSQLiteAdapter(
       }
     },
 
-    async insert(
-      details,
-      options,
-    ): Promise<Either<AdapterError, AdapterInsertResult>> {
+    async insert(details, options): Promise<Either<AdapterError, AdapterInsertResult>> {
       try {
         const query = getInsertQuery(details, otherRequirements);
 
@@ -199,16 +174,11 @@ export function createSQLiteAdapter(
       }
     },
 
-    async introspect(
-      options,
-    ): Promise<Either<AdapterError, AdapterIntrospectResult>> {
+    async introspect(options): Promise<Either<AdapterError, AdapterIntrospectResult>> {
       return await introspectDatabase(options);
     },
 
-    async sqlSchema(
-      _details,
-      options,
-    ): Promise<Either<AdapterError, AdapterSqlSchemaResult>> {
+    async sqlSchema(_details, options): Promise<Either<AdapterError, AdapterSqlSchemaResult>> {
       const [error, introspection] = await introspectDatabase(options);
 
       if (error) {
@@ -225,14 +195,8 @@ export function createSQLiteAdapter(
       ];
     },
 
-    async sqlLint(
-      details,
-      options,
-    ): Promise<Either<AdapterError, AdapterSqlLintResult>> {
-      if (
-        canUseExecutorLintTransport &&
-        typeof executor.lintSql === "function"
-      ) {
+    async sqlLint(details, options): Promise<Either<AdapterError, AdapterSqlLintResult>> {
+      if (canUseExecutorLintTransport && typeof executor.lintSql === "function") {
         try {
           const [error, result] = await executor.lintSql(details, options);
 
@@ -257,20 +221,16 @@ export function createSQLiteAdapter(
       return await lintSQLiteWithExplainFallback(executor, details, options);
     },
 
-    async query(
-      details,
-      options,
-    ): Promise<Either<AdapterError, AdapterQueryResult>> {
+    async query(details, options): Promise<Either<AdapterError, AdapterQueryResult>> {
       try {
         const query = getSelectQuery(details, otherRequirements);
-        const [error, results] =
-          await executeQueryWithFullTableSearchGuardrails({
-            executor,
-            options,
-            query,
-            searchTerm: details.fullTableSearchTerm,
-            state: fullTableSearchState,
-          });
+        const [error, results] = await executeQueryWithFullTableSearchGuardrails({
+          executor,
+          options,
+          query,
+          searchTerm: details.fullTableSearchTerm,
+          state: fullTableSearchState,
+        });
 
         if (error) {
           return createSQLiteAdapterError({ error, query });
@@ -290,10 +250,7 @@ export function createSQLiteAdapter(
       }
     },
 
-    async raw(
-      details,
-      options,
-    ): Promise<Either<AdapterError, AdapterRawResult>> {
+    async raw(details, options): Promise<Either<AdapterError, AdapterRawResult>> {
       try {
         const query = asQuery<Record<string, unknown>>(details.sql);
         const [error, rows] = await executor.execute(query, options);
@@ -315,10 +272,7 @@ export function createSQLiteAdapter(
       }
     },
 
-    async update(
-      details,
-      options,
-    ): Promise<Either<AdapterError, AdapterUpdateResult>> {
+    async update(details, options): Promise<Either<AdapterError, AdapterUpdateResult>> {
       try {
         const query = getUpdateQuery(details, otherRequirements);
 
@@ -383,13 +337,7 @@ function createIntrospection(args: {
 
         const columnsRecord = columns.reduce(
           (columnsRecord, column, index) => {
-            const {
-              datatype,
-              default: defaultValue,
-              fk_column,
-              name: columnName,
-              pk,
-            } = column;
+            const { datatype, default: defaultValue, fk_column, name: columnName, pk } = column;
 
             maxPKSeen = Math.max(maxPKSeen, pk);
 
@@ -405,11 +353,9 @@ function createIntrospection(args: {
               pk === 1 &&
               // no other primary key columns before this column.
               maxPKSeen === 1 &&
-              !columns
-                .slice(index + 1)
-                .some(function isAlsoInPrimaryKey(column) {
-                  return column.pk > 1;
-                }) &&
+              !columns.slice(index + 1).some(function isAlsoInPrimaryKey(column) {
+                return column.pk > 1;
+              }) &&
               !WITHOUT_ROWID_REGEX.test(sql);
 
             const isComputed = Boolean(column.computed);
@@ -437,8 +383,7 @@ function createIntrospection(args: {
               // the `CREATE TABLE` statement.
               isAutoincrement: isRowId,
               isComputed,
-              isRequired:
-                !nullable && !isRowId && !isComputed && defaultValue == null,
+              isRequired: !nullable && !isRowId && !isComputed && defaultValue == null,
               name: columnName,
               nullable,
               pkPosition: pk > 0 ? pk : null,

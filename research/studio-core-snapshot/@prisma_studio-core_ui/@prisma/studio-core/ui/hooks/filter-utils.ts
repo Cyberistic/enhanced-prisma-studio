@@ -7,10 +7,7 @@ import type {
   Table,
 } from "../../data/adapter";
 import { coerceToString } from "../../lib/conversionUtils";
-import {
-  hasEmbeddedSqlStatementSeparator,
-  normalizeSqlWhereClause,
-} from "../../lib/sql-filter";
+import { hasEmbeddedSqlStatementSeparator, normalizeSqlWhereClause } from "../../lib/sql-filter";
 import short from "../lib/short-uuid";
 
 export type EditingFilterOperator = FilterOperator | "";
@@ -40,10 +37,7 @@ export interface EditingFilterGroup extends Omit<FilterGroup, "filters"> {
   filters: EditingFilterNode[];
 }
 
-export type EditingFilterNode =
-  | EditingColumnFilter
-  | EditingFilterGroup
-  | EditingSqlFilter;
+export type EditingFilterNode = EditingColumnFilter | EditingFilterGroup | EditingSqlFilter;
 
 const FILTER_OPERATORS = new Set<FilterOperator>([
   "=",
@@ -71,15 +65,11 @@ export function createDefaultFilter(): FilterGroup {
 
 export const defaultFilter: FilterGroup = createDefaultFilter();
 
-export function createEditingFilterFromApplied(
-  filterGroup: FilterGroup,
-): EditingFilterGroup {
+export function createEditingFilterFromApplied(filterGroup: FilterGroup): EditingFilterGroup {
   return JSON.parse(JSON.stringify(filterGroup)) as EditingFilterGroup;
 }
 
-export function cloneEditingFilter(
-  filterGroup: EditingFilterGroup,
-): EditingFilterGroup {
+export function cloneEditingFilter(filterGroup: EditingFilterGroup): EditingFilterGroup {
   return JSON.parse(JSON.stringify(filterGroup)) as EditingFilterGroup;
 }
 
@@ -114,9 +104,7 @@ export function createAppliedFilterFromEditing(
 ): FilterGroup {
   return {
     ...filterGroup,
-    filters: filterGroup.filters.flatMap<
-      ColumnFilter | FilterGroup | SqlFilter
-    >((filter) => {
+    filters: filterGroup.filters.flatMap<ColumnFilter | FilterGroup | SqlFilter>((filter) => {
       if (filter.kind === "ColumnFilter") {
         if (
           !filter.column.trim() ||
@@ -126,22 +114,13 @@ export function createAppliedFilterFromEditing(
           return [];
         }
 
-        const {
-          aiSource: _aiSource,
-          draftValue: _draftValue,
-          ...appliedFilter
-        } = filter;
+        const { aiSource: _aiSource, draftValue: _draftValue, ...appliedFilter } = filter;
 
         return [{ ...appliedFilter, operator: filter.operator }];
       }
 
       if (filter.kind === "SqlFilter") {
-        if (
-          getEditingFilterSyntaxIssue(
-            filter,
-            columns ?? ({} as Table["columns"]),
-          )
-        ) {
+        if (getEditingFilterSyntaxIssue(filter, columns ?? ({} as Table["columns"]))) {
           return [];
         }
 
@@ -162,9 +141,7 @@ export function createAppliedFilterFromEditing(
 }
 
 export function countFiltersRecursive(
-  filterGroup:
-    | Pick<EditingFilterGroup, "filters">
-    | Pick<FilterGroup, "filters">,
+  filterGroup: Pick<EditingFilterGroup, "filters"> | Pick<FilterGroup, "filters">,
 ): number {
   let count = 0;
 
@@ -209,14 +186,8 @@ export interface FilterSyntaxIssue {
 
 const COMPARISON_OPERATORS = new Set<FilterOperator>([">", ">=", "<", "<="]);
 const EQUALITY_OPERATORS = new Set<FilterOperator>(["=", "!="]);
-const TEXT_MATCH_OPERATORS = new Set<FilterOperator>([
-  "ilike",
-  "like",
-  "not ilike",
-  "not like",
-]);
-const UUID_PATTERN =
-  /^[\da-f]{8}-[\da-f]{4}-[1-5][\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i;
+const TEXT_MATCH_OPERATORS = new Set<FilterOperator>(["ilike", "like", "not ilike", "not like"]);
+const UUID_PATTERN = /^[\da-f]{8}-[\da-f]{4}-[1-5][\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i;
 
 type ColumnSyntaxKind =
   | "array"
@@ -248,9 +219,7 @@ export function getSupportedFilterOperatorsForColumn(
 
   const availableOperatorSet = new Set(availableOperators);
 
-  return supportedOperators.filter((operator) =>
-    availableOperatorSet.has(operator),
-  );
+  return supportedOperators.filter((operator) => availableOperatorSet.has(operator));
 }
 
 export function isFilterOperatorSupportedForColumn(
@@ -277,8 +246,7 @@ export function getEditingFilterSyntaxIssue(
     if (hasEmbeddedSqlStatementSeparator(filter.sql)) {
       return {
         code: "invalid-sql-fragment",
-        message:
-          "SQL filters must be a single WHERE clause fragment without embedded semicolons.",
+        message: "SQL filters must be a single WHERE clause fragment without embedded semicolons.",
       };
     }
 
@@ -474,9 +442,7 @@ export function mergeEditingFilterUiMetadata(args: {
     }
   }
 
-  function applyPreviousFilterMetadata(
-    filterGroup: EditingFilterGroup,
-  ): EditingFilterGroup {
+  function applyPreviousFilterMetadata(filterGroup: EditingFilterGroup): EditingFilterGroup {
     return {
       ...filterGroup,
       filters: filterGroup.filters.map((filter) => {
@@ -507,10 +473,7 @@ export function mergeEditingFilterUiMetadata(args: {
   return applyPreviousFilterMetadata(currentFilter);
 }
 
-function getEditingFilterRawValue(
-  filter: EditingColumnFilter,
-  column: Column,
-): string {
+function getEditingFilterRawValue(filter: EditingColumnFilter, column: Column): string {
   if (typeof filter.draftValue === "string") {
     return filter.draftValue;
   }
@@ -588,16 +551,7 @@ function getSupportedScalarOperatorsForKind(
     case "datetime":
     case "numeric":
     case "time":
-      return [
-        "=",
-        "!=",
-        ">",
-        ">=",
-        "<",
-        "<=",
-        "is",
-        "is not",
-      ] as FilterOperator[];
+      return ["=", "!=", ">", ">=", "<", "<=", "is", "is not"] as FilterOperator[];
     case "enum":
     case "text":
       return [
@@ -619,9 +573,7 @@ function getSupportedScalarOperatorsForKind(
   }
 }
 
-function getScalarColumnSyntaxKind(
-  column: Column,
-): Exclude<ColumnSyntaxKind, "array"> {
+function getScalarColumnSyntaxKind(column: Column): Exclude<ColumnSyntaxKind, "array"> {
   if (isUuidLikeColumn(column)) {
     return "uuid";
   }
@@ -657,15 +609,10 @@ function getScalarColumnSyntaxKind(
 }
 
 function supportsTextSearchOnArray(column: Column): boolean {
-  return ["enum", "text"].includes(
-    getScalarColumnSyntaxKind(asScalarColumn(column)),
-  );
+  return ["enum", "text"].includes(getScalarColumnSyntaxKind(asScalarColumn(column)));
 }
 
-function getUnsupportedOperatorIssue(
-  column: Column,
-  operator: FilterOperator,
-): FilterSyntaxIssue {
+function getUnsupportedOperatorIssue(column: Column, operator: FilterOperator): FilterSyntaxIssue {
   if (TEXT_MATCH_OPERATORS.has(operator)) {
     return {
       code: "invalid-operator-for-type",
@@ -701,11 +648,7 @@ function asScalarColumn(column: Column): Column {
 function isBinaryLikeColumn(column: Column): boolean {
   const typeName = getNormalizedTypeName(column);
 
-  return (
-    typeName.includes("blob") ||
-    typeName.includes("bytea") ||
-    typeName.includes("binary")
-  );
+  return typeName.includes("blob") || typeName.includes("bytea") || typeName.includes("binary");
 }
 
 function isTextLikeRawColumn(column: Column): boolean {

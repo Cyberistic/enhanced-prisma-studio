@@ -1,11 +1,5 @@
-import {
-  queryCollectionOptions,
-} from "@tanstack/query-db-collection";
-import {
-  type Collection,
-  createCollection,
-  useLiveQuery,
-} from "@tanstack/react-db";
+import { queryCollectionOptions } from "@tanstack/query-db-collection";
+import { type Collection, createCollection, useLiveQuery } from "@tanstack/react-db";
 import { type QueryKey, useIsFetching } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
@@ -45,10 +39,8 @@ function writeUpdatedRows(args: {
 }
 
 function compareRowsByQueryOrder(left: RowRecord, right: RowRecord): number {
-  const leftOrder =
-    typeof left.__ps_order === "number" ? left.__ps_order : Infinity;
-  const rightOrder =
-    typeof right.__ps_order === "number" ? right.__ps_order : Infinity;
+  const leftOrder = typeof left.__ps_order === "number" ? left.__ps_order : Infinity;
+  const rightOrder = typeof right.__ps_order === "number" ? right.__ps_order : Infinity;
 
   if (leftOrder !== rightOrder) {
     return leftOrder - rightOrder;
@@ -78,10 +70,7 @@ function getFilterKey(filter: FilterGroup): string {
   return JSON.stringify(filter);
 }
 
-function getQueryScopeKey(
-  table: Table | undefined,
-  query: ActiveTableRowsCollectionQuery,
-): string {
+function getQueryScopeKey(table: Table | undefined, query: ActiveTableRowsCollectionQuery): string {
   if (!table) {
     return "";
   }
@@ -118,9 +107,7 @@ function getFilteredRowCountKey(
 function upsertFilteredRowCount(
   id: string,
   filteredRowCount: AdapterQueryResult["filteredRowCount"],
-  tableQueryMetaCollection: ReturnType<
-    typeof useStudio
-  >["tableQueryMetaCollection"],
+  tableQueryMetaCollection: ReturnType<typeof useStudio>["tableQueryMetaCollection"],
 ): void {
   const existing = tableQueryMetaCollection.get(id);
 
@@ -201,28 +188,57 @@ export function useActiveTableRowsCollection(
       return null;
     }
 
-    return studio.getOrCreateRowsCollection<RowCollection>(
-      queryScopeKey,
-      () => {
-        return createCollection(
-          queryCollectionOptions({
-            compare: compareRowsByQueryOrder,
-            gcTime: 0,
-            id: `rows:${queryScopeKey}`,
-            getKey(item) {
-              return String(item.__ps_rowid);
-            },
-            onDelete: async ({ transaction }) => {
-              const rows = transaction.mutations.map(
-                (mutation) => mutation.original,
-              );
+    return studio.getOrCreateRowsCollection<RowCollection>(queryScopeKey, () => {
+      return createCollection(
+        queryCollectionOptions({
+          compare: compareRowsByQueryOrder,
+          gcTime: 0,
+          id: `rows:${queryScopeKey}`,
+          getKey(item) {
+            return String(item.__ps_rowid);
+          },
+          onDelete: async ({ transaction }) => {
+            const rows = transaction.mutations.map((mutation) => mutation.original);
 
-              if (rows.length === 0) {
-                return;
-              }
+            if (rows.length === 0) {
+              return;
+            }
 
-              const [error, result] = await adapter.delete(
-                { rows, table: activeTable },
+            const [error, result] = await adapter.delete({ rows, table: activeTable }, {});
+
+            if (error) {
+              onEvent({
+                name: "studio_operation_error",
+                payload: {
+                  operation: "delete",
+                  query: error.query,
+                  error,
+                },
+              });
+
+              throw error;
+            }
+
+            onEvent({
+              name: "studio_operation_success",
+              payload: {
+                operation: "delete",
+                query: result.query,
+                error: undefined,
+              },
+            });
+          },
+          onUpdate: async ({ collection, transaction }) => {
+            if (transaction.mutations.length > 1 && typeof adapter.updateMany === "function") {
+              const [error, result] = await adapter.updateMany(
+                {
+                  table: activeTable,
+                  updates: transaction.mutations.map((mutation) => ({
+                    changes: mutation.changes,
+                    row: mutation.original,
+                    table: activeTable,
+                  })),
+                },
                 {},
               );
 
@@ -230,7 +246,7 @@ export function useActiveTableRowsCollection(
                 onEvent({
                   name: "studio_operation_error",
                   payload: {
-                    operation: "delete",
+                    operation: "update",
                     query: error.query,
                     error,
                   },
@@ -239,131 +255,47 @@ export function useActiveTableRowsCollection(
                 throw error;
               }
 
-              onEvent({
-                name: "studio_operation_success",
-                payload: {
-                  operation: "delete",
-                  query: result.query,
-                  error: undefined,
-                },
-              });
-            },
-            onUpdate: async ({ collection, transaction }) => {
-              if (
-                transaction.mutations.length > 1 &&
-                typeof adapter.updateMany === "function"
-              ) {
-                const [error, result] = await adapter.updateMany(
-                  {
-                    table: activeTable,
-                    updates: transaction.mutations.map((mutation) => ({
-                      changes: mutation.changes,
-                      row: mutation.original,
-                      table: activeTable,
-                    })),
-                  },
-                  {},
-                );
-
-                if (error) {
-                  onEvent({
-                    name: "studio_operation_error",
-                    payload: {
-                      operation: "update",
-                      query: error.query,
-                      error,
-                    },
-                  });
-
-                  throw error;
-                }
-
-                for (const query of result.queries) {
-                  onEvent({
-                    name: "studio_operation_success",
-                    payload: {
-                      operation: "update",
-                      query,
-                      error: undefined,
-                    },
-                  });
-                }
-
-                writeUpdatedRows({
-                  activeTable,
-                  writeUpdate: (collection as unknown as {
-                    utils: {
-                      writeUpdate: (row: RowRecord) => void;
-                    };
-                  }).utils.writeUpdate,
-                  rows: result.rows,
-                });
-
-                return;
-              }
-
-              for (const mutation of transaction.mutations) {
-                const [error, result] = await adapter.update(
-                  {
-                    changes: mutation.changes,
-                    row: mutation.original,
-                    table: activeTable,
-                  },
-                  {},
-                );
-
-                if (error) {
-                  onEvent({
-                    name: "studio_operation_error",
-                    payload: {
-                      operation: "update",
-                      query: error.query,
-                      error,
-                    },
-                  });
-
-                  throw error;
-                }
-
+              for (const query of result.queries) {
                 onEvent({
                   name: "studio_operation_success",
                   payload: {
                     operation: "update",
-                    query: result.query,
+                    query,
                     error: undefined,
                   },
                 });
+              }
 
-                writeUpdatedRows({
-                  activeTable,
-                  writeUpdate: (collection as unknown as {
+              writeUpdatedRows({
+                activeTable,
+                writeUpdate: (
+                  collection as unknown as {
                     utils: {
                       writeUpdate: (row: RowRecord) => void;
                     };
-                  }).utils.writeUpdate,
-                  rows: [result.row],
-                });
-              }
-            },
-            queryClient,
-            queryFn: async ({ signal }) => {
-              const [error, result] = await adapter.query(
+                  }
+                ).utils.writeUpdate,
+                rows: result.rows,
+              });
+
+              return;
+            }
+
+            for (const mutation of transaction.mutations) {
+              const [error, result] = await adapter.update(
                 {
-                  pageIndex,
-                  pageSize,
-                  sortOrder,
+                  changes: mutation.changes,
+                  row: mutation.original,
                   table: activeTable,
-                  filter,
-                  fullTableSearchTerm,
                 },
-                { abortSignal: signal },
+                {},
               );
 
               if (error) {
                 onEvent({
                   name: "studio_operation_error",
                   payload: {
-                    operation: "query",
+                    operation: "update",
                     query: error.query,
                     error,
                   },
@@ -375,42 +307,89 @@ export function useActiveTableRowsCollection(
               onEvent({
                 name: "studio_operation_success",
                 payload: {
-                  operation: "query",
+                  operation: "update",
                   query: result.query,
                   error: undefined,
                 },
               });
 
-              upsertFilteredRowCount(
-                filteredRowCountKey,
-                result.filteredRowCount,
-                tableQueryMetaCollection,
-              );
+              writeUpdatedRows({
+                activeTable,
+                writeUpdate: (
+                  collection as unknown as {
+                    utils: {
+                      writeUpdate: (row: RowRecord) => void;
+                    };
+                  }
+                ).utils.writeUpdate,
+                rows: [result.row],
+              });
+            }
+          },
+          queryClient,
+          queryFn: async ({ signal }) => {
+            const [error, result] = await adapter.query(
+              {
+                pageIndex,
+                pageSize,
+                sortOrder,
+                table: activeTable,
+                filter,
+                fullTableSearchTerm,
+              },
+              { abortSignal: signal },
+            );
 
-              return addRowIdToResult<AdapterQueryResult>(result, activeTable)
-                .rows;
-            },
-            queryKey: () => [
-              "schema",
-              activeTable.schema,
-              "table",
-              activeTable.name,
-              "query",
-              "sortOrder",
-              sortKey || "natural",
-              "pageIndex",
-              pageIndex,
-              "pageSize",
-              pageSize,
-              "filter",
-              filterKey,
-            ],
-            retry: false,
-            staleTime: Infinity,
-          }),
-        );
-      },
-    );
+            if (error) {
+              onEvent({
+                name: "studio_operation_error",
+                payload: {
+                  operation: "query",
+                  query: error.query,
+                  error,
+                },
+              });
+
+              throw error;
+            }
+
+            onEvent({
+              name: "studio_operation_success",
+              payload: {
+                operation: "query",
+                query: result.query,
+                error: undefined,
+              },
+            });
+
+            upsertFilteredRowCount(
+              filteredRowCountKey,
+              result.filteredRowCount,
+              tableQueryMetaCollection,
+            );
+
+            return addRowIdToResult<AdapterQueryResult>(result, activeTable).rows;
+          },
+          queryKey: () => [
+            "schema",
+            activeTable.schema,
+            "table",
+            activeTable.name,
+            "query",
+            "sortOrder",
+            sortKey || "natural",
+            "pageIndex",
+            pageIndex,
+            "pageSize",
+            pageSize,
+            "filter",
+            filterKey,
+          ],
+          retry: false,
+          staleTime: Infinity,
+        }),
+      );
+    });
   }, [
     activeTable,
     adapter,
@@ -452,8 +431,7 @@ export function useActiveTableRowsCollection(
   );
 
   const filteredRowCount =
-    tableQueryMetaCollection.get(filteredRowCountKey)?.filteredRowCount ??
-    Infinity;
+    tableQueryMetaCollection.get(filteredRowCountKey)?.filteredRowCount ?? Infinity;
 
   const refetch = useCallback(async () => {
     if (!collection) {

@@ -3,8 +3,6 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 
-import dotenv from "dotenv";
-
 import { createSQLiteBunSqlProvider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/bun-sql";
 import { createSQLiteCloudflareD1Provider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/cloudflare-d1";
 import { createSQLiteDrizzleProvider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/drizzle";
@@ -36,48 +34,17 @@ const execFileAsync = promisify(execFile);
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const testSuiteRoot = path.resolve(scriptDir, "../../..");
 const workspaceRoot = path.resolve(testSuiteRoot, "../..");
-
-dotenv.config({
-  override: true,
-  path: path.join(workspaceRoot, "apps/web/.env"),
-});
-
-if (!process.env.CLOUDFLARE_API_TOKEN || !process.env.CLOUDFLARE_ACCOUNT_ID) {
-  dotenv.config({
-    override: true,
-    path: path.join(workspaceRoot, "apps/web/.env"),
-  });
-}
-
-if (!process.env.CLOUDFLARE_API_TOKEN || !process.env.CLOUDFLARE_ACCOUNT_ID) {
-  dotenv.config({
-    override: true,
-    path: path.join(process.cwd(), "apps/web/.env"),
-  });
-}
-
-if (!process.env.CLOUDFLARE_API_TOKEN) {
-  process.env.CLOUDFLARE_API_TOKEN = process.env.VITE_CLOUDFLARE_API_TOKEN;
-}
-
-if (!process.env.CLOUDFLARE_ACCOUNT_ID) {
-  process.env.CLOUDFLARE_ACCOUNT_ID = process.env.VITE_CLOUDFLARE_ACCOUNT_ID;
-}
+const packageRoot = path.resolve(testSuiteRoot, "test-suite");
 
 const d1DbName = process.env.D1_TEST_DB_NAME ?? "eps-provider-test";
-const initToken =
-  process.env.CLOUDFLARE_API_TOKEN ?? process.env.VITE_CLOUDFLARE_API_TOKEN;
+const initToken = process.env.CLOUDFLARE_API_TOKEN ?? process.env.VITE_CLOUDFLARE_API_TOKEN;
 const initAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 
 function getCloudflareAuth() {
   const cloudflareApiToken =
-    process.env.CLOUDFLARE_API_TOKEN ??
-    process.env.VITE_CLOUDFLARE_API_TOKEN ??
-    initToken;
+    process.env.CLOUDFLARE_API_TOKEN ?? process.env.VITE_CLOUDFLARE_API_TOKEN ?? initToken;
   const cloudflareAccountId =
-    process.env.CLOUDFLARE_ACCOUNT_ID ??
-    process.env.VITE_CLOUDFLARE_ACCOUNT_ID ??
-    initAccountId;
+    process.env.CLOUDFLARE_ACCOUNT_ID ?? process.env.VITE_CLOUDFLARE_ACCOUNT_ID ?? initAccountId;
 
   if (!cloudflareApiToken || !cloudflareAccountId) {
     throw new Error("Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID in environment.");
@@ -159,7 +126,7 @@ async function getDatabaseId() {
 
 async function seedRemoteDatabase() {
   const { cloudflareApiToken } = getCloudflareAuth();
-  const schemaFilePath = path.join(testSuiteRoot, "src", "db", "d1", "schema.sql");
+  const schemaFilePath = path.join(packageRoot, "src", "db", "d1", "schema.sql");
   await execFileAsync(
     "bunx",
     ["wrangler", "d1", "execute", d1DbName, "--remote", "--file", schemaFilePath, "--yes"],
@@ -173,7 +140,10 @@ async function seedRemoteDatabase() {
   );
 }
 
-async function captureProviderSnapshot(provider: ProviderRecord, executeStudioRequest: (payload: any) => Promise<unknown>) {
+async function captureProviderSnapshot(
+  provider: ProviderRecord,
+  executeStudioRequest: (payload: any) => Promise<unknown>,
+) {
   const adapter = provider.create({
     env: provider.env,
     executeStudioRequest,
@@ -265,10 +235,7 @@ async function main() {
   ];
 
   const baselineProvider = providers[0]!;
-  const baselineSnapshot = await captureProviderSnapshot(
-    baselineProvider,
-    executeStudioRequest,
-  );
+  const baselineSnapshot = await captureProviderSnapshot(baselineProvider, executeStudioRequest);
 
   const report: Array<{ details?: string; name: string; ok: boolean }> = [];
   report.push({ name: baselineProvider.name, ok: true });
@@ -305,7 +272,9 @@ async function main() {
   }
 
   if (failed.length > 0) {
-    throw new Error(`Remote D1 provider compatibility checks failed for ${failed.length} provider(s).`);
+    throw new Error(
+      `Remote D1 provider compatibility checks failed for ${failed.length} provider(s).`,
+    );
   }
 
   console.log(`All providers matched kysely baseline on remote D1 database '${d1DbName}'.`);

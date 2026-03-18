@@ -10,12 +10,7 @@ import { NumericInput } from "./NumericInput";
 import { RawInput } from "./RawInput";
 import { TimeInput } from "./TimeInput";
 
-export type CellEditNavigationDirection =
-  | "down"
-  | "left"
-  | "right"
-  | "tab"
-  | "up";
+export type CellEditNavigationDirection = "down" | "left" | "right" | "tab" | "up";
 
 export interface GetInputProps {
   cell: Cell<Record<string, unknown>, unknown>;
@@ -28,8 +23,7 @@ export interface GetInputProps {
 }
 
 export function getInput(props: GetInputProps) {
-  const { cell, column, context, onNavigate, onSubmit, showSaveAction } =
-    props;
+  const { cell, column, context, onNavigate, onSubmit, showSaveAction } = props;
   const { datatype, isAutoincrement, isComputed, nullable } = column;
   const { format, group, isArray, options } = datatype;
 

@@ -67,15 +67,11 @@ export function validateSqlForLint(sql: string): SqlLintValidationResult {
   for (const statement of statements) {
     const firstKeyword = getStatementFirstKeyword(statement.statement);
 
-    if (
-      !firstKeyword ||
-      !SQL_LINT_ALLOWED_STATEMENT_KEYWORDS.has(firstKeyword)
-    ) {
+    if (!firstKeyword || !SQL_LINT_ALLOWED_STATEMENT_KEYWORDS.has(firstKeyword)) {
       return {
         diagnostic: {
           from: statement.from,
-          message:
-            "SQL lint supports SELECT, WITH, VALUES, INSERT, UPDATE, and DELETE statements.",
+          message: "SQL lint supports SELECT, WITH, VALUES, INSERT, UPDATE, and DELETE statements.",
           severity: "error",
           to: Math.min(sql.length, statement.from + 1),
         },
@@ -164,9 +160,7 @@ function getPostgresErrorPosition(error: Error): number | undefined {
   return undefined;
 }
 
-function getPostgresErrorSeverity(
-  error: Error,
-): AdapterSqlLintDiagnostic["severity"] {
+function getPostgresErrorSeverity(error: Error): AdapterSqlLintDiagnostic["severity"] {
   const withSeverity = error as Error & { severity?: unknown };
   return withSeverity.severity === "WARNING" ? "warning" : "error";
 }
@@ -200,10 +194,7 @@ function getDiagnosticRange(args: {
   return { from, to: Math.max(from + 1, from) };
 }
 
-function inferRangeFromMessage(
-  sql: string,
-  message: string,
-): { from: number; to: number } | null {
+function inferRangeFromMessage(sql: string, message: string): { from: number; to: number } | null {
   const quotedTokenMatch = /"([^"]+)"/.exec(message);
   const token = quotedTokenMatch?.[1];
 

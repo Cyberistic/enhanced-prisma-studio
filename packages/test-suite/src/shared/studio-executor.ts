@@ -1,7 +1,10 @@
 import path from "node:path";
 
 import { createClient } from "@libsql/client";
-import { serializeError, type StudioBFFRequest } from "@enhanced-prisma-studio/studio-core/data/bff";
+import {
+  serializeError,
+  type StudioBFFRequest,
+} from "@enhanced-prisma-studio/studio-core/data/bff";
 
 type DataRow = Record<string, unknown>;
 
@@ -19,14 +22,19 @@ function resolveSqliteUrl(rawUrl: string) {
 }
 
 function normalizeRows(rows: unknown[]): DataRow[] {
-  return rows.filter((row): row is DataRow => typeof row === "object" && row != null && !Array.isArray(row));
+  return rows.filter(
+    (row): row is DataRow => typeof row === "object" && row != null && !Array.isArray(row),
+  );
 }
 
-async function executeSqlQuery(client: ReturnType<typeof createClient>, query: {
-  sql: string;
-  parameters: readonly unknown[];
-  transformations?: Record<string, unknown>;
-}) {
+async function executeSqlQuery(
+  client: ReturnType<typeof createClient>,
+  query: {
+    sql: string;
+    parameters: readonly unknown[];
+    transformations?: Record<string, unknown>;
+  },
+) {
   const result = await client.execute({
     sql: query.sql,
     args: [...query.parameters],
@@ -48,8 +56,7 @@ async function executeSqlQuery(client: ReturnType<typeof createClient>, query: {
       if (typeof value === "string") {
         try {
           transformed[columnName] = JSON.parse(value);
-        } catch {
-        }
+        } catch {}
       }
     }
 
@@ -65,9 +72,7 @@ export function createStudioRequestExecutor(rawDatabaseUrl: string) {
     close: async () => {
       client.close();
     },
-    executeStudioRequest: async (payload: {
-      data: StudioBFFRequest;
-    }) => {
+    executeStudioRequest: async (payload: { data: StudioBFFRequest }) => {
       const { data } = payload;
 
       if (data.procedure === "query") {
@@ -85,9 +90,15 @@ export function createStudioRequestExecutor(rawDatabaseUrl: string) {
           const firstRows = await executeSqlQuery(client, firstQuery as any);
           try {
             const secondRows = await executeSqlQuery(client, secondQuery as any);
-            return [[null, firstRows], [null, secondRows]] as const;
+            return [
+              [null, firstRows],
+              [null, secondRows],
+            ] as const;
           } catch (secondError) {
-            return [[null, firstRows], [serializeError(secondError), undefined]] as const;
+            return [
+              [null, firstRows],
+              [serializeError(secondError), undefined],
+            ] as const;
           }
         } catch (firstError) {
           return [[serializeError(firstError)]] as const;

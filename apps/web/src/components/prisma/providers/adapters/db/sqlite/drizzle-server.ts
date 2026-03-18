@@ -1,6 +1,9 @@
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
-import { serializeError, type StudioBFFRequest } from "@enhanced-prisma-studio/studio-core/data/bff";
+import {
+  serializeError,
+  type StudioBFFRequest,
+} from "@enhanced-prisma-studio/studio-core/data/bff";
 
 import type { DataRow } from "@/components/prisma/types";
 import type { SQLiteProviderServerConfig, SQLiteServerRequestExecutor } from "./types";
@@ -17,10 +20,15 @@ function toRows(result: { rows: unknown[] } | undefined): DataRow[] {
     return [];
   }
 
-  return result.rows.filter((row): row is DataRow => typeof row === "object" && row != null && !Array.isArray(row));
+  return result.rows.filter(
+    (row): row is DataRow => typeof row === "object" && row != null && !Array.isArray(row),
+  );
 }
 
-async function executeSqlQuery(rawExecutor: RawSqlExecutor, query: { sql: string; parameters: readonly unknown[]; transformations?: Record<string, unknown> }) {
+async function executeSqlQuery(
+  rawExecutor: RawSqlExecutor,
+  query: { sql: string; parameters: readonly unknown[]; transformations?: Record<string, unknown> },
+) {
   const result = await rawExecutor.execute({
     sql: query.sql,
     args: [...query.parameters],
@@ -43,8 +51,7 @@ async function executeSqlQuery(rawExecutor: RawSqlExecutor, query: { sql: string
       if (typeof value === "string") {
         try {
           transformed[columnName] = JSON.parse(value);
-        } catch {
-        }
+        } catch {}
       }
     }
 
@@ -52,8 +59,13 @@ async function executeSqlQuery(rawExecutor: RawSqlExecutor, query: { sql: string
   });
 }
 
-export function createSQLiteDrizzleServerExecutor(config: SQLiteProviderServerConfig = {}): SQLiteServerRequestExecutor {
-  const fallbackEnv = (typeof process !== "undefined" ? process.env : {}) as Record<string, string | undefined>;
+export function createSQLiteDrizzleServerExecutor(
+  config: SQLiteProviderServerConfig = {},
+): SQLiteServerRequestExecutor {
+  const fallbackEnv = (typeof process !== "undefined" ? process.env : {}) as Record<
+    string,
+    string | undefined
+  >;
   const env = {
     ...fallbackEnv,
     ...(config.env ?? {}),
@@ -83,9 +95,15 @@ export function createSQLiteDrizzleServerExecutor(config: SQLiteProviderServerCo
         const firstResult = await executeSqlQuery(rawExecutor, firstQuery as any);
         try {
           const secondResult = await executeSqlQuery(rawExecutor, secondQuery as any);
-          return [[null, firstResult], [null, secondResult]] as const;
+          return [
+            [null, firstResult],
+            [null, secondResult],
+          ] as const;
         } catch (secondError) {
-          return [[null, firstResult], [serializeError(secondError), undefined]] as const;
+          return [
+            [null, firstResult],
+            [serializeError(secondError), undefined],
+          ] as const;
         }
       } catch (firstError) {
         return [[serializeError(firstError)]] as const;

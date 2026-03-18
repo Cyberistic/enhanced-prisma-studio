@@ -16,9 +16,7 @@ interface IntrospectionStatusNoticeProps {
   variant?: "error" | "warning";
 }
 
-export function IntrospectionStatusNotice(
-  props: IntrospectionStatusNoticeProps,
-) {
+export function IntrospectionStatusNotice(props: IntrospectionStatusNoticeProps) {
   const {
     className,
     compact = false,
@@ -43,21 +41,14 @@ export function IntrospectionStatusNotice(
         className,
       )}
     >
-      <div
-        className={cn(
-          "gap-3",
-          compact ? "flex items-start justify-between" : "flex flex-col",
-        )}
-      >
+      <div className={cn("gap-3", compact ? "flex items-start justify-between" : "flex flex-col")}>
         <div className="min-w-0">
           <div className="flex items-center gap-2 font-medium">
             <AlertCircle size={14} />
             <span>{title}</span>
           </div>
           <p className="mt-1 text-foreground/80">{description}</p>
-          {message ? (
-            <p className="mt-2 text-foreground/70">{message}</p>
-          ) : null}
+          {message ? <p className="mt-2 text-foreground/70">{message}</p> : null}
           <p className="mt-2 text-foreground/60">Source: {source}</p>
           {queryPreview ? (
             <code
@@ -77,9 +68,7 @@ export function IntrospectionStatusNotice(
           type="button"
           variant="outline"
         >
-          <RefreshCw
-            className={cn("mr-1 size-3", isRetrying && "animate-spin")}
-          />
+          <RefreshCw className={cn("mr-1 size-3", isRetrying && "animate-spin")} />
           Retry
         </Button>
       </div>

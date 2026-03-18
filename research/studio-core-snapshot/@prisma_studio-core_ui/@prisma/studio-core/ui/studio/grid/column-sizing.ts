@@ -5,15 +5,10 @@ export const DEFAULT_GRID_COLUMN_MIN_SIZE = 50;
 export const DEFAULT_GRID_COLUMN_MAX_SIZE = 400;
 
 function clampGridColumnWidth(width: number): number {
-  return Math.min(
-    DEFAULT_GRID_COLUMN_MAX_SIZE,
-    Math.max(DEFAULT_GRID_COLUMN_MIN_SIZE, width),
-  );
+  return Math.min(DEFAULT_GRID_COLUMN_MAX_SIZE, Math.max(DEFAULT_GRID_COLUMN_MIN_SIZE, width));
 }
 
-export function clampColumnSizingState(
-  columnSizing: ColumnSizingState,
-): ColumnSizingState {
+export function clampColumnSizingState(columnSizing: ColumnSizingState): ColumnSizingState {
   let didChange = false;
   const nextState: ColumnSizingState = {};
 
@@ -31,9 +26,7 @@ export function resolveColumnSizingStateUpdate(
   updaterOrValue: Updater<ColumnSizingState>,
 ): ColumnSizingState {
   const nextState =
-    typeof updaterOrValue === "function"
-      ? updaterOrValue(previous)
-      : updaterOrValue;
+    typeof updaterOrValue === "function" ? updaterOrValue(previous) : updaterOrValue;
 
   return clampColumnSizingState(nextState);
 }

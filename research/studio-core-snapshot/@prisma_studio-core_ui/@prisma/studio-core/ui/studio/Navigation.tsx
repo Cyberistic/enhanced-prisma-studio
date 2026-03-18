@@ -32,13 +32,14 @@ type NavigationProps = {
 export function Navigation({ className }: NavigationProps) {
   const { metadata, createUrl, viewParam, schemaParam } = useNavigation();
   const { isFetching, activeTable } = metadata;
-  const { errorState, hasResolvedIntrospection, isRefetching, refetch } =
-    useIntrospection();
-  const [tableSearchUiState, setTableSearchUiState] =
-    useUiState<TableSearchUiState>(TABLE_SEARCH_UI_STATE_KEY, {
+  const { errorState, hasResolvedIntrospection, isRefetching, refetch } = useIntrospection();
+  const [tableSearchUiState, setTableSearchUiState] = useUiState<TableSearchUiState>(
+    TABLE_SEARCH_UI_STATE_KEY,
+    {
       isOpen: false,
       term: "",
-    });
+    },
+  );
   const [, setTableGridFocusRequest] = useUiState<TableGridFocusRequestUiState>(
     TABLE_GRID_FOCUS_REQUEST_UI_STATE_KEY,
     {
@@ -52,18 +53,11 @@ export function Navigation({ className }: NavigationProps) {
     schema: schemaParam,
     searchTerm: tableSearchUiState.term,
   });
-  const tableListKey = useMemo(
-    () => tables.map((table) => table.id).join("|"),
-    [tables],
-  );
-  const activeTableId = activeTable
-    ? `${activeTable.schema}.${activeTable.name}`
-    : null;
+  const tableListKey = useMemo(() => tables.map((table) => table.id).join("|"), [tables]);
+  const activeTableId = activeTable ? `${activeTable.schema}.${activeTable.name}` : null;
   const isInitialIntrospectionLoad = isFetching && !hasResolvedIntrospection;
-  const hasStartupIntrospectionFailure =
-    errorState != null && !hasResolvedIntrospection;
-  const hasRecoverableIntrospectionWarning =
-    errorState != null && hasResolvedIntrospection;
+  const hasStartupIntrospectionFailure = errorState != null && !hasResolvedIntrospection;
+  const hasRecoverableIntrospectionWarning = errorState != null && hasResolvedIntrospection;
 
   useEffect(() => {
     if (!tableSearchUiState.isOpen) {
@@ -82,20 +76,10 @@ export function Navigation({ className }: NavigationProps) {
 
     const tableIds = tableListKey.length > 0 ? tableListKey.split("|") : [];
     const activeIndex =
-      viewParam === "table" && activeTableId
-        ? tableIds.indexOf(activeTableId)
-        : -1;
+      viewParam === "table" && activeTableId ? tableIds.indexOf(activeTableId) : -1;
 
-    setHighlightedTableIndex(
-      activeIndex >= 0 ? activeIndex : tableIds.length > 0 ? 0 : -1,
-    );
-  }, [
-    activeTableId,
-    tableListKey,
-    tableSearchUiState.isOpen,
-    tableSearchUiState.term,
-    viewParam,
-  ]);
+    setHighlightedTableIndex(activeIndex >= 0 ? activeIndex : tableIds.length > 0 ? 0 : -1);
+  }, [activeTableId, tableListKey, tableSearchUiState.isOpen, tableSearchUiState.term, viewParam]);
 
   function openTableSearch() {
     setTableSearchUiState((previous) => ({
@@ -140,9 +124,7 @@ export function Navigation({ className }: NavigationProps) {
     navigateToTable(args);
   }
 
-  function handleTableSearchKeyDown(
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) {
+  function handleTableSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Escape") {
       event.preventDefault();
       closeTableSearch();
@@ -283,8 +265,7 @@ export function Navigation({ className }: NavigationProps) {
                 ))
             ) : tables.length > 0 ? (
               tables.map((table, index) => {
-                const isHighlighted =
-                  tableSearchUiState.isOpen && index === highlightedTableIndex;
+                const isHighlighted = tableSearchUiState.isOpen && index === highlightedTableIndex;
                 const isCurrentTable =
                   activeTable?.schema === table.schema &&
                   activeTable?.name === table.table &&
@@ -295,9 +276,7 @@ export function Navigation({ className }: NavigationProps) {
                     key={table.id}
                     asChild
                     data-search-highlighted={isHighlighted ? "true" : "false"}
-                    isActive={
-                      tableSearchUiState.isOpen ? isHighlighted : isCurrentTable
-                    }
+                    isActive={tableSearchUiState.isOpen ? isHighlighted : isCurrentTable}
                     className={`py-1 font-mono text-xs text-foreground/60 hover:text-foreground transition-all cursor-pointer data-[active=true]:bg-accent data-[active=true]:foreground data-[active=true]:text-foreground`}
                     onMouseEnter={() => {
                       if (!tableSearchUiState.isOpen) {
@@ -423,9 +402,7 @@ const TablesBlock = ({
           data-table-search-input-wrapper
           className={cn(
             "absolute right-4 top-1/2 -translate-y-1/2 origin-right transition-[opacity,transform] duration-200 ease-out will-change-transform w-[calc(100%-2rem)]",
-            isSearchOpen
-              ? "opacity-100 scale-x-100"
-              : "opacity-0 scale-x-0 pointer-events-none",
+            isSearchOpen ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0 pointer-events-none",
           )}
         >
           <Input
@@ -482,21 +459,13 @@ const Item = ({
       )}
       {...props}
     >
-      {wrapChildrenInSpan ? (
-        <span className="truncate">{children}</span>
-      ) : (
-        <>{children}</>
-      )}
+      {wrapChildrenInSpan ? <span className="truncate">{children}</span> : <>{children}</>}
     </Comp>
   );
 };
 
 const SchemaSelector = () => {
-  const {
-    data: introspection,
-    hasResolvedIntrospection,
-    isFetching,
-  } = useIntrospection();
+  const { data: introspection, hasResolvedIntrospection, isFetching } = useIntrospection();
   const { schemaParam, setSchemaParam, setTableParam } = useNavigation();
 
   // Extract schema names from introspection data

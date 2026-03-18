@@ -10,9 +10,7 @@ export function StringCell(props: StringCellProps) {
 
   const startTrimmed = value.trimStart();
   const trimmed = value.trim();
-  const trailingWhitespaceLength = !startTrimmed
-    ? 0
-    : value.length - value.trimEnd().length;
+  const trailingWhitespaceLength = !startTrimmed ? 0 : value.length - value.trimEnd().length;
 
   return (
     <>

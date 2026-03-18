@@ -1,11 +1,6 @@
 import type { Expression, ExpressionBuilder, SqlBool } from "kysely";
 
-import type {
-  AdapterQueryOptions,
-  AdapterRequirements,
-  Column,
-  Table,
-} from "./adapter";
+import type { AdapterQueryOptions, AdapterRequirements, Column, Table } from "./adapter";
 import type { Query, QueryResult } from "./query";
 import type { Either } from "./type-utils";
 
@@ -24,16 +19,14 @@ export class FullTableSearchTimeoutError extends Error {
   }
 }
 
-const UUID_PATTERN =
-  /^[\da-f]{8}-[\da-f]{4}-[1-5][\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i;
+const UUID_PATTERN = /^[\da-f]{8}-[\da-f]{4}-[1-5][\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i;
 const NUMERIC_PATTERN = /^[+-]?(?:\d+|\d*\.\d+)$/;
 const DATE_YEAR_PATTERN = /^(\d{4})$/;
 const DATE_YEAR_MONTH_PATTERN = /^(\d{4})-(\d{2})$/;
 const DATE_YEAR_MONTH_DAY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const DATETIME_PARTIAL_PATTERN =
   /^(\d{4})-(\d{2})-(\d{2})(?:[T ]?([01]\d|2[0-3])(?::([0-5]\d)(?::([0-5]\d)(?:\.(\d{1,3}))?)?)?)(?:[Zz])?$/;
-const TIME_PATTERN =
-  /^([01]\d|2[0-3])(?::([0-5]\d)(?::([0-5]\d)(?:\.(\d{1,6}))?)?)?$/;
+const TIME_PATTERN = /^([01]\d|2[0-3])(?::([0-5]\d)(?::([0-5]\d)(?:\.(\d{1,6}))?)?)?$/;
 
 interface DatetimeDayRange {
   endExclusive: string;
@@ -92,9 +85,7 @@ export function createFullTableSearchExecutionState(): FullTableSearchExecutionS
   };
 }
 
-export function isFullTableSearchRequest(
-  searchTerm: string | undefined,
-): boolean {
+export function isFullTableSearchRequest(searchTerm: string | undefined): boolean {
   return (searchTerm?.trim().length ?? 0) > 0;
 }
 
@@ -285,11 +276,7 @@ export function getFullTableSearchExpression(
         switch (predicate.kind) {
           case "text-like": {
             if (dialect === "postgres") {
-              return eb(
-                eb.cast(predicate.column, "text"),
-                "ilike",
-                predicate.pattern,
-              );
+              return eb(eb.cast(predicate.column, "text"), "ilike", predicate.pattern);
             }
 
             const textCastType = dialect === "mysql" ? "char" : "text";
@@ -332,9 +319,7 @@ export function getFullTableSearchExpression(
   };
 }
 
-function getNumericCastType(
-  dialect: FullTableSearchDialect,
-): "decimal" | "numeric" {
+function getNumericCastType(dialect: FullTableSearchDialect): "decimal" | "numeric" {
   if (dialect === "mysql") {
     return "decimal";
   }
@@ -369,11 +354,7 @@ function isTextSearchColumn(column: Column): boolean {
 function isBinaryLikeColumn(column: Column): boolean {
   const typeName = column.datatype.name.toLowerCase();
 
-  return (
-    typeName.includes("blob") ||
-    typeName.includes("bytea") ||
-    typeName.includes("binary")
-  );
+  return typeName.includes("blob") || typeName.includes("bytea") || typeName.includes("binary");
 }
 
 function isUuidColumn(column: Column): boolean {
@@ -491,9 +472,7 @@ function parseDateTimeTerm(value: string): DatetimeDayRange | null {
   const hour = Number.parseInt(match[4]!, 10);
   const minute = Number.parseInt(match[5] ?? "00", 10);
   const second = Number.parseInt(match[6] ?? "00", 10);
-  const milliseconds = match[7]
-    ? Number.parseInt(match[7].padEnd(3, "0"), 10)
-    : 0;
+  const milliseconds = match[7] ? Number.parseInt(match[7].padEnd(3, "0"), 10) : 0;
 
   const start = createUtcDateTime({
     day,
@@ -571,9 +550,7 @@ function createUtcDateTime(args: {
   year: number;
 }): Date | null {
   const { day, hour, milliseconds, minute, month, second, year } = args;
-  const date = new Date(
-    Date.UTC(year, month - 1, day, hour, minute, second, milliseconds),
-  );
+  const date = new Date(Date.UTC(year, month - 1, day, hour, minute, second, milliseconds));
 
   if (
     Number.isNaN(date.getTime()) ||

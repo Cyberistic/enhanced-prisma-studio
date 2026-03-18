@@ -11,12 +11,7 @@ import { toast } from "sonner";
 import { Query } from "../../../../data";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { useUiState } from "../../../hooks/use-ui-state";
 import { cn } from "../../../lib/utils";
 import { StudioOperationEvent } from "../../Studio";
@@ -45,17 +40,11 @@ export function OperationEventEntry({ event }: OperationEventEntryProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <Card
-        className={cn(
-          "w-full rounded-sm border-ring/20 overflow-clip shadow-none",
-        )}
-      >
+      <Card className={cn("w-full rounded-sm border-ring/20 overflow-clip shadow-none")}>
         <CardHeader
           className={cn(
             "p-3 font-normal",
-            isError
-              ? "border-red-500/60 bg-red-500/10"
-              : "border-green-500/60 bg-green-500/10",
+            isError ? "border-red-500/60 bg-red-500/10" : "border-green-500/60 bg-green-500/10",
           )}
         >
           <CardTitle className="flex items-center justify-between font-mono text-xs">
@@ -69,10 +58,7 @@ export function OperationEventEntry({ event }: OperationEventEntryProps) {
                 {event.payload.operation}, {formatTimestamp(event.timestamp)}
               </span>
             </div>
-            <Badge
-              variant={isError ? "destructive" : "success"}
-              className="font-normal text-xs"
-            >
+            <Badge variant={isError ? "destructive" : "success"} className="font-normal text-xs">
               {event.name === "studio_operation_success" ? "Success" : "Error"}
             </Badge>
           </CardTitle>
@@ -87,11 +73,7 @@ export function OperationEventEntry({ event }: OperationEventEntryProps) {
                   className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                   aria-expanded={isQueryExpanded}
                 >
-                  {isQueryExpanded ? (
-                    <ChevronDown size={12} />
-                  ) : (
-                    <ChevronRight size={12} />
-                  )}
+                  {isQueryExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
                   SQL Query
                 </button>
                 <Button
@@ -100,9 +82,7 @@ export function OperationEventEntry({ event }: OperationEventEntryProps) {
                   size="icon"
                   className="size-6"
                   onClick={() => {
-                    void navigator.clipboard.writeText(
-                      event.payload.query?.sql || "",
-                    );
+                    void navigator.clipboard.writeText(event.payload.query?.sql || "");
                     toast.success("Query copied to clipboard");
                   }}
                 >
@@ -117,21 +97,13 @@ export function OperationEventEntry({ event }: OperationEventEntryProps) {
                     : "max-h-10 overflow-hidden",
                 )}
               >
-                {isQueryExpanded
-                  ? event.payload.query.sql
-                  : getQueryPreview(event.payload.query)}
+                {isQueryExpanded ? event.payload.query.sql : getQueryPreview(event.payload.query)}
               </div>
               {
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs text-muted-foreground">
-                    Parameters
-                  </span>
+                  <span className="text-xs text-muted-foreground">Parameters</span>
                   <div className="p-3 bg-secondary/50 border border-border rounded-sm text-xs font-mono overflow-x-auto">
-                    {JSON.stringify(
-                      event.payload.query.parameters || [],
-                      null,
-                      2,
-                    )}
+                    {JSON.stringify(event.payload.query.parameters || [], null, 2)}
                   </div>
                 </div>
               }
@@ -156,11 +128,9 @@ export function OperationEventEntry({ event }: OperationEventEntryProps) {
               <div className="p-3 bg-secondary/50 border border-red-400/20 rounded-sm text-xs font-mono overflow-x-auto">
                 <pre className="text-xs text-red-400 whitespace-pre-wrap font-mono">
                   {event.payload.error instanceof AggregateError
-                    ? event.payload.error.errors.map(
-                        (err: Error, index: number) => (
-                          <div key={index}>{err.message}</div>
-                        ),
-                      )
+                    ? event.payload.error.errors.map((err: Error, index: number) => (
+                        <div key={index}>{err.message}</div>
+                      ))
                     : event.payload.error.message}
                 </pre>
               </div>

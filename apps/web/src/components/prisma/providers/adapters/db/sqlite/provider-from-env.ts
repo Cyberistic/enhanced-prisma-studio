@@ -5,17 +5,14 @@ import { createSQLiteDrizzleProvider } from "./drizzle";
 import { createSQLiteKyselyProvider } from "./kysely";
 import { createSQLitePrismaRawProvider } from "./prisma-raw";
 
-export type SQLiteProviderName =
-  | "kysely"
-  | "bun.sql"
-  | "prisma-raw"
-  | "drizzle"
-  | "cloudflare-d1";
+export type SQLiteProviderName = "kysely" | "bun.sql" | "prisma-raw" | "drizzle" | "cloudflare-d1";
 
 type EnvSource = Record<string, string | undefined>;
 
-export function createSQLiteProviderFromEnv(config: AdapterProviderConfig & { env?: EnvSource }): StudioAdapter {
-  const sourceEnv = config.env ?? ((import.meta as unknown as { env?: EnvSource }).env ?? {});
+export function createSQLiteProviderFromEnv(
+  config: AdapterProviderConfig & { env?: EnvSource },
+): StudioAdapter {
+  const sourceEnv = config.env ?? (import.meta as unknown as { env?: EnvSource }).env ?? {};
   const provider = (sourceEnv.VITE_STUDIO_SQLITE_PROVIDER ?? "prisma-raw") as SQLiteProviderName;
 
   if (provider === "kysely") {

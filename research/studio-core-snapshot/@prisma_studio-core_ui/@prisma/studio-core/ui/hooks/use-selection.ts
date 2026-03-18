@@ -24,10 +24,8 @@ export function useSelection(data: QueryRows | undefined) {
 
   useEffect(() => {
     const scopeChanged = previousScopeRef.current !== scopeKey;
-    const pageChanged =
-      previousPageIndexRef.current !== paginationState.pageIndex;
-    const pageSizeChanged =
-      previousPageSizeRef.current !== paginationState.pageSize;
+    const pageChanged = previousPageIndexRef.current !== paginationState.pageIndex;
+    const pageSizeChanged = previousPageSizeRef.current !== paginationState.pageSize;
 
     previousScopeRef.current = scopeKey;
     previousPageIndexRef.current = paginationState.pageIndex;
@@ -56,8 +54,7 @@ export function useSelection(data: QueryRows | undefined) {
     (updater) => {
       updateTableUiState((draft) => {
         const previous = draft.rowSelectionState ?? {};
-        draft.rowSelectionState =
-          typeof updater === "function" ? updater(previous) : updater;
+        draft.rowSelectionState = typeof updater === "function" ? updater(previous) : updater;
       });
     },
     [updateTableUiState],

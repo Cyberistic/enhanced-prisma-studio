@@ -18,7 +18,11 @@ export type SQLiteServerRequestExecutor = (payload: {
   data: import("@enhanced-prisma-studio/studio-core/data/bff").StudioBFFRequest;
 }) => Promise<unknown>;
 
-export function requireEnv(env: SQLiteEnv | undefined, requiredKeys: readonly string[], providerName: string) {
+export function requireEnv(
+  env: SQLiteEnv | undefined,
+  requiredKeys: readonly string[],
+  providerName: string,
+) {
   const source = env ?? {};
   const missing = requiredKeys.filter((key) => {
     const value = source[key];

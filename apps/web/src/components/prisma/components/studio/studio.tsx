@@ -67,9 +67,7 @@ function toOperationQuery(query: unknown): { parameters?: unknown[]; sql: string
   }
 
   const queryParameters = (query as { parameters?: unknown }).parameters;
-  const parameters = Array.isArray(queryParameters)
-    ? queryParameters
-    : undefined;
+  const parameters = Array.isArray(queryParameters) ? queryParameters : undefined;
 
   return {
     parameters,
@@ -181,10 +179,10 @@ export function StudioShell(props: {
   const [selectedView, setSelectedView] = useState<StudioView>(initialView);
   const [pinnedColumns, setPinnedColumns] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<SortOrderItem[]>([]);
-  const [introspection, setIntrospection] =
-    useState<StudioIntrospectionResult | null>(null);
-  const [introspectionError, setIntrospectionError] =
-    useState<StudioIntrospectionError | null>(null);
+  const [introspection, setIntrospection] = useState<StudioIntrospectionResult | null>(null);
+  const [introspectionError, setIntrospectionError] = useState<StudioIntrospectionError | null>(
+    null,
+  );
   const [isIntrospecting, setIsIntrospecting] = useState(false);
   const [introspectionRetryToken, setIntrospectionRetryToken] = useState(0);
   const [operationEvents, setOperationEvents] = useState<StudioOperationEvent[]>([]);
@@ -343,18 +341,17 @@ export function StudioShell(props: {
 
     const preferredSchema = introspection.schemas[schema]
       ? schema
-      : instrumentedAdapter.defaultSchema && introspection.schemas[instrumentedAdapter.defaultSchema]
+      : instrumentedAdapter.defaultSchema &&
+          introspection.schemas[instrumentedAdapter.defaultSchema]
         ? instrumentedAdapter.defaultSchema
-        : schemaNames[0] ?? schema;
+        : (schemaNames[0] ?? schema);
 
     if (preferredSchema !== schema) {
       setSchema(preferredSchema);
       return;
     }
 
-    const tableNamesInSchema = Object.keys(
-      introspection.schemas[preferredSchema]?.tables ?? {},
-    );
+    const tableNamesInSchema = Object.keys(introspection.schemas[preferredSchema]?.tables ?? {});
 
     if (tableNamesInSchema.length === 0) {
       setTable(null);

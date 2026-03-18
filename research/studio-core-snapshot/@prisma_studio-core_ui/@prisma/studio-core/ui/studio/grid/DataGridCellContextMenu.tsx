@@ -1,11 +1,5 @@
 import { Copy } from "lucide-react";
-import {
-  isValidElement,
-  type PropsWithChildren,
-  type ReactNode,
-  useCallback,
-  useRef,
-} from "react";
+import { isValidElement, type PropsWithChildren, type ReactNode, useCallback, useRef } from "react";
 
 import {
   ContextMenu,
@@ -26,12 +20,10 @@ export function DataGridCellContextMenu(props: DataGridCellContextMenuProps) {
 
   const handleCopyAction = useCallback(() => {
     setGridInteractionSuppressionWindow();
-    const providedCopyText =
-      typeof copyText === "function" ? copyText() : copyText;
+    const providedCopyText = typeof copyText === "function" ? copyText() : copyText;
     const content =
       providedCopyText ??
-      (getVisibleTriggerText(triggerRef.current) ||
-        extractTextContent(children));
+      (getVisibleTriggerText(triggerRef.current) || extractTextContent(children));
 
     if (content == null) {
       return;
@@ -68,11 +60,7 @@ function getVisibleTriggerText(node: HTMLElement | null): string {
 }
 
 function extractTextContent(node: ReactNode): string {
-  if (
-    typeof node === "string" ||
-    typeof node === "number" ||
-    typeof node === "boolean"
-  ) {
+  if (typeof node === "string" || typeof node === "number" || typeof node === "boolean") {
     return String(node);
   }
 
@@ -84,20 +72,12 @@ function extractTextContent(node: ReactNode): string {
     const props = node.props as { text?: string; children?: React.ReactNode };
 
     // Handle RevealText component specifically
-    if (
-      node.type &&
-      typeof node.type === "function" &&
-      node.type.name === "RevealText"
-    ) {
+    if (node.type && typeof node.type === "function" && node.type.name === "RevealText") {
       return props.text || "";
     }
 
     // Handle NullValue component
-    if (
-      node.type &&
-      typeof node.type === "function" &&
-      node.type.name === "NullValue"
-    ) {
+    if (node.type && typeof node.type === "function" && node.type.name === "NullValue") {
       return "NULL";
     }
 

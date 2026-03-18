@@ -185,8 +185,7 @@ const TableNode: FC<NodeProps<TableNodeData>> = memo(({ data }) => {
                 <div key={idx}>{icon}</div>
               ))}
               <span className="flex-1">
-                No database tables found. Connect to a database to see your
-                schema.
+                No database tables found. Connect to a database to see your schema.
               </span>
             </div>
           ) : (
@@ -212,11 +211,7 @@ const TableNode: FC<NodeProps<TableNodeData>> = memo(({ data }) => {
             ))
           )}
         </div>
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          style={{ opacity: 0 }}
-        />
+        <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
       </div>
     </TooltipProvider>
   );
@@ -273,22 +268,13 @@ function getLayoutedNodes(
   });
 }
 
-export function SchemaVisualization({
-  tables,
-  relationships,
-}: SchemaVisualizationProps) {
+export function SchemaVisualization({ tables, relationships }: SchemaVisualizationProps) {
   // Create a map of node IDs for quick lookup
-  const nodeIdSet = useMemo(
-    () => new Set(tables.map((table) => table.name)),
-    [tables],
-  );
+  const nodeIdSet = useMemo(() => new Set(tables.map((table) => table.name)), [tables]);
 
   // Filter out relationships where either source or target doesn't exist
   const validRelationships = useMemo(
-    () =>
-      relationships.filter(
-        (rel) => nodeIdSet.has(rel.from) && nodeIdSet.has(rel.to),
-      ),
+    () => relationships.filter((rel) => nodeIdSet.has(rel.from) && nodeIdSet.has(rel.to)),
     [relationships, nodeIdSet],
   );
 
@@ -373,13 +359,11 @@ export function SchemaVisualization({
     [setEdges],
   );
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) =>
-      setNodes((currentNodes) => applyNodeChanges(changes, currentNodes)),
+    (changes: NodeChange[]) => setNodes((currentNodes) => applyNodeChanges(changes, currentNodes)),
     [setNodes],
   );
   const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) =>
-      setEdges((currentEdges) => applyEdgeChanges(changes, currentEdges)),
+    (changes: EdgeChange[]) => setEdges((currentEdges) => applyEdgeChanges(changes, currentEdges)),
     [setEdges],
   );
 

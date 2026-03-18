@@ -34,11 +34,7 @@ export default function Header() {
             Studio New (Enhanced)
           </a>
         </nav>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleTheme}
-        >
+        <Button variant="outline" size="sm" onClick={toggleTheme}>
           {mounted ? (isDark ? "Light mode" : "Dark mode") : "Theme"}
         </Button>
       </div>

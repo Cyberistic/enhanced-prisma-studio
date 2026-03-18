@@ -1,11 +1,5 @@
 import { Table } from "@tanstack/react-table";
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import type {
   FocusEvent as ReactFocusEvent,
   KeyboardEvent as ReactKeyboardEvent,
@@ -58,8 +52,7 @@ export function DataGridPagination(props: DataGridPaginationProps) {
     pageDraft.trim().length || 1,
   );
   const shouldBlockInteraction = controlsDisabled;
-  const shouldDisablePageControls =
-    infiniteScrollEnabled && !shouldBlockInteraction;
+  const shouldDisablePageControls = infiniteScrollEnabled && !shouldBlockInteraction;
 
   useEffect(() => {
     setPageDraft(String(pageIndex + 1));
@@ -78,9 +71,7 @@ export function DataGridPagination(props: DataGridPaginationProps) {
     handleBlockedInteraction();
   }
 
-  function handleBlockedInputFocus(
-    event: ReactFocusEvent<HTMLInputElement>,
-  ): void {
+  function handleBlockedInputFocus(event: ReactFocusEvent<HTMLInputElement>): void {
     if (!shouldBlockInteraction) {
       return;
     }
@@ -128,11 +119,7 @@ export function DataGridPagination(props: DataGridPaginationProps) {
             <Button
               variant="outline"
               size="sm"
-              aria-disabled={
-                shouldBlockInteraction ||
-                !table.getCanPreviousPage() ||
-                undefined
-              }
+              aria-disabled={shouldBlockInteraction || !table.getCanPreviousPage() || undefined}
               className={controlsDisabled ? "opacity-70" : undefined}
               onMouseDown={handleBlockedMouseDown}
               onClick={() => {
@@ -157,9 +144,7 @@ export function DataGridPagination(props: DataGridPaginationProps) {
             <Button
               variant="outline"
               size="sm"
-              aria-disabled={
-                shouldBlockInteraction || !table.getCanNextPage() || undefined
-              }
+              aria-disabled={shouldBlockInteraction || !table.getCanNextPage() || undefined}
               className={controlsDisabled ? "opacity-70" : undefined}
               onMouseDown={handleBlockedMouseDown}
               onClick={() => {
@@ -193,14 +178,8 @@ export function DataGridPagination(props: DataGridPaginationProps) {
                 aria-label="Go to first page"
                 variant="outline"
                 size="icon"
-                disabled={
-                  shouldDisablePageControls || !table.getCanPreviousPage()
-                }
-                aria-disabled={
-                  shouldBlockInteraction ||
-                  !table.getCanPreviousPage() ||
-                  undefined
-                }
+                disabled={shouldDisablePageControls || !table.getCanPreviousPage()}
+                aria-disabled={shouldBlockInteraction || !table.getCanPreviousPage() || undefined}
                 className={cn(
                   "h-9 w-9 rounded-none border-0 border-r border-input shadow-none",
                   controlsDisabled ? "opacity-70" : undefined,
@@ -229,14 +208,8 @@ export function DataGridPagination(props: DataGridPaginationProps) {
                 aria-label="Go to previous page"
                 variant="outline"
                 size="icon"
-                disabled={
-                  shouldDisablePageControls || !table.getCanPreviousPage()
-                }
-                aria-disabled={
-                  shouldBlockInteraction ||
-                  !table.getCanPreviousPage() ||
-                  undefined
-                }
+                disabled={shouldDisablePageControls || !table.getCanPreviousPage()}
+                aria-disabled={shouldBlockInteraction || !table.getCanPreviousPage() || undefined}
                 className={cn(
                   "h-9 w-9 rounded-none border-0 border-r border-input shadow-none",
                   controlsDisabled ? "opacity-70" : undefined,
@@ -271,8 +244,7 @@ export function DataGridPagination(props: DataGridPaginationProps) {
                   value={pageDraft}
                   className={cn(
                     "h-9 w-auto min-w-0 rounded-none border-0 px-1 text-right font-sans text-xs tabular-nums shadow-none focus-visible:ring-0",
-                    (shouldBlockInteraction || shouldDisablePageControls) &&
-                      "opacity-70",
+                    (shouldBlockInteraction || shouldDisablePageControls) && "opacity-70",
                   )}
                   style={{ width: `${pageDigitCount + 1}ch` }}
                   readOnly={shouldBlockInteraction || shouldDisablePageControls}
@@ -284,13 +256,9 @@ export function DataGridPagination(props: DataGridPaginationProps) {
                   }}
                   onBlur={(event) => commitPageDraft(event.currentTarget.value)}
                   onChange={(event) => setPageDraft(event.target.value)}
-                  onInput={(event) =>
-                    setPageDraft((event.target as HTMLInputElement).value)
-                  }
+                  onInput={(event) => setPageDraft((event.target as HTMLInputElement).value)}
                   onFocus={handleBlockedInputFocus}
-                  onKeyDown={(event) =>
-                    handleDraftKeyDown(event, commitPageDraft)
-                  }
+                  onKeyDown={(event) => handleDraftKeyDown(event, commitPageDraft)}
                 />
                 <span className="shrink-0">of</span>
                 <span className="shrink-0">{pageCount}</span>
@@ -341,10 +309,7 @@ export function DataGridPagination(props: DataGridPaginationProps) {
                     <ChevronDown data-icon="inline-end" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  className="min-w-[11rem] font-sans"
-                >
+                <DropdownMenuContent align="start" className="min-w-[11rem] font-sans">
                   <DropdownMenuRadioGroup
                     value={String(pageSize)}
                     onValueChange={(value) => {
@@ -374,9 +339,7 @@ export function DataGridPagination(props: DataGridPaginationProps) {
                 variant="outline"
                 size="icon"
                 disabled={shouldDisablePageControls || !table.getCanNextPage()}
-                aria-disabled={
-                  shouldBlockInteraction || !table.getCanNextPage() || undefined
-                }
+                aria-disabled={shouldBlockInteraction || !table.getCanNextPage() || undefined}
                 className={cn(
                   "h-9 w-9 rounded-none border-0 border-r border-input shadow-none",
                   controlsDisabled ? "opacity-70" : undefined,
@@ -406,9 +369,7 @@ export function DataGridPagination(props: DataGridPaginationProps) {
                 variant="outline"
                 size="icon"
                 disabled={shouldDisablePageControls || !table.getCanNextPage()}
-                aria-disabled={
-                  shouldBlockInteraction || !table.getCanNextPage() || undefined
-                }
+                aria-disabled={shouldBlockInteraction || !table.getCanNextPage() || undefined}
                 className={cn(
                   "h-9 w-9 rounded-none border-0 shadow-none",
                   controlsDisabled ? "opacity-70" : undefined,
@@ -479,11 +440,7 @@ function parsePositiveInteger(value: string): number | null {
 
   const parsedValue = Number(trimmedValue);
 
-  if (
-    !Number.isInteger(parsedValue) ||
-    !Number.isSafeInteger(parsedValue) ||
-    parsedValue <= 0
-  ) {
+  if (!Number.isInteger(parsedValue) || !Number.isSafeInteger(parsedValue) || parsedValue <= 0) {
     return null;
   }
 

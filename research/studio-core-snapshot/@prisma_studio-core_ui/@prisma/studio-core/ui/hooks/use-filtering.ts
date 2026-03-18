@@ -23,14 +23,8 @@ function parseAppliedFilter(filterParam: string): FilterGroup {
 
 export function useFiltering(columns?: Table["columns"]) {
   const { filterParam, setFilterParam } = useNavigation();
-  const appliedFilter = useMemo(
-    () => parseAppliedFilter(filterParam),
-    [filterParam],
-  );
-  const appliedFilterSerialized = useMemo(
-    () => JSON.stringify(appliedFilter),
-    [appliedFilter],
-  );
+  const appliedFilter = useMemo(() => parseAppliedFilter(filterParam), [filterParam]);
+  const appliedFilterSerialized = useMemo(() => JSON.stringify(appliedFilter), [appliedFilter]);
   const editingFilterDefaults = useMemo(
     () => createEditingFilterFromApplied(appliedFilter),
     [appliedFilter],
@@ -73,17 +67,9 @@ export function useFiltering(columns?: Table["columns"]) {
         previousFilter: editingFilter,
       }),
     );
-  }, [
-    currentFilterSyncKey,
-    editingFilter,
-    editingFilterDefaults,
-    setEditingFilter,
-  ]);
+  }, [currentFilterSyncKey, editingFilter, editingFilterDefaults, setEditingFilter]);
 
-  const totalEditingFilters = useMemo(
-    () => countFiltersRecursive(editingFilter),
-    [editingFilter],
-  );
+  const totalEditingFilters = useMemo(() => countFiltersRecursive(editingFilter), [editingFilter]);
 
   return {
     appliedFilter,

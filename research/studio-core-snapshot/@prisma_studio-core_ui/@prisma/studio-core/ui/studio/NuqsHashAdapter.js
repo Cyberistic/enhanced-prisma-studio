@@ -1,4 +1,7 @@
-import { unstable_AdapterOptions as AdapterOptions, unstable_createAdapterProvider as createAdapterProvider, } from "nuqs/adapters/custom";
+import {
+  unstable_AdapterOptions as AdapterOptions,
+  unstable_createAdapterProvider as createAdapterProvider,
+} from "nuqs/adapters/custom";
 import { FC, useEffect, useMemo } from "react";
 import { useUiState } from "../hooks/use-ui-state";
 const HASH_STATE_KEY = "nuqs-hash";
@@ -6,59 +9,57 @@ const HASH_STATE_KEY = "nuqs-hash";
  * Simple debounce utility
  */
 function debounce(fn, delay) {
-    let timeout;
-    return (...args) => {
-        if (timeout)
-            clearTimeout(timeout);
-        timeout = setTimeout(() => fn(...args), delay);
-    };
+  let timeout;
+  return (...args) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
 }
 /**
  * Hook that Nuqs will call to read & write URL state.
  */
 function useHashAdapter() {
-    const rawHash = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
-    const [storedRawHash, setStoredRawHash] = useUiState(HASH_STATE_KEY, rawHash);
-    const updateHashState = (nextRawHash) => {
-        setStoredRawHash(nextRawHash);
-    };
-    useEffect(() => {
-        if (storedRawHash === rawHash) {
-            return;
-        }
-        updateHashState(rawHash);
-    }, [rawHash, storedRawHash]);
-    // write new state back into the hash fragment
-    function updateUrl(updated, { history }) {
-        const { pathname, search } = window.location;
-        const nextRawHash = updated.toString();
-        const url = `${pathname}${search}#${nextRawHash}`;
-        if (history === "push") {
-            window.history.pushState(null, "", url);
-        }
-        else {
-            window.history.replaceState(null, "", url);
-        }
-        updateHashState(nextRawHash);
+  const rawHash = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
+  const [storedRawHash, setStoredRawHash] = useUiState(HASH_STATE_KEY, rawHash);
+  const updateHashState = (nextRawHash) => {
+    setStoredRawHash(nextRawHash);
+  };
+  useEffect(() => {
+    if (storedRawHash === rawHash) {
+      return;
     }
-    // expose a snapshot of the current params
-    function getSearchParamsSnapshot() {
-        if (typeof window === "undefined") {
-            return new URLSearchParams();
-        }
-        const raw = window.location.hash.slice(1);
-        return new URLSearchParams(raw);
+    updateHashState(rawHash);
+  }, [rawHash, storedRawHash]);
+  // write new state back into the hash fragment
+  function updateUrl(updated, { history }) {
+    const { pathname, search } = window.location;
+    const nextRawHash = updated.toString();
+    const url = `${pathname}${search}#${nextRawHash}`;
+    if (history === "push") {
+      window.history.pushState(null, "", url);
+    } else {
+      window.history.replaceState(null, "", url);
     }
-    // sync state when user navigates via browser controls or external script
-    useEffect(() => {
-        const handleHashChange = debounce(() => {
-            updateHashState(window.location.hash.slice(1));
-        }, 50);
-        window.addEventListener("hashchange", handleHashChange);
-        return () => window.removeEventListener("hashchange", handleHashChange);
-    }, []);
-    const searchParams = useMemo(() => new URLSearchParams(storedRawHash), [storedRawHash]);
-    return { searchParams, updateUrl, getSearchParamsSnapshot };
+    updateHashState(nextRawHash);
+  }
+  // expose a snapshot of the current params
+  function getSearchParamsSnapshot() {
+    if (typeof window === "undefined") {
+      return new URLSearchParams();
+    }
+    const raw = window.location.hash.slice(1);
+    return new URLSearchParams(raw);
+  }
+  // sync state when user navigates via browser controls or external script
+  useEffect(() => {
+    const handleHashChange = debounce(() => {
+      updateHashState(window.location.hash.slice(1));
+    }, 50);
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+  const searchParams = useMemo(() => new URLSearchParams(storedRawHash), [storedRawHash]);
+  return { searchParams, updateUrl, getSearchParamsSnapshot };
 }
 /**
  * The adapter provider component you wrap your app in.

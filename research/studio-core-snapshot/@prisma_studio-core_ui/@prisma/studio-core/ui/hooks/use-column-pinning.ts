@@ -2,9 +2,7 @@ import { useCallback, useMemo } from "react";
 
 import { useNavigation } from "./use-navigation";
 
-export function parsePinnedColumns(
-  pinParam: string | null | undefined,
-): string[] {
+export function parsePinnedColumns(pinParam: string | null | undefined): string[] {
   if (!pinParam) {
     return [];
   }
@@ -32,10 +30,7 @@ export function serializePinnedColumns(columnIds: string[]): string | null {
 
 export function useColumnPinning() {
   const { pinParam, setPinParam } = useNavigation();
-  const pinnedColumnIds = useMemo(
-    () => parsePinnedColumns(pinParam),
-    [pinParam],
-  );
+  const pinnedColumnIds = useMemo(() => parsePinnedColumns(pinParam), [pinParam]);
 
   const setPinnedColumnIds = useCallback(
     (nextPinnedColumnIds: string[]) => {
@@ -54,4 +49,3 @@ export function useColumnPinning() {
     setPinnedColumnIds,
   };
 }
-

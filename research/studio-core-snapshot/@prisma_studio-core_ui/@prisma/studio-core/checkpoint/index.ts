@@ -115,17 +115,9 @@ export async function check(options: CheckOptions): Promise<CheckResponseBody> {
       CheckRequestQueryParameters,
       MultiValueQueryParameterName<CheckRequestQueryParameters>
     >),
-    ...getQueryParameterListPairs(
-      "schema_generators_providers",
-      options.ormGeneratorProviders,
-    ),
-    ...getQueryParameterListPairs(
-      "schema_preview_features",
-      options.ormPreviewFeatures,
-    ),
-    ...getQueryParameterListPairs("schema_providers", [
-      options.ormDatasourceProvider,
-    ]),
+    ...getQueryParameterListPairs("schema_generators_providers", options.ormGeneratorProviders),
+    ...getQueryParameterListPairs("schema_preview_features", options.ormPreviewFeatures),
+    ...getQueryParameterListPairs("schema_providers", [options.ormDatasourceProvider]),
   ]).toString();
 
   if (options.debug) {
@@ -141,9 +133,7 @@ export async function check(options: CheckOptions): Promise<CheckResponseBody> {
   });
 
   if (!response.ok) {
-    throw new Error(
-      `checkpoint response error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`checkpoint response error: ${response.status} ${response.statusText}`);
   }
 
   return (await response.json()) as never;

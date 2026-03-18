@@ -33,11 +33,7 @@ export interface URLProviderProps {
 export function URLProvider(props: URLProviderProps) {
   const { adapter, children } = props;
 
-  return (
-    <URLProviderContext.Provider value={adapter}>
-      {children}
-    </URLProviderContext.Provider>
-  );
+  return <URLProviderContext.Provider value={adapter}>{children}</URLProviderContext.Provider>;
 }
 
 /**
@@ -46,9 +42,7 @@ export function URLProvider(props: URLProviderProps) {
 export function useURLProvider(): URLProviderAdapter {
   const context = useContext(URLProviderContext);
   if (!context) {
-    throw new Error(
-      "useURLProvider must be used within a URLProvider component"
-    );
+    throw new Error("useURLProvider must be used within a URLProvider component");
   }
   return context;
 }

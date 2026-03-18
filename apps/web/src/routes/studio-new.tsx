@@ -107,7 +107,8 @@ function StudioNewRouteComponent() {
             Randomize
           </Button>
           <span className="text-xs text-muted-foreground">
-            Mode: {mounted ? (resolvedTheme ?? "light") : "..."} | {themeValue.replace("preset:", "")} | {radiusValue} | {currentFontLabel}
+            Mode: {mounted ? (resolvedTheme ?? "light") : "..."} |{" "}
+            {themeValue.replace("preset:", "")} | {radiusValue} | {currentFontLabel}
           </span>
         </div>
 

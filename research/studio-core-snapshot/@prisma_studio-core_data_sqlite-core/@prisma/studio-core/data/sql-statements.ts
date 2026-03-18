@@ -1,194 +1,194 @@
 export interface SqlStatementSegment {
-    from: number;
-    statement: string;
-    to: number;
+  from: number;
+  statement: string;
+  to: number;
 }
 
 function readDollarQuoteTag(sql: string, index: number): string | null {
-    if (sql[index] !== "$") {
-        return null;
-    }
+  if (sql[index] !== "$") {
+    return null;
+  }
 
-    const rest = sql.slice(index);
-    const match = /^\$\$|^\$[A-Za-z_][A-Za-z0-9_]*\$/.exec(rest);
-    return match?.[0] ?? null;
+  const rest = sql.slice(index);
+  const match = /^\$\$|^\$[A-Za-z_][A-Za-z0-9_]*\$/.exec(rest);
+  return match?.[0] ?? null;
 }
 
 function toSegment(
-    sql: string,
-    segmentStart: number,
-    segmentEnd: number,
+  sql: string,
+  segmentStart: number,
+  segmentEnd: number,
 ): SqlStatementSegment | null {
-    let from = segmentStart;
-    let to = segmentEnd;
+  let from = segmentStart;
+  let to = segmentEnd;
 
-    while (from < segmentEnd && /\s/.test(sql[from]!)) {
-        from += 1;
-    }
+  while (from < segmentEnd && /\s/.test(sql[from]!)) {
+    from += 1;
+  }
 
-    while (to > from && /\s/.test(sql[to - 1]!)) {
-        to -= 1;
-    }
+  while (to > from && /\s/.test(sql[to - 1]!)) {
+    to -= 1;
+  }
 
-    if (from >= to) {
-        return null;
-    }
+  if (from >= to) {
+    return null;
+  }
 
-    return {
-        from,
-        statement: sql.slice(from, to),
-        to,
-    };
+  return {
+    from,
+    statement: sql.slice(from, to),
+    to,
+  };
 }
 
 export function splitTopLevelSqlStatements(sql: string): SqlStatementSegment[] {
-    const segments: SqlStatementSegment[] = [];
+  const segments: SqlStatementSegment[] = [];
 
-    let depth = 0;
-    let segmentStart = 0;
+  let depth = 0;
+  let segmentStart = 0;
 
-    let inLineComment = false;
-    let inBlockComment = false;
-    let inSingleQuotedString = false;
-    let inDoubleQuotedString = false;
-    let inDollarQuotedStringTag: string | null = null;
+  let inLineComment = false;
+  let inBlockComment = false;
+  let inSingleQuotedString = false;
+  let inDoubleQuotedString = false;
+  let inDollarQuotedStringTag: string | null = null;
 
-    for (let index = 0; index < sql.length; index += 1) {
-        const char = sql[index]!;
-        const next = sql[index + 1];
+  for (let index = 0; index < sql.length; index += 1) {
+    const char = sql[index]!;
+    const next = sql[index + 1];
 
-        if (inLineComment) {
-            if (char === "\n") {
-                inLineComment = false;
-            }
-            continue;
-        }
-
-        if (inBlockComment) {
-            if (char === "*" && next === "/") {
-                inBlockComment = false;
-                index += 1;
-            }
-            continue;
-        }
-
-        if (inDollarQuotedStringTag) {
-            if (sql.startsWith(inDollarQuotedStringTag, index)) {
-                index += inDollarQuotedStringTag.length - 1;
-                inDollarQuotedStringTag = null;
-            }
-            continue;
-        }
-
-        if (inSingleQuotedString) {
-            if (char === "'") {
-                if (next === "'") {
-                    index += 1;
-                } else {
-                    inSingleQuotedString = false;
-                }
-            }
-            continue;
-        }
-
-        if (inDoubleQuotedString) {
-            if (char === '"') {
-                if (next === '"') {
-                    index += 1;
-                } else {
-                    inDoubleQuotedString = false;
-                }
-            }
-            continue;
-        }
-
-        if (char === "-" && next === "-") {
-            inLineComment = true;
-            index += 1;
-            continue;
-        }
-
-        if (char === "/" && next === "*") {
-            inBlockComment = true;
-            index += 1;
-            continue;
-        }
-
-        if (char === "'") {
-            inSingleQuotedString = true;
-            continue;
-        }
-
-        if (char === '"') {
-            inDoubleQuotedString = true;
-            continue;
-        }
-
-        if (char === "$") {
-            const dollarQuoteTag = readDollarQuoteTag(sql, index);
-
-            if (dollarQuoteTag) {
-                inDollarQuotedStringTag = dollarQuoteTag;
-                index += dollarQuoteTag.length - 1;
-                continue;
-            }
-        }
-
-        if (char === "(") {
-            depth += 1;
-            continue;
-        }
-
-        if (char === ")") {
-            depth = Math.max(0, depth - 1);
-            continue;
-        }
-
-        if (char === ";" && depth === 0) {
-            const segment = toSegment(sql, segmentStart, index);
-
-            if (segment) {
-                segments.push(segment);
-            }
-
-            segmentStart = index + 1;
-        }
+    if (inLineComment) {
+      if (char === "\n") {
+        inLineComment = false;
+      }
+      continue;
     }
 
-    const finalSegment = toSegment(sql, segmentStart, sql.length);
-
-    if (finalSegment) {
-        segments.push(finalSegment);
+    if (inBlockComment) {
+      if (char === "*" && next === "/") {
+        inBlockComment = false;
+        index += 1;
+      }
+      continue;
     }
 
-    return segments;
+    if (inDollarQuotedStringTag) {
+      if (sql.startsWith(inDollarQuotedStringTag, index)) {
+        index += inDollarQuotedStringTag.length - 1;
+        inDollarQuotedStringTag = null;
+      }
+      continue;
+    }
+
+    if (inSingleQuotedString) {
+      if (char === "'") {
+        if (next === "'") {
+          index += 1;
+        } else {
+          inSingleQuotedString = false;
+        }
+      }
+      continue;
+    }
+
+    if (inDoubleQuotedString) {
+      if (char === '"') {
+        if (next === '"') {
+          index += 1;
+        } else {
+          inDoubleQuotedString = false;
+        }
+      }
+      continue;
+    }
+
+    if (char === "-" && next === "-") {
+      inLineComment = true;
+      index += 1;
+      continue;
+    }
+
+    if (char === "/" && next === "*") {
+      inBlockComment = true;
+      index += 1;
+      continue;
+    }
+
+    if (char === "'") {
+      inSingleQuotedString = true;
+      continue;
+    }
+
+    if (char === '"') {
+      inDoubleQuotedString = true;
+      continue;
+    }
+
+    if (char === "$") {
+      const dollarQuoteTag = readDollarQuoteTag(sql, index);
+
+      if (dollarQuoteTag) {
+        inDollarQuotedStringTag = dollarQuoteTag;
+        index += dollarQuoteTag.length - 1;
+        continue;
+      }
+    }
+
+    if (char === "(") {
+      depth += 1;
+      continue;
+    }
+
+    if (char === ")") {
+      depth = Math.max(0, depth - 1);
+      continue;
+    }
+
+    if (char === ";" && depth === 0) {
+      const segment = toSegment(sql, segmentStart, index);
+
+      if (segment) {
+        segments.push(segment);
+      }
+
+      segmentStart = index + 1;
+    }
+  }
+
+  const finalSegment = toSegment(sql, segmentStart, sql.length);
+
+  if (finalSegment) {
+    segments.push(finalSegment);
+  }
+
+  return segments;
 }
 
 export function getTopLevelSqlStatementAtCursor(args: {
-    cursorIndex: number;
-    sql: string;
+  cursorIndex: number;
+  sql: string;
 }): SqlStatementSegment | null {
-    const { cursorIndex, sql } = args;
-    const segments = splitTopLevelSqlStatements(sql);
+  const { cursorIndex, sql } = args;
+  const segments = splitTopLevelSqlStatements(sql);
 
-    if (segments.length === 0) {
-        return null;
+  if (segments.length === 0) {
+    return null;
+  }
+
+  const clampedCursorIndex = Math.max(0, Math.min(sql.length, cursorIndex));
+  let previousSegment: SqlStatementSegment | null = null;
+
+  for (const segment of segments) {
+    if (clampedCursorIndex < segment.from) {
+      return previousSegment ?? segment;
     }
 
-    const clampedCursorIndex = Math.max(0, Math.min(sql.length, cursorIndex));
-    let previousSegment: SqlStatementSegment | null = null;
-
-    for (const segment of segments) {
-        if (clampedCursorIndex < segment.from) {
-            return previousSegment ?? segment;
-        }
-
-        if (clampedCursorIndex <= segment.to) {
-            return segment;
-        }
-
-        previousSegment = segment;
+    if (clampedCursorIndex <= segment.to) {
+      return segment;
     }
 
-    return previousSegment;
+    previousSegment = segment;
+  }
+
+  return previousSegment;
 }

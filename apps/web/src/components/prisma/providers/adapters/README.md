@@ -5,6 +5,7 @@ This directory contains different data adapters for Prisma Studio. Adapters hand
 ## Available Adapters
 
 ### **Prisma Raw Studio Adapter** (`prisma-adapter.ts`)
+
 Prisma-backed adapter that routes SQLite introspection SQL through Prisma raw queries.
 
 ### **SQLite DB Providers** (`db/sqlite/*`)
@@ -57,9 +58,12 @@ Expected env vars by provider:
 - `cloudflare-d1`: `VITE_CLOUDFLARE_ACCOUNT_ID`, `VITE_CLOUDFLARE_API_TOKEN`, `VITE_D1_DATABASE_ID` (optional `VITE_D1_HTTP_SCHEMA_CACHE_TTL_MS`)
 
 ```tsx
-import { AdapterProvider, createPrismaRawStudioAdapter } from '@/components/prisma/providers/adapters';
-import { PrismaStudio } from '@/components/prisma/studio';
-import { executeStudioRequest } from '@/components/prisma/utils/studio-request';
+import {
+  AdapterProvider,
+  createPrismaRawStudioAdapter,
+} from "@/components/prisma/providers/adapters";
+import { PrismaStudio } from "@/components/prisma/studio";
+import { executeStudioRequest } from "@/components/prisma/utils/studio-request";
 
 export function App() {
   return (
@@ -75,16 +79,13 @@ export function App() {
 Use both `URLProvider` and `AdapterProvider` for complete functionality:
 
 ```tsx
-import {
-  URLProvider,
-  createTanStackRouterAdapter,
-} from '@/components/prisma/providers/url';
+import { URLProvider, createTanStackRouterAdapter } from "@/components/prisma/providers/url";
 import {
   AdapterProvider,
   createPrismaRawStudioAdapter,
-} from '@/components/prisma/providers/adapters';
-import { PrismaStudio } from '@/components/prisma/studio';
-import { executeStudioRequest } from '@/components/prisma/utils/studio-request';
+} from "@/components/prisma/providers/adapters";
+import { PrismaStudio } from "@/components/prisma/studio";
+import { executeStudioRequest } from "@/components/prisma/utils/studio-request";
 
 export function StudioPage() {
   return (
@@ -104,7 +105,7 @@ export function StudioPage() {
 To create a custom adapter, implement the `StudioAdapter` interface from `@enhanced-prisma-studio/studio-core/ui`:
 
 ```tsx
-import type { StudioAdapter } from '@/components/prisma/providers/adapters';
+import type { StudioAdapter } from "@/components/prisma/providers/adapters";
 
 export function createCustomAdapter(): StudioAdapter {
   return {
@@ -112,7 +113,7 @@ export function createCustomAdapter(): StudioAdapter {
     introspect: async (options) => {
       // Implementation
     },
-    
+
     // ... other required methods
   };
 }
@@ -131,16 +132,16 @@ Then use it with `AdapterProvider`:
 Inside components wrapped by `AdapterProvider`, use the `useAdapter` hook:
 
 ```tsx
-import { useAdapter } from '@/components/prisma/providers/adapters';
+import { useAdapter } from "@/components/prisma/providers/adapters";
 
 function MyComponent() {
   const adapter = useAdapter();
-  
+
   // Use adapter for database operations
   const [error, result] = await adapter.introspect({
     abortSignal: new AbortController().signal,
   });
-  
+
   return null;
 }
 ```
@@ -148,6 +149,7 @@ function MyComponent() {
 ## Interface Reference
 
 ### `AdapterProviderConfig`
+
 ```tsx
 interface AdapterProviderConfig {
   executeStudioRequest: (request: unknown) => Promise<unknown>;
@@ -155,7 +157,9 @@ interface AdapterProviderConfig {
 ```
 
 ### `StudioAdapter`
+
 Extends the core Prisma Studio adapter interface with methods for:
+
 - Database introspection
 - Query execution
 - Transaction handling

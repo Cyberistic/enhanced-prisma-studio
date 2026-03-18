@@ -34,10 +34,7 @@ function Calendar({
   hideNavigation,
   ...props
 }: CalendarProps) {
-  const _monthsClassName = cn(
-    "relative flex flex-col gap-4 sm:flex-row",
-    props.monthsClassName,
-  );
+  const _monthsClassName = cn("relative flex flex-col gap-4 sm:flex-row", props.monthsClassName);
   const _monthCaptionClassName = cn("hidden", props.monthCaptionClassName);
   const _dropdownsClassName = cn(
     "flex items-center justify-center gap-2 w-full",
@@ -50,10 +47,7 @@ function Calendar({
     "w-9 text-xs font-normal text-muted-foreground",
     props.weekdayClassName,
   );
-  const _captionLabelClassName = cn(
-    "truncate text-xs font-medium",
-    props.captionLabelClassName,
-  );
+  const _captionLabelClassName = cn("truncate text-xs font-medium", props.captionLabelClassName);
 
   const _monthGridClassName = cn("mx-auto mt-4", props.monthGridClassName);
   const _weekClassName = cn("mt-0 flex w-max items-start", props.weekClassName);
@@ -69,16 +63,8 @@ function Calendar({
 
   const buttonRangeClassName =
     "bg-accent [&>button]:bg-primary [&>button]:text-primary-foreground [&>button]:hover:bg-primary [&>button]:hover:text-primary-foreground";
-  const _rangeStartClassName = cn(
-    buttonRangeClassName,
-    "rounded-s-md",
-    props.rangeStartClassName,
-  );
-  const _rangeEndClassName = cn(
-    buttonRangeClassName,
-    "rounded-e-md",
-    props.rangeEndClassName,
-  );
+  const _rangeStartClassName = cn(buttonRangeClassName, "rounded-s-md", props.rangeStartClassName);
+  const _rangeEndClassName = cn(buttonRangeClassName, "rounded-e-md", props.rangeEndClassName);
   const _rangeMiddleClassName = cn(
     "bg-accent text-foreground! [&>button]:bg-transparent [&>button]:text-foreground! [&>button]:hover:bg-transparent [&>button]:hover:text-foreground!",
     props.rangeMiddleClassName,
@@ -96,10 +82,7 @@ function Calendar({
     "text-muted-foreground opacity-50 aria-selected:text-muted-foreground aria-selected:opacity-30",
     props.outsideClassName,
   );
-  const _disabledClassName = cn(
-    "text-muted-foreground opacity-50",
-    props.disabledClassName,
-  );
+  const _disabledClassName = cn("text-muted-foreground opacity-50", props.disabledClassName);
   const _hiddenClassName = cn("invisible flex-1", props.hiddenClassName);
 
   return (

@@ -1,9 +1,4 @@
-import type {
-  AdapterQueryResult,
-  FilterGroup,
-  SortOrderItem,
-  Table,
-} from "../../data/adapter";
+import type { AdapterQueryResult, FilterGroup, SortOrderItem, Table } from "../../data/adapter";
 import { useActiveTableRowsCollection } from "./use-active-table-rows-collection";
 import { useNavigation } from "./use-navigation";
 
@@ -27,9 +22,7 @@ export interface UseActiveTableQueryResult {
   refetch: () => Promise<void>;
 }
 
-export function useActiveTableQuery(
-  props: UseActiveTableQueryProps,
-): UseActiveTableQueryResult {
+export function useActiveTableQuery(props: UseActiveTableQueryProps): UseActiveTableQueryResult {
   const { filter, pageIndex, pageSize, sortOrder } = props;
   const {
     metadata: { activeTable },

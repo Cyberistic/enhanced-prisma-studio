@@ -18,15 +18,7 @@ export interface JsonInputProps {
 }
 
 export function JsonInput(props: JsonInputProps) {
-  const {
-    column,
-    context,
-    onNavigate,
-    onSubmit,
-    readonly,
-    showSaveAction,
-    value,
-  } = props;
+  const { column, context, onNavigate, onSubmit, readonly, showSaveAction, value } = props;
   const { datatype, defaultValue, fkColumn, isRequired, nullable } = column;
   const { isArray } = datatype;
 

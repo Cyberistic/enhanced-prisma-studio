@@ -16,9 +16,7 @@ function HeaderTooltipIcon(props: { children: ReactNode; tooltip: ReactNode }) {
     <TooltipProvider delayDuration={120}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="inline-flex shrink-0 items-center justify-center">
-            {children}
-          </span>
+          <span className="inline-flex shrink-0 items-center justify-center">{children}</span>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="text-xs">
           {tooltip}
@@ -52,8 +50,7 @@ export function DataGridHeaderCell({ column }: { column: Column }) {
         <HeaderTooltipIcon
           tooltip={
             <span>
-              Foreign key - references{" "}
-              {[fkSchema, fkTable, fkColumn].filter(Boolean).join(".")}
+              Foreign key - references {[fkSchema, fkTable, fkColumn].filter(Boolean).join(".")}
             </span>
           }
         >
@@ -74,8 +71,7 @@ export function DataGridHeaderCell({ column }: { column: Column }) {
         <HeaderTooltipIcon
           tooltip={
             <span>
-              Required - not nullable, computed, auto-incrementing, and has no
-              default value
+              Required - not nullable, computed, auto-incrementing, and has no default value
             </span>
           }
         >

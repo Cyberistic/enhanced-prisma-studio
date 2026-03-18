@@ -70,9 +70,7 @@ function cloneCoordinate(coordinate: GridCellCoordinate): GridCellCoordinate {
   };
 }
 
-function cloneState(
-  state: GridSelectionMachineState,
-): GridSelectionMachineState {
+function cloneState(state: GridSelectionMachineState): GridSelectionMachineState {
   if (state.mode === "none") {
     return GRID_SELECTION_MACHINE_INITIAL_STATE;
   }
@@ -103,9 +101,7 @@ export function transitionGridSelectionMachine(
         end: cloneCoordinate(event.end),
       };
     case "cell.clear":
-      return state.mode === "cell"
-        ? GRID_SELECTION_MACHINE_INITIAL_STATE
-        : cloneState(state);
+      return state.mode === "cell" ? GRID_SELECTION_MACHINE_INITIAL_STATE : cloneState(state);
     case "row.select": {
       const rowIds = normalizeRowIds(event.rowIds);
 
@@ -119,9 +115,7 @@ export function transitionGridSelectionMachine(
       };
     }
     case "row.clear":
-      return state.mode === "row"
-        ? GRID_SELECTION_MACHINE_INITIAL_STATE
-        : cloneState(state);
+      return state.mode === "row" ? GRID_SELECTION_MACHINE_INITIAL_STATE : cloneState(state);
     case "escape":
     case "reset":
       return GRID_SELECTION_MACHINE_INITIAL_STATE;
@@ -130,9 +124,7 @@ export function transitionGridSelectionMachine(
   }
 }
 
-export function getCellSelectionRange(
-  state: GridSelectionMachineState,
-): GridSelectionRange | null {
+export function getCellSelectionRange(state: GridSelectionMachineState): GridSelectionRange | null {
   if (state.mode !== "cell") {
     return null;
   }
@@ -149,9 +141,7 @@ export function getCellSelectionAnchor(
   return state.mode === "cell" ? state.start : null;
 }
 
-export function getCellSelectionFocus(
-  state: GridSelectionMachineState,
-): GridCellCoordinate | null {
+export function getCellSelectionFocus(state: GridSelectionMachineState): GridCellCoordinate | null {
   return state.mode === "cell" ? state.end : null;
 }
 
@@ -167,9 +157,7 @@ export function hasAnySelection(state: GridSelectionMachineState): boolean {
   return state.mode !== "none";
 }
 
-export function rowSelectionStateToIds(
-  rowSelectionState: RowSelectionState,
-): string[] {
+export function rowSelectionStateToIds(rowSelectionState: RowSelectionState): string[] {
   return Object.entries(rowSelectionState)
     .filter(([, isSelected]) => isSelected === true)
     .map(([rowId]) => rowId)

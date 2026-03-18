@@ -137,9 +137,7 @@ export function createActiveTableCommandPaletteActions(
       label: (query) =>
         `Search rows: ${resolveCommandQueryMode({ label: SEARCH_ROWS_LABEL, query }).payload}`,
       onSelect: (query) =>
-        onRunSearch(
-          resolveCommandQueryMode({ label: SEARCH_ROWS_LABEL, query }).payload,
-        ),
+        onRunSearch(resolveCommandQueryMode({ label: SEARCH_ROWS_LABEL, query }).payload),
       shouldShow: (query) =>
         resolveCommandQueryMode({
           label: SEARCH_ROWS_LABEL,
@@ -168,10 +166,7 @@ export function createActiveTableCommandPaletteActions(
       label: (query) =>
         `Filter with AI: ${resolveCommandQueryMode({ label: FILTER_WITH_AI_LABEL, query }).payload}`,
       onSelect: (query) =>
-        onRunFilterWithAi(
-          resolveCommandQueryMode({ label: FILTER_WITH_AI_LABEL, query })
-            .payload,
-        ),
+        onRunFilterWithAi(resolveCommandQueryMode({ label: FILTER_WITH_AI_LABEL, query }).payload),
       shouldShow: (query) =>
         hasAiFilter &&
         resolveCommandQueryMode({

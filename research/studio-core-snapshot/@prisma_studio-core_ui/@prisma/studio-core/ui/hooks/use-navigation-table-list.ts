@@ -37,9 +37,7 @@ export function useNavigationTableList(args: UseNavigationTableListArgs) {
               table.table.toLowerCase().includes(normalizedSearchTerm),
             );
 
-      return filteredQuery
-        .orderBy(({ table }) => table.table)
-        .fn.select((row) => row.table);
+      return filteredQuery.orderBy(({ table }) => table.table).fn.select((row) => row.table);
     },
     [navigationTableNamesCollection, schema, normalizedSearchTerm],
   );

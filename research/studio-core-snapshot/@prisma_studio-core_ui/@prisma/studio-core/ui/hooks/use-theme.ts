@@ -37,10 +37,7 @@ export function parseThemeFromCSS(cssString: string): CustomTheme | null {
     }
 
     // Return null if no valid theme found
-    if (
-      Object.keys(theme.light).length === 0 &&
-      Object.keys(theme.dark).length === 0
-    ) {
+    if (Object.keys(theme.light).length === 0 && Object.keys(theme.dark).length === 0) {
       return null;
     }
 
@@ -97,10 +94,7 @@ export function applyDarkModeClass(isDarkMode: boolean): void {
 /**
  * Hook to manage custom theme application
  */
-export function useTheme(
-  customTheme?: CustomTheme | string,
-  isDarkMode?: boolean,
-) {
+export function useTheme(customTheme?: CustomTheme | string, isDarkMode?: boolean) {
   const parsedTheme = useMemo(() => {
     if (!customTheme) return null;
 

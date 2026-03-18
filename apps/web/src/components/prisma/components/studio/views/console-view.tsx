@@ -52,7 +52,9 @@ function OperationEventEntry(props: { event: StudioOperationEvent }) {
             ) : (
               <CheckCircle size={16} className="text-green-500" />
             )}
-            <span>{event.payload.operation}, {formatTimestamp(event.timestamp)}</span>
+            <span>
+              {event.payload.operation}, {formatTimestamp(event.timestamp)}
+            </span>
           </div>
           <Badge variant={isError ? "destructive" : "secondary"} className="text-xs font-normal">
             {isError ? "Error" : "Success"}
@@ -94,7 +96,9 @@ function OperationEventEntry(props: { event: StudioOperationEvent }) {
             <div
               className={cn(
                 "overflow-x-auto rounded-sm border border-border bg-secondary/50 p-3 font-mono text-xs",
-                isQueryExpanded ? "block max-h-64 whitespace-pre-wrap overflow-y-auto" : "max-h-10 overflow-hidden",
+                isQueryExpanded
+                  ? "block max-h-64 whitespace-pre-wrap overflow-y-auto"
+                  : "max-h-10 overflow-hidden",
               )}
             >
               {isQueryExpanded ? event.payload.query.sql : getQueryPreview(event.payload.query)}
@@ -130,7 +134,8 @@ export function ConsoleView(props: {
   schema: string;
   table: string | null;
 }) {
-  const { isIntrospecting, isNavigationOpen, onToggleNavigation, operationEvents, schema, table } = props;
+  const { isIntrospecting, isNavigationOpen, onToggleNavigation, operationEvents, schema, table } =
+    props;
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -145,33 +150,36 @@ export function ConsoleView(props: {
     <ErrorBoundary>
       <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
         <StudioHeader isNavigationOpen={isNavigationOpen} onToggleNavigation={onToggleNavigation}>
-        <div className="text-xs text-muted-foreground">
-          Operation Console · <span className="font-mono text-foreground/80">{schema}</span>
-          <span className="mx-1 text-foreground/40">/</span>
-          <span className="font-mono text-foreground/80">{table ?? "none"}</span>
-        </div>
-      </StudioHeader>
+          <div className="text-xs text-muted-foreground">
+            Operation Console · <span className="font-mono text-foreground/80">{schema}</span>
+            <span className="mx-1 text-foreground/40">/</span>
+            <span className="font-mono text-foreground/80">{table ?? "none"}</span>
+          </div>
+        </StudioHeader>
 
-      <div ref={scrollRef} className="flex grow flex-col gap-2 overflow-y-auto bg-background/50 p-4">
-        {operationEvents.length === 0 ? (
-          isIntrospecting ? (
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-18 w-full" />
-              <Skeleton className="h-18 w-full" />
-              <Skeleton className="h-18 w-full" />
-            </div>
+        <div
+          ref={scrollRef}
+          className="flex grow flex-col gap-2 overflow-y-auto bg-background/50 p-4"
+        >
+          {operationEvents.length === 0 ? (
+            isIntrospecting ? (
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-18 w-full" />
+                <Skeleton className="h-18 w-full" />
+                <Skeleton className="h-18 w-full" />
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center text-muted-foreground">
+                No operation events yet.
+              </div>
+            )
           ) : (
-            <div className="flex h-full items-center justify-center text-muted-foreground">
-              No operation events yet.
-            </div>
-          )
-        ) : (
-          operationEvents.map((eventItem) => (
-            <OperationEventEntry key={eventItem.eventId} event={eventItem} />
-          ))
-        )}
+            operationEvents.map((eventItem) => (
+              <OperationEventEntry key={eventItem.eventId} event={eventItem} />
+            ))
+          )}
+        </div>
       </div>
-    </div>
     </ErrorBoundary>
   );
 }

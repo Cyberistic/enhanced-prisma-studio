@@ -94,8 +94,7 @@ function getDefaultStudioUiState(): StudioUiState {
     id: STUDIO_UI_STATE_ID,
     isNavigationOpen: true,
     isDarkMode:
-      typeof document !== "undefined" &&
-      document.documentElement.classList.contains("dark"),
+      typeof document !== "undefined" && document.documentElement.classList.contains("dark"),
     tablePageSize: DEFAULT_TABLE_PAGE_SIZE,
     isInfiniteScrollEnabled: false,
   };
@@ -148,10 +147,7 @@ interface StudioContextValue {
   tableQueryMetaCollection: Collection<TableQueryMetaState, string | number>;
   uiLocalStateCollection: Collection<StudioLocalUiState, string | number>;
   sqlEditorStateCollection: Collection<SqlEditorState, string | number>;
-  navigationTableNamesCollection: Collection<
-    NavigationTableNameState,
-    string | number
-  >;
+  navigationTableNamesCollection: Collection<NavigationTableNameState, string | number>;
   getOrCreateRowsCollection<T>(key: string, factory: () => T): T;
 }
 
@@ -279,13 +275,10 @@ export function StudioContextProvider(props: StudioContextProviderProps) {
   const tableQueryMetaCollection = tableQueryMetaCollectionRef.current;
   const uiLocalStateCollection = uiLocalStateCollectionRef.current;
   const sqlEditorStateCollection = sqlEditorStateCollectionRef.current;
-  const navigationTableNamesCollection =
-    navigationTableNamesCollectionRef.current;
+  const navigationTableNamesCollection = navigationTableNamesCollectionRef.current;
 
   const { data: studioUiRows = [] } = useLiveQuery(studioUiCollection);
-  const { data: operationEventsRows = [] } = useLiveQuery(
-    operationEventsCollection,
-  );
+  const { data: operationEventsRows = [] } = useLiveQuery(operationEventsCollection);
 
   const studioUiState = normalizeStudioUiState(
     studioUiRows.find((item) => item.id === STUDIO_UI_STATE_ID),
@@ -294,9 +287,7 @@ export function StudioContextProvider(props: StudioContextProviderProps) {
   const operationEvents = useMemo(
     () =>
       [...operationEventsRows].sort(
-        (left, right) =>
-          new Date(left.timestamp).getTime() -
-          new Date(right.timestamp).getTime(),
+        (left, right) => new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime(),
       ),
     [operationEventsRows],
   );
@@ -317,25 +308,20 @@ export function StudioContextProvider(props: StudioContextProviderProps) {
     [studioUiCollection],
   );
 
-  const getOrCreateRowsCollection = useCallback(
-    <T,>(key: string, factory: () => T): T => {
-      const existingCollection = rowsCollectionCacheRef.current.get(key) as
-        | T
-        | undefined;
+  const getOrCreateRowsCollection = useCallback(<T,>(key: string, factory: () => T): T => {
+    const existingCollection = rowsCollectionCacheRef.current.get(key) as T | undefined;
 
-      if (existingCollection != null) {
-        return existingCollection;
-      }
+    if (existingCollection != null) {
+      return existingCollection;
+    }
 
-      const newCollection = instrumentTanStackCollectionMutations(factory(), {
-        collectionName: `rows:${key}`,
-      });
-      rowsCollectionCacheRef.current.set(key, newCollection);
+    const newCollection = instrumentTanStackCollectionMutations(factory(), {
+      collectionName: `rows:${key}`,
+    });
+    rowsCollectionCacheRef.current.set(key, newCollection);
 
-      return newCollection;
-    },
-    [],
-  );
+    return newCollection;
+  }, []);
 
   const clearRowsCollections = useCallback(() => {
     for (const collection of rowsCollectionCacheRef.current.values()) {
@@ -373,9 +359,7 @@ export function StudioContextProvider(props: StudioContextProviderProps) {
     const syncDarkMode = () => {
       const hasDarkClass = document.documentElement.classList.contains("dark");
 
-      if (
-        studioUiCollection.get(STUDIO_UI_STATE_ID)?.isDarkMode === hasDarkClass
-      ) {
+      if (studioUiCollection.get(STUDIO_UI_STATE_ID)?.isDarkMode === hasDarkClass) {
         return;
       }
 
@@ -388,10 +372,7 @@ export function StudioContextProvider(props: StudioContextProviderProps) {
 
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
-        if (
-          mutation.type === "attributes" &&
-          mutation.attributeName === "class"
-        ) {
+        if (mutation.type === "attributes" && mutation.attributeName === "class") {
           syncDarkMode();
           break;
         }
@@ -451,8 +432,7 @@ export function StudioContextProvider(props: StudioContextProviderProps) {
           const staleEvents = [...operationEventsCollection.toArray]
             .sort(
               (left, right) =>
-                new Date(left.timestamp).getTime() -
-                new Date(right.timestamp).getTime(),
+                new Date(left.timestamp).getTime() - new Date(right.timestamp).getTime(),
             )
             .slice(0, overflow)
             .map((event) => event.eventId);
@@ -566,26 +546,18 @@ export function useStudio(): StudioContextValue {
   const context = useOptionalStudio();
 
   if (!context) {
-    throw new Error(
-      "`useStudio` must be used within a `StudioContext.Provider`",
-    );
+    throw new Error("`useStudio` must be used within a `StudioContext.Provider`");
   }
 
   return context;
 }
 
 function isPrismaVSCodeExtension(): boolean {
-  return (
-    isVSCodeExtension() && "__PVCE__" in window && window.__PVCE__ === true
-  );
+  return isVSCodeExtension() && "__PVCE__" in window && window.__PVCE__ === true;
 }
 
 function isVSCodeExtension(): boolean {
-  return (
-    hasWindow &&
-    "acquireVsCodeApi" in window &&
-    typeof window.acquireVsCodeApi === "function"
-  );
+  return hasWindow && "acquireVsCodeApi" in window && typeof window.acquireVsCodeApi === "function";
 }
 
 function isPrismaPlatform(): boolean {

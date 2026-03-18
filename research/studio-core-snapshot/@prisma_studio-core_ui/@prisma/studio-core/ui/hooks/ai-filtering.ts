@@ -80,11 +80,8 @@ export interface ResolveAiFilteringResult extends ParsedAiFilterResult {
 export function buildAiFilterPrompt(args: AiFilterPromptArgs): string {
   const { filterOperators, now = new Date(), request, table, timeZone } = args;
   const availableOperators =
-    filterOperators && filterOperators.length > 0
-      ? filterOperators
-      : DEFAULT_FILTER_OPERATORS;
-  const promptTimeZone =
-    timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC";
+    filterOperators && filterOperators.length > 0 ? filterOperators : DEFAULT_FILTER_OPERATORS;
+  const promptTimeZone = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC";
   const columnLines = Object.values(table.columns).map((column) => {
     return `- ${column.name}: ${column.datatype.name} (group: ${column.datatype.group}; supported operators: ${getSupportedFilterOperatorsForColumn(column, availableOperators).join(", ")})`;
   });
@@ -134,9 +131,7 @@ export function buildAiFilterCorrectionPrompt(args: {
     issues.length > 0
       ? issues.map((issue) => {
           const prefix =
-            issue.filterIndex != null
-              ? `- Filter ${issue.filterIndex + 1}`
-              : "- Response";
+            issue.filterIndex != null ? `- Filter ${issue.filterIndex + 1}` : "- Response";
           const detailParts = [
             issue.column ? `column=${issue.column}` : null,
             issue.operator ? `operator=${issue.operator}` : null,
@@ -181,10 +176,7 @@ export async function resolveAiFiltering(
   if (initialResult.issues.length === 0) {
     return {
       ...initialResult,
-      filterGroup: attachAiSourceToEditingFilter(
-        initialResult.filterGroup,
-        request,
-      ),
+      filterGroup: attachAiSourceToEditingFilter(initialResult.filterGroup, request),
       didRetry: false,
       responseText: initialResponseText,
     };
@@ -213,10 +205,7 @@ export async function resolveAiFiltering(
   ) {
     return {
       ...initialResult,
-      filterGroup: attachAiSourceToEditingFilter(
-        initialResult.filterGroup,
-        request,
-      ),
+      filterGroup: attachAiSourceToEditingFilter(initialResult.filterGroup, request),
       didRetry: true,
       responseText: retryResponseText,
     };
@@ -224,10 +213,7 @@ export async function resolveAiFiltering(
 
   return {
     ...retryResult,
-    filterGroup: attachAiSourceToEditingFilter(
-      retryResult.filterGroup,
-      request,
-    ),
+    filterGroup: attachAiSourceToEditingFilter(retryResult.filterGroup, request),
     didRetry: true,
     responseText: retryResponseText,
   };
@@ -241,10 +227,7 @@ export function createEditingFilterFromAiResponse(args: {
   const result = parseAiFilterResponseToEditingFilter(args);
 
   if (result.filterGroup.filters.length === 0) {
-    throw new Error(
-      result.issues[0]?.message ??
-        "AI response did not contain any valid filters.",
-    );
+    throw new Error(result.issues[0]?.message ?? "AI response did not contain any valid filters.");
   }
 
   return result.filterGroup;
@@ -258,9 +241,7 @@ export function parseAiFilterResponseToEditingFilter(args: {
   const { filterOperators, responseText, table } = args;
   const filterGroup = createEmptyEditingFilterGroup();
   const availableOperators = new Set<FilterOperator>(
-    filterOperators && filterOperators.length > 0
-      ? filterOperators
-      : DEFAULT_FILTER_OPERATORS,
+    filterOperators && filterOperators.length > 0 ? filterOperators : DEFAULT_FILTER_OPERATORS,
   );
   const parseResult = parseAiFilterResponse(responseText);
 
@@ -276,9 +257,7 @@ export function parseAiFilterResponseToEditingFilter(args: {
 
   const issues: AiFilterIssue[] = [];
 
-  for (const [filterIndex, candidate] of (
-    parseResult.filters ?? []
-  ).entries()) {
+  for (const [filterIndex, candidate] of (parseResult.filters ?? []).entries()) {
     if (
       candidate.kind === "sql" ||
       (candidate.kind === undefined &&
@@ -323,19 +302,13 @@ export function parseAiFilterResponseToEditingFilter(args: {
       continue;
     }
 
-    if (
-      typeof candidate.column !== "string" ||
-      !table.columns[candidate.column]
-    ) {
+    if (typeof candidate.column !== "string" || !table.columns[candidate.column]) {
       issues.push({
         code: "invalid-column",
         filterIndex,
         message: "Use one of the listed columns.",
         responseText,
-        value:
-          candidate.value === undefined
-            ? undefined
-            : serializeAiFilterValue(candidate.value),
+        value: candidate.value === undefined ? undefined : serializeAiFilterValue(candidate.value),
       });
       continue;
     }
@@ -350,15 +323,9 @@ export function parseAiFilterResponseToEditingFilter(args: {
         column: candidate.column,
         filterIndex,
         message: "Use one of the allowed operators.",
-        operator:
-          typeof candidate.operator === "string"
-            ? candidate.operator
-            : undefined,
+        operator: typeof candidate.operator === "string" ? candidate.operator : undefined,
         responseText,
-        value:
-          candidate.value === undefined
-            ? undefined
-            : serializeAiFilterValue(candidate.value),
+        value: candidate.value === undefined ? undefined : serializeAiFilterValue(candidate.value),
       });
       continue;
     }
@@ -504,11 +471,7 @@ function serializeAiFilterValue(value: unknown): string {
     return value;
   }
 
-  if (
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    typeof value === "bigint"
-  ) {
+  if (typeof value === "number" || typeof value === "boolean" || typeof value === "bigint") {
     return String(value);
   }
 
@@ -531,9 +494,7 @@ function formatPromptLocalDateTime(now: Date, timeZone: string): string {
     year: "numeric",
   }).formatToParts(now);
   const values = Object.fromEntries(
-    parts
-      .filter((part) => part.type !== "literal")
-      .map((part) => [part.type, part.value]),
+    parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]),
   ) as Record<string, string>;
 
   return `${values.year}-${values.month}-${values.day} ${values.hour}:${values.minute}:${values.second}`;

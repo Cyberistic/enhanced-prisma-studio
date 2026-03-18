@@ -26,21 +26,13 @@ import {
   CommandItem,
   CommandList,
 } from "../components/ui/command";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "../components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../components/ui/dialog";
 import { useNavigation } from "../hooks/use-navigation";
 import { useNavigationTableList } from "../hooks/use-navigation-table-list";
 import { useUiState } from "../hooks/use-ui-state";
 import { cn } from "../lib/utils";
 import { useStudio } from "./context";
-import {
-  TABLE_SEARCH_UI_STATE_KEY,
-  type TableSearchUiState,
-} from "./navigation-ui-state";
+import { TABLE_SEARCH_UI_STATE_KEY, type TableSearchUiState } from "./navigation-ui-state";
 
 const COMMAND_PALETTE_UI_STATE_KEY = "studio:command-palette";
 
@@ -60,10 +52,7 @@ interface CommandPaletteActionRegistration {
 }
 
 interface CommandPaletteContextValue {
-  registerContextActions: (
-    id: string,
-    actions: CommandPaletteContextAction[],
-  ) => void;
+  registerContextActions: (id: string, actions: CommandPaletteContextAction[]) => void;
   unregisterContextActions: (id: string) => void;
 }
 
@@ -83,12 +72,10 @@ interface CommandPaletteItem {
   section: "context" | "tables" | "views";
 }
 
-const CommandPaletteContext = createContext<
-  CommandPaletteContextValue | undefined
->(undefined);
-const CommandPaletteStateContext = createContext<
-  CommandPaletteStateContextValue | undefined
->(undefined);
+const CommandPaletteContext = createContext<CommandPaletteContextValue | undefined>(undefined);
+const CommandPaletteStateContext = createContext<CommandPaletteStateContextValue | undefined>(
+  undefined,
+);
 
 function normalizeQuery(query: string): string {
   return query.trim().toLowerCase();
@@ -105,23 +92,14 @@ function matchesCommandSearch(args: {
     return true;
   }
 
-  return [args.label, ...(args.keywords ?? [])]
-    .join(" ")
-    .toLowerCase()
-    .includes(normalizedQuery);
+  return [args.label, ...(args.keywords ?? [])].join(" ").toLowerCase().includes(normalizedQuery);
 }
 
-function resolveActionLabel(
-  label: CommandPaletteContextAction["label"],
-  query: string,
-) {
+function resolveActionLabel(label: CommandPaletteContextAction["label"], query: string) {
   return typeof label === "function" ? label(query) : label;
 }
 
-function resolveActionDisabled(
-  disabled: CommandPaletteContextAction["disabled"],
-  query: string,
-) {
+function resolveActionDisabled(disabled: CommandPaletteContextAction["disabled"], query: string) {
   return typeof disabled === "function" ? disabled(query) : Boolean(disabled);
 }
 
@@ -135,9 +113,7 @@ function useCommandPaletteContext() {
   const context = useContext(CommandPaletteContext);
 
   if (!context) {
-    throw new Error(
-      "useCommandPaletteContext must be used within StudioCommandPaletteProvider",
-    );
+    throw new Error("useCommandPaletteContext must be used within StudioCommandPaletteProvider");
   }
 
   return context;
@@ -170,11 +146,8 @@ export function useCommandPalette() {
   };
 }
 
-export function useRegisterCommandPaletteActions(
-  actions: CommandPaletteContextAction[],
-) {
-  const { registerContextActions, unregisterContextActions } =
-    useCommandPaletteContext();
+export function useRegisterCommandPaletteActions(actions: CommandPaletteContextAction[]) {
+  const { registerContextActions, unregisterContextActions } = useCommandPaletteContext();
   const registrationId = useId();
 
   useEffect(() => {
@@ -183,25 +156,15 @@ export function useRegisterCommandPaletteActions(
     return () => {
       unregisterContextActions(registrationId);
     };
-  }, [
-    actions,
-    registerContextActions,
-    registrationId,
-    unregisterContextActions,
-  ]);
+  }, [actions, registerContextActions, registrationId, unregisterContextActions]);
 }
 
 export function StudioCommandPaletteProvider(props: PropsWithChildren) {
   const { children } = props;
-  const [paletteUiState, setPaletteUiState] = useUiState(
-    COMMAND_PALETTE_UI_STATE_KEY,
-    {
-      isOpen: false,
-    },
-  );
-  const [registrations, setRegistrations] = useState<
-    CommandPaletteActionRegistration[]
-  >([]);
+  const [paletteUiState, setPaletteUiState] = useUiState(COMMAND_PALETTE_UI_STATE_KEY, {
+    isOpen: false,
+  });
+  const [registrations, setRegistrations] = useState<CommandPaletteActionRegistration[]>([]);
   const viewActions = useMemo(
     () => getContextActionsFromRegistrations(registrations),
     [registrations],
@@ -231,9 +194,7 @@ export function StudioCommandPaletteProvider(props: PropsWithChildren) {
     [],
   );
   const unregisterContextActions = useCallback((id: string) => {
-    setRegistrations((previous) =>
-      previous.filter((registration) => registration.id !== id),
-    );
+    setRegistrations((previous) => previous.filter((registration) => registration.id !== id));
   }, []);
   const commandPaletteRegistryContextValue = useMemo(
     () => ({
@@ -253,11 +214,7 @@ export function StudioCommandPaletteProvider(props: PropsWithChildren) {
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      if (
-        event.key.toLowerCase() !== "k" ||
-        !(event.metaKey || event.ctrlKey) ||
-        event.altKey
-      ) {
+      if (event.key.toLowerCase() !== "k" || !(event.metaKey || event.ctrlKey) || event.altKey) {
         return;
       }
 
@@ -274,9 +231,7 @@ export function StudioCommandPaletteProvider(props: PropsWithChildren) {
 
   return (
     <CommandPaletteContext.Provider value={commandPaletteRegistryContextValue}>
-      <CommandPaletteStateContext.Provider
-        value={commandPaletteStateContextValue}
-      >
+      <CommandPaletteStateContext.Provider value={commandPaletteStateContextValue}>
         {children}
         <StudioCommandPalette />
       </CommandPaletteStateContext.Provider>
@@ -289,13 +244,10 @@ function StudioCommandPalette() {
   const { createUrl, schemaParam } = useNavigation();
   const { isOpen, setIsOpen, viewActions } = useCommandPaletteStateContext();
   const [query, setQuery] = useState("");
-  const [, setTableSearchUiState] = useUiState<TableSearchUiState>(
-    TABLE_SEARCH_UI_STATE_KEY,
-    {
-      isOpen: false,
-      term: "",
-    },
-  );
+  const [, setTableSearchUiState] = useUiState<TableSearchUiState>(TABLE_SEARCH_UI_STATE_KEY, {
+    isOpen: false,
+    term: "",
+  });
   const inputRef = useRef<HTMLInputElement | null>(null);
   const scopeRef = useRef<HTMLSpanElement | null>(null);
   const { tables } = useNavigationTableList({
@@ -343,10 +295,7 @@ function StudioCommandPalette() {
       section: "tables",
     }));
   }, [createUrl, tables]);
-  const overflowTableCount = Math.max(
-    tables.length - visibleTableItems.length,
-    0,
-  );
+  const overflowTableCount = Math.max(tables.length - visibleTableItems.length, 0);
   const moreTablesItem = useMemo<CommandPaletteItem | null>(() => {
     if (overflowTableCount === 0) {
       return null;
@@ -370,16 +319,9 @@ function StudioCommandPalette() {
       },
       section: "tables",
     };
-  }, [
-    isNavigationOpen,
-    overflowTableCount,
-    setTableSearchUiState,
-    toggleNavigation,
-  ]);
+  }, [isNavigationOpen, overflowTableCount, setTableSearchUiState, toggleNavigation]);
   const tableItems = useMemo(() => {
-    return moreTablesItem
-      ? [...visibleTableItems, moreTablesItem]
-      : visibleTableItems;
+    return moreTablesItem ? [...visibleTableItems, moreTablesItem] : visibleTableItems;
   }, [moreTablesItem, visibleTableItems]);
   const viewItems = useMemo(() => {
     const items: CommandPaletteItem[] = [

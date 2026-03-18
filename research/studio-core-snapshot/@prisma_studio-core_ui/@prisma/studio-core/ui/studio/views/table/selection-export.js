@@ -1,137 +1,136 @@
 export function buildCellSelectionExportTable(args) {
-    const { columnIds, range, rows } = args;
-    const selectedColumnIds = [];
-    const selectedRows = [];
-    for (let columnIndex = range.columnStart; columnIndex <= range.columnEnd; columnIndex++) {
-        const columnId = columnIds[columnIndex];
-        if (!columnId) {
-            continue;
-        }
-        selectedColumnIds.push(columnId);
+  const { columnIds, range, rows } = args;
+  const selectedColumnIds = [];
+  const selectedRows = [];
+  for (let columnIndex = range.columnStart; columnIndex <= range.columnEnd; columnIndex++) {
+    const columnId = columnIds[columnIndex];
+    if (!columnId) {
+      continue;
     }
-    if (selectedColumnIds.length === 0) {
-        return {
-            columnIds: [],
-            rows: [],
-        };
-    }
-    for (let rowIndex = range.rowStart; rowIndex <= range.rowEnd; rowIndex++) {
-        const row = rows[rowIndex];
-        if (!row) {
-            continue;
-        }
-        selectedRows.push(selectedColumnIds.map((columnId) => stringifySelectionExportValue(row[columnId])));
-    }
+    selectedColumnIds.push(columnId);
+  }
+  if (selectedColumnIds.length === 0) {
     return {
-        columnIds: selectedColumnIds,
-        rows: selectedRows,
+      columnIds: [],
+      rows: [],
     };
+  }
+  for (let rowIndex = range.rowStart; rowIndex <= range.rowEnd; rowIndex++) {
+    const row = rows[rowIndex];
+    if (!row) {
+      continue;
+    }
+    selectedRows.push(
+      selectedColumnIds.map((columnId) => stringifySelectionExportValue(row[columnId])),
+    );
+  }
+  return {
+    columnIds: selectedColumnIds,
+    rows: selectedRows,
+  };
 }
 export function buildRowSelectionExportTable(args) {
-    const { columnIds, rowSelectionState, rows } = args;
-    if (columnIds.length === 0) {
-        return {
-            columnIds: [],
-            rows: [],
-        };
-    }
-    const selectedRows = rows
-        .filter((row) => {
-        const rowId = row.__ps_rowid;
-        return typeof rowId === "string" && rowSelectionState[rowId] === true;
-    })
-        .map((row) => columnIds.map((columnId) => stringifySelectionExportValue(row[columnId])));
+  const { columnIds, rowSelectionState, rows } = args;
+  if (columnIds.length === 0) {
     return {
-        columnIds: [...columnIds],
-        rows: selectedRows,
+      columnIds: [],
+      rows: [],
     };
+  }
+  const selectedRows = rows
+    .filter((row) => {
+      const rowId = row.__ps_rowid;
+      return typeof rowId === "string" && rowSelectionState[rowId] === true;
+    })
+    .map((row) => columnIds.map((columnId) => stringifySelectionExportValue(row[columnId])));
+  return {
+    columnIds: [...columnIds],
+    rows: selectedRows,
+  };
 }
 export function serializeSelectionExport(args) {
-    const { format, includeColumnHeader, table } = args;
-    if (table.columnIds.length === 0) {
-        return "";
-    }
-    if (format === "csv") {
-        return serializeSelectionExportCsv({ includeColumnHeader, table });
-    }
-    return serializeSelectionExportMarkdown({ includeColumnHeader, table });
+  const { format, includeColumnHeader, table } = args;
+  if (table.columnIds.length === 0) {
+    return "";
+  }
+  if (format === "csv") {
+    return serializeSelectionExportCsv({ includeColumnHeader, table });
+  }
+  return serializeSelectionExportMarkdown({ includeColumnHeader, table });
 }
 export function buildSelectionExportFilename(args) {
-    const extension = args.format === "csv" ? "csv" : "md";
-    return `${args.schema}-${args.table}-selection.${extension}`;
+  const extension = args.format === "csv" ? "csv" : "md";
+  return `${args.schema}-${args.table}-selection.${extension}`;
 }
 export function downloadSelectionExport(args) {
-    const { content, filename, format } = args;
-    const blob = new Blob([content], {
-        type: format === "csv"
-            ? "text/csv;charset=utf-8"
-            : "text/markdown;charset=utf-8",
-    });
-    const objectUrl = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = objectUrl;
-    link.download = filename;
-    link.rel = "noopener";
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(objectUrl);
+  const { content, filename, format } = args;
+  const blob = new Blob([content], {
+    type: format === "csv" ? "text/csv;charset=utf-8" : "text/markdown;charset=utf-8",
+  });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  link.rel = "noopener";
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
 }
 function serializeSelectionExportCsv(args) {
-    const { includeColumnHeader, table } = args;
-    const lines = [];
-    if (includeColumnHeader) {
-        lines.push(serializeCsvRow(table.columnIds));
-    }
-    for (const row of table.rows) {
-        lines.push(serializeCsvRow(row));
-    }
-    return lines.join("\n");
+  const { includeColumnHeader, table } = args;
+  const lines = [];
+  if (includeColumnHeader) {
+    lines.push(serializeCsvRow(table.columnIds));
+  }
+  for (const row of table.rows) {
+    lines.push(serializeCsvRow(row));
+  }
+  return lines.join("\n");
 }
 function serializeCsvRow(values) {
-    return values.map(escapeCsvValue).join(",");
+  return values.map(escapeCsvValue).join(",");
 }
 function escapeCsvValue(value) {
-    if (/[",\n\r]/.test(value)) {
-        return `"${value.replaceAll('"', '""')}"`;
-    }
-    return value;
+  if (/[",\n\r]/.test(value)) {
+    return `"${value.replaceAll('"', '""')}"`;
+  }
+  return value;
 }
 function serializeSelectionExportMarkdown(args) {
-    const { includeColumnHeader, table } = args;
-    const lines = [];
-    if (includeColumnHeader) {
-        lines.push(serializeMarkdownRow(table.columnIds));
-        lines.push(`| ${table.columnIds.map(() => "---").join(" | ")} |`);
-    }
-    for (const row of table.rows) {
-        lines.push(serializeMarkdownRow(row));
-    }
-    return lines.join("\n");
+  const { includeColumnHeader, table } = args;
+  const lines = [];
+  if (includeColumnHeader) {
+    lines.push(serializeMarkdownRow(table.columnIds));
+    lines.push(`| ${table.columnIds.map(() => "---").join(" | ")} |`);
+  }
+  for (const row of table.rows) {
+    lines.push(serializeMarkdownRow(row));
+  }
+  return lines.join("\n");
 }
 function serializeMarkdownRow(values) {
-    return `| ${values.map(escapeMarkdownValue).join(" | ")} |`;
+  return `| ${values.map(escapeMarkdownValue).join(" | ")} |`;
 }
 function escapeMarkdownValue(value) {
-    return value
-        .replaceAll("\\", "\\\\")
-        .replaceAll("|", "\\|")
-        .replaceAll("\r\n", "<br />")
-        .replaceAll("\n", "<br />")
-        .replaceAll("\r", "<br />");
+  return value
+    .replaceAll("\\", "\\\\")
+    .replaceAll("|", "\\|")
+    .replaceAll("\r\n", "<br />")
+    .replaceAll("\n", "<br />")
+    .replaceAll("\r", "<br />");
 }
 function stringifySelectionExportValue(value) {
-    if (value == null) {
-        return "";
+  if (value == null) {
+    return "";
+  }
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
     }
-    if (typeof value === "object") {
-        try {
-            return JSON.stringify(value);
-        }
-        catch {
-            return String(value);
-        }
-    }
-    return String(value);
+  }
+  return String(value);
 }

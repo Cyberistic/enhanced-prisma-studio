@@ -15,13 +15,7 @@ interface RowSearchUiState {
 }
 
 export function useActiveTableRowSearch(args: UseActiveTableRowSearchArgs) {
-  const {
-    scopeKey,
-    searchTerm,
-    setPageIndexParam,
-    setSearchParam,
-    supportsFullTableSearch,
-  } = args;
+  const { scopeKey, searchTerm, setPageIndexParam, setSearchParam, supportsFullTableSearch } = args;
   const [rowSearchUiState, setRowSearchUiState] = useUiState<RowSearchUiState>(
     supportsFullTableSearch ? `table-row-search:${scopeKey}` : undefined,
     {
@@ -71,13 +65,7 @@ export function useActiveTableRowSearch(args: UseActiveTableRowSearchArgs) {
     }, 350);
 
     return () => clearTimeout(timeout);
-  }, [
-    searchInput,
-    searchTerm,
-    setPageIndexParam,
-    setSearchParam,
-    supportsFullTableSearch,
-  ]);
+  }, [searchInput, searchTerm, setPageIndexParam, setSearchParam, supportsFullTableSearch]);
 
   const closeRowSearch = useCallback(() => {
     rowSearchInputRef.current?.blur();

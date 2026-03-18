@@ -1,9 +1,4 @@
-import {
-  createCollection,
-  eq,
-  localOnlyCollectionOptions,
-  useLiveQuery,
-} from "@tanstack/react-db";
+import { createCollection, eq, localOnlyCollectionOptions, useLiveQuery } from "@tanstack/react-db";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import shortUUID from "../lib/short-uuid";
@@ -38,9 +33,7 @@ function cloneValue<T>(value: T): T {
 }
 
 function resolveUpdater<T>(previous: T, updater: Updater<T>): T {
-  return typeof updater === "function"
-    ? (updater as (previous: T) => T)(previous)
-    : updater;
+  return typeof updater === "function" ? (updater as (previous: T) => T)(previous) : updater;
 }
 
 export function useStableUiStateKey(prefix: string): string {
@@ -59,9 +52,7 @@ export function useUiState<T>(
   options: UseUiStateOptions = {},
 ) {
   const { cleanupOnUnmount = false } = options;
-  const [volatileValue, setVolatileValue] = useState<T>(() =>
-    cloneValue(initialValue),
-  );
+  const [volatileValue, setVolatileValue] = useState<T>(() => cloneValue(initialValue));
   const previousVolatileKeyRef = useRef<string | undefined>(key);
   const studioContext = useOptionalStudio();
   const uiLocalStateCollection =
@@ -109,9 +100,7 @@ export function useUiState<T>(
   }, [cleanupOnUnmount, initialValue, key]);
 
   const setVolatileStateValue = useCallback((updater: Updater<T>) => {
-    setVolatileValue((previous) =>
-      cloneValue(resolveUpdater(previous, updater)),
-    );
+    setVolatileValue((previous) => cloneValue(resolveUpdater(previous, updater)));
   }, []);
 
   const resetVolatileStateValue = useCallback(() => {
@@ -163,13 +152,7 @@ export function useUiState<T>(
         draft.value = cloneValue(resolveUpdater(previous, updater));
       });
     },
-    [
-      cleanupOnUnmount,
-      initialValue,
-      key,
-      setVolatileStateValue,
-      uiLocalStateCollection,
-    ],
+    [cleanupOnUnmount, initialValue, key, setVolatileStateValue, uiLocalStateCollection],
   );
 
   const resetValue = useCallback(() => {
@@ -193,13 +176,7 @@ export function useUiState<T>(
     uiLocalStateCollection.update(key, (draft) => {
       draft.value = cloneValue(initialValue);
     });
-  }, [
-    cleanupOnUnmount,
-    initialValue,
-    key,
-    resetVolatileStateValue,
-    uiLocalStateCollection,
-  ]);
+  }, [cleanupOnUnmount, initialValue, key, resetVolatileStateValue, uiLocalStateCollection]);
 
   return [
     cleanupOnUnmount

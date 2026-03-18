@@ -12,17 +12,8 @@ interface ApplyAiTableFilterRequestArgs {
   table: Table;
 }
 
-export async function applyAiTableFilterRequest(
-  args: ApplyAiTableFilterRequestArgs,
-) {
-  const {
-    aiFilter,
-    applyEditingFilter,
-    filterOperators,
-    request,
-    setEditingFilter,
-    table,
-  } = args;
+export async function applyAiTableFilterRequest(args: ApplyAiTableFilterRequestArgs) {
+  const { aiFilter, applyEditingFilter, filterOperators, request, setEditingFilter, table } = args;
   const trimmedRequest = request.trim();
 
   if (trimmedRequest.length === 0) {
@@ -38,10 +29,7 @@ export async function applyAiTableFilterRequest(
   const nextFilter = result.filterGroup;
 
   if (nextFilter.filters.length === 0) {
-    throw new Error(
-      result.issues[0]?.message ??
-        "AI response did not contain any valid filters.",
-    );
+    throw new Error(result.issues[0]?.message ?? "AI response did not contain any valid filters.");
   }
 
   setEditingFilter(nextFilter);

@@ -32,8 +32,7 @@ export function createLintDiagnosticsFromSQLiteError(args: {
   }
 
   const code = getSQLiteErrorCode(error);
-  const inferredRange =
-    inferRangeFromMessage(sql, error.message) ?? fallbackRange;
+  const inferredRange = inferRangeFromMessage(sql, error.message) ?? fallbackRange;
 
   return [
     {
@@ -68,9 +67,7 @@ export async function lintSQLiteWithExplainFallback(
 
   for (const statement of validation.statements) {
     try {
-      const explainQuery = asQuery<Record<string, unknown>>(
-        `EXPLAIN ${statement.statement}`,
-      );
+      const explainQuery = asQuery<Record<string, unknown>>(`EXPLAIN ${statement.statement}`);
       const [error] = await executor.execute(explainQuery, options);
 
       if (!error) {
@@ -125,10 +122,7 @@ function getFallbackRange(sqlLength: number): { from: number; to: number } {
   return { from: 0, to: 1 };
 }
 
-function inferRangeFromMessage(
-  sql: string,
-  message: string,
-): { from: number; to: number } | null {
+function inferRangeFromMessage(sql: string, message: string): { from: number; to: number } | null {
   const nearMatch = /near\s+["'`]([^"'`]+)["'`]/i.exec(message);
   if (nearMatch?.[1]) {
     return findTokenRange(sql, nearMatch[1]);
@@ -147,10 +141,7 @@ function inferRangeFromMessage(
   return null;
 }
 
-function findTokenRange(
-  sql: string,
-  rawToken: string,
-): { from: number; to: number } | null {
+function findTokenRange(sql: string, rawToken: string): { from: number; to: number } | null {
   const token = rawToken.trim().replace(/^['"`]|['"`]$/g, "");
 
   if (token.length === 0) {

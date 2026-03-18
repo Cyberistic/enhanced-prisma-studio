@@ -5,14 +5,9 @@ import { useStudio } from "../studio/context";
 import { useNavigation } from "./use-navigation";
 
 export function usePagination() {
-  const { pageIndexParam, setPageIndexParam, setPageSizeParam } =
-    useNavigation();
-  const {
-    isInfiniteScrollEnabled,
-    setInfiniteScrollEnabled,
-    setTablePageSize,
-    tablePageSize,
-  } = useStudio();
+  const { pageIndexParam, setPageIndexParam, setPageSizeParam } = useNavigation();
+  const { isInfiniteScrollEnabled, setInfiniteScrollEnabled, setTablePageSize, tablePageSize } =
+    useStudio();
 
   const normalizedPageIndex = Number.isSafeInteger(Number(pageIndexParam))
     ? Math.max(0, Number(pageIndexParam))
@@ -37,13 +32,7 @@ export function usePagination() {
         setTablePageSize(updaterOrValue.pageSize);
       }
     },
-    [
-      normalizedPageIndex,
-      setPageIndexParam,
-      setPageSizeParam,
-      setTablePageSize,
-      tablePageSize,
-    ],
+    [normalizedPageIndex, setPageIndexParam, setPageSizeParam, setTablePageSize, tablePageSize],
   );
 
   return {

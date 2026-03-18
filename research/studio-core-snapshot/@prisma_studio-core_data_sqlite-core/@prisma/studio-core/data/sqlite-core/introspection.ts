@@ -80,11 +80,7 @@ export function getTablesQuery(
 ) {
   return compile(
     getSQLiteBuilder<Database>(requirements)
-      .selectFrom(
-        expressionBuilder()
-          .fn<PragmaTableList>("pragma_table_list", [])
-          .as("tl"),
-      )
+      .selectFrom(expressionBuilder().fn<PragmaTableList>("pragma_table_list", []).as("tl"))
       .leftJoin("sqlite_schema as ss", (jb) =>
         jb.onRef("ss.type", "=", "tl.type").onRef("ss.name", "=", "tl.name"),
       )
@@ -99,17 +95,9 @@ export function getTablesQuery(
       .select((eb) => [
         jsonArrayFrom(
           eb
-            .selectFrom(
-              eb
-                .fn<PragmaTableXInfo>("pragma_table_xinfo", ["tl.name"])
-                .as("txi"),
-            )
+            .selectFrom(eb.fn<PragmaTableXInfo>("pragma_table_xinfo", ["tl.name"]).as("txi"))
             .leftJoin(
-              eb
-                .fn<PragmaForeignKeyList>("pragma_foreign_key_list", [
-                  "tl.name",
-                ])
-                .as("fkl"),
+              eb.fn<PragmaForeignKeyList>("pragma_foreign_key_list", ["tl.name"]).as("fkl"),
               "fkl.from",
               "txi.name",
             )

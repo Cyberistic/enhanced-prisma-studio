@@ -21,33 +21,18 @@ export interface BooleanInputProps {
 }
 
 export function BooleanInput(props: BooleanInputProps) {
-  const {
-    column,
-    context,
-    onNavigate,
-    onSubmit,
-    readonly,
-    showSaveAction,
-    value,
-  } = props;
+  const { column, context, onNavigate, onSubmit, readonly, showSaveAction, value } = props;
   const { defaultValue, fkColumn, isRequired } = column;
 
-  const indeterminateValue =
-    context === "insert" && defaultValue != null ? undefined : null;
+  const indeterminateValue = context === "insert" && defaultValue != null ? undefined : null;
 
   const valueWithDefaults =
-    value == null
-      ? isRequired && !fkColumn
-        ? DEFAULT_BOOLEAN
-        : "indeterminate"
-      : Boolean(value);
+    value == null ? (isRequired && !fkColumn ? DEFAULT_BOOLEAN : "indeterminate") : Boolean(value);
 
   const inputStateKey = useStableUiStateKey("boolean-input");
-  const [inputValue, setInputValue] = useUiState<CheckedState>(
-    inputStateKey,
-    valueWithDefaults,
-    { cleanupOnUnmount: true },
-  );
+  const [inputValue, setInputValue] = useUiState<CheckedState>(inputStateKey, valueWithDefaults, {
+    cleanupOnUnmount: true,
+  });
 
   const { handleCancel, handleKeyDown, handleSave } = usePopoverActions({
     onNavigate,
@@ -56,9 +41,7 @@ export function BooleanInput(props: BooleanInputProps) {
         return false;
       }
 
-      onSubmit(
-        inputValue === "indeterminate" ? indeterminateValue : inputValue,
-      );
+      onSubmit(inputValue === "indeterminate" ? indeterminateValue : inputValue);
 
       return true;
     },
@@ -74,9 +57,7 @@ export function BooleanInput(props: BooleanInputProps) {
           disabled={readonly}
           id="boolean-input"
           onCheckedChange={() =>
-            setInputValue((prev) =>
-              !isRequired && prev === true ? "indeterminate" : !prev,
-            )
+            setInputValue((prev) => (!isRequired && prev === true ? "indeterminate" : !prev))
           }
         />
         <Label htmlFor="boolean-input">

@@ -1,12 +1,6 @@
 import type { DataType } from "../adapter";
 
-export type SQLiteAffinity =
-  | "BLOB"
-  | "INTEGER"
-  | "NULL"
-  | "NUMERIC"
-  | "REAL"
-  | "TEXT";
+export type SQLiteAffinity = "BLOB" | "INTEGER" | "NULL" | "NUMERIC" | "REAL" | "TEXT";
 
 export const SQLITE_AFFINITY_TO_METADATA: Record<
   SQLiteAffinity,
@@ -37,9 +31,7 @@ export const SQLITE_AFFINITY_TO_METADATA: Record<
  *
  * DO NOT CHANGE THE ORDER OF THE CHECKS IN THIS FUNCTION!
  */
-export function determineColumnAffinity(
-  declaredDataType: string | null,
-): SQLiteAffinity {
+export function determineColumnAffinity(declaredDataType: string | null): SQLiteAffinity {
   if (!declaredDataType) {
     return "BLOB";
   }
@@ -50,11 +42,7 @@ export function determineColumnAffinity(
     return "INTEGER";
   }
 
-  if (
-    upperType.includes("TEXT") ||
-    upperType.includes("CHAR") ||
-    upperType.includes("CLOB")
-  ) {
+  if (upperType.includes("TEXT") || upperType.includes("CHAR") || upperType.includes("CLOB")) {
     return "TEXT";
   }
 
@@ -62,11 +50,7 @@ export function determineColumnAffinity(
     return "BLOB";
   }
 
-  if (
-    upperType.includes("REAL") ||
-    upperType.includes("FLOA") ||
-    upperType.includes("DOUB")
-  ) {
+  if (upperType.includes("REAL") || upperType.includes("FLOA") || upperType.includes("DOUB")) {
     return "REAL";
   }
 

@@ -1,11 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Header, useReactTable } from "@tanstack/react-table";
-import {
-  type ComponentPropsWithoutRef,
-  CSSProperties,
-  PropsWithChildren,
-} from "react";
+import { type ComponentPropsWithoutRef, CSSProperties, PropsWithChildren } from "react";
 
 import { TableHead } from "@/ui/components/ui/table";
 import { cn } from "@/ui/lib/utils";
@@ -18,35 +14,16 @@ type DraggableHeaderCellProps = PropsWithChildren<{
 }> &
   Omit<ComponentPropsWithoutRef<typeof TableHead>, "className" | "style">;
 
-export const DataGridDraggableHeaderCell = (
-  props: DraggableHeaderCellProps,
-) => {
-  const {
-    children,
-    className,
-    header,
-    style: commonStyle,
-    table,
-    ...tableHeadProps
-  } = props;
+export const DataGridDraggableHeaderCell = (props: DraggableHeaderCellProps) => {
+  const { children, className, header, style: commonStyle, table, ...tableHeadProps } = props;
 
-  const {
-    attributes,
-    listeners,
-    transform,
-    transition,
-    setNodeRef,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, transform, transition, setNodeRef, isDragging } = useSortable({
     id: header.id,
   });
 
   const shouldPreviewReorder = Boolean(
-    (
-      table.options.meta as
-        | { isColumnReorderPreviewEnabled?: boolean }
-        | undefined
-    )?.isColumnReorderPreviewEnabled,
+    (table.options.meta as { isColumnReorderPreviewEnabled?: boolean } | undefined)
+      ?.isColumnReorderPreviewEnabled,
   );
   const shouldSuppressReorderTransform = !isDragging && !shouldPreviewReorder;
 
@@ -57,9 +34,7 @@ export const DataGridDraggableHeaderCell = (
     ...commonStyle,
     cursor: "grab",
     touchAction: "none",
-    transform:
-      [commonStyle?.transform, dragTransform].filter(Boolean).join(" ") ||
-      undefined,
+    transform: [commonStyle?.transform, dragTransform].filter(Boolean).join(" ") || undefined,
     transition: shouldSuppressReorderTransform ? undefined : transition,
   } as CSSProperties;
 

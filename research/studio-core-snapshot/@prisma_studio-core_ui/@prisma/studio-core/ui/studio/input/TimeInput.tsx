@@ -23,15 +23,7 @@ export interface TimeInputProps {
 }
 
 export function TimeInput(props: TimeInputProps) {
-  const {
-    column,
-    context,
-    onNavigate,
-    onSubmit,
-    readonly,
-    showSaveAction,
-    value,
-  } = props;
+  const { column, context, onNavigate, onSubmit, readonly, showSaveAction, value } = props;
   const { datatype, fkColumn, isRequired } = column;
   const { format } = datatype;
 
@@ -40,11 +32,7 @@ export function TimeInput(props: TimeInputProps) {
   }
 
   const valueAsString =
-    value == null
-      ? isRequired && !fkColumn
-        ? getDate0(format)
-        : ""
-      : String(value);
+    value == null ? (isRequired && !fkColumn ? getDate0(format) : "") : String(value);
 
   const emptyValue =
     context === "insert" && column.defaultValue != null
@@ -65,13 +53,10 @@ export function TimeInput(props: TimeInputProps) {
       const hasTimezone = /[+-]\d{2}(:\d{2})?$/.test(inputValue);
       const date = dayjs(`2000-01-01 ${inputValue}`);
       if (date.isValid()) {
-        return (
-          date.format("h:mm A") + (hasTimezone ? ` (${date.format("Z")})` : "")
-        );
+        return date.format("h:mm A") + (hasTimezone ? ` (${date.format("Z")})` : "");
       }
 
-      const timeRegex =
-        /(\d{1,2}):(\d{2}):(\d{2})(?:\.\d+)?([+-]\d{2}(?::\d{2})?)?/;
+      const timeRegex = /(\d{1,2}):(\d{2}):(\d{2})(?:\.\d+)?([+-]\d{2}(?::\d{2})?)?/;
       const match = inputValue.match(timeRegex);
       if (match) {
         const hours = parseInt(match[1] || "12", 10);
@@ -93,9 +78,7 @@ export function TimeInput(props: TimeInputProps) {
     onNavigate,
     onSave: () => {
       const formattedInputValue =
-        !inputValue && isRequired && !fkColumn
-          ? getDate0(format)
-          : formatTime(inputValue, format);
+        !inputValue && isRequired && !fkColumn ? getDate0(format) : formatTime(inputValue, format);
       const formattedValue = formatTime(valueAsString, format);
 
       if (formattedInputValue !== formattedValue) {
@@ -124,9 +107,7 @@ export function TimeInput(props: TimeInputProps) {
       {inputValue && inputValue !== formattedTime ? (
         <div className="flex flex-col gap-1 p-2 border-t border-table-border">
           <div className="text-xs text-muted-foreground">Formatted value</div>
-          <div className="text-xs font-mono text-foreground">
-            {formattedTime}
-          </div>
+          <div className="text-xs font-mono text-foreground">{formattedTime}</div>
         </div>
       ) : null}
       <InputActions

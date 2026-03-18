@@ -33,9 +33,11 @@ function resolveLogTable(schemaTables: SchemaTables) {
     return exactMatch;
   }
 
-  return tableNames.find(
-    (tableName) => tableName.toLowerCase() === AUDIT_LOG_TABLE_NAME.toLowerCase(),
-  ) ?? null;
+  return (
+    tableNames.find(
+      (tableName) => tableName.toLowerCase() === AUDIT_LOG_TABLE_NAME.toLowerCase(),
+    ) ?? null
+  );
 }
 
 function resolveUserTable(schemaTables: SchemaTables) {
@@ -52,7 +54,9 @@ function getTimestampColumnName(columns: string[]) {
   const priority = ["timestamp", "createdAt", "created_at", "loggedAt", "time"];
 
   for (const candidate of priority) {
-    const match = columns.find((columnName) => columnName.toLowerCase() === candidate.toLowerCase());
+    const match = columns.find(
+      (columnName) => columnName.toLowerCase() === candidate.toLowerCase(),
+    );
     if (match) {
       return match;
     }
@@ -124,7 +128,12 @@ function summarizeChanges(oldData: unknown, newData: unknown) {
     return "Deleted record payload";
   }
 
-  if (typeof oldData === "object" && oldData != null && typeof newData === "object" && newData != null) {
+  if (
+    typeof oldData === "object" &&
+    oldData != null &&
+    typeof newData === "object" &&
+    newData != null
+  ) {
     const oldKeys = Object.keys(oldData as Record<string, unknown>);
     const newKeys = Object.keys(newData as Record<string, unknown>);
     const keyCount = new Set([...oldKeys, ...newKeys]).size;
@@ -154,7 +163,8 @@ export function LogsView(props: {
   schema: string;
   schemaTables: SchemaTables;
 }) {
-  const { adapter, isIntrospecting, isNavigationOpen, onToggleNavigation, schema, schemaTables } = props;
+  const { adapter, isIntrospecting, isNavigationOpen, onToggleNavigation, schema, schemaTables } =
+    props;
   const [rows, setRows] = useState<AuditLogRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -225,7 +235,8 @@ export function LogsView(props: {
 
   const logEvents = useMemo<LogEventRow[]>(() => {
     return rows.map((row) => {
-      const shortEntityId = row.entityId.length > 14 ? `${row.entityId.slice(0, 14)}...` : row.entityId;
+      const shortEntityId =
+        row.entityId.length > 14 ? `${row.entityId.slice(0, 14)}...` : row.entityId;
       return {
         action: row.action,
         createdAtLabel: formatTimestamp(row.createdAt),
@@ -233,7 +244,7 @@ export function LogsView(props: {
         entity: row.entity,
         entityId: shortEntityId,
         summary: summarizeChanges(row.oldData, row.newData),
-        userLabel: row.userName?.trim() ? row.userName : row.userId ?? "system",
+        userLabel: row.userName?.trim() ? row.userName : (row.userId ?? "system"),
         oldData: row.oldData,
         newData: row.newData,
       };
@@ -268,7 +279,8 @@ export function LogsView(props: {
           <div className="text-xs text-muted-foreground">
             Logs · schema: <span className="font-mono text-foreground/80">{schema}</span>
             <span className="mx-1 text-foreground/40">·</span>
-            table: <span className="font-mono text-foreground/80">{logTableName ?? "not configured"}</span>
+            table:{" "}
+            <span className="font-mono text-foreground/80">{logTableName ?? "not configured"}</span>
           </div>
         </StudioHeader>
 
@@ -283,10 +295,11 @@ export function LogsView(props: {
             <div className="rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
               <p className="font-medium">Log table not found in current schema.</p>
               <p className="mt-2 text-xs text-destructive/90">
-                Add the model below to your Prisma schema, run a migration (or `prisma db push`), and regenerate Prisma Client.
+                Add the model below to your Prisma schema, run a migration (or `prisma db push`),
+                and regenerate Prisma Client.
               </p>
               <pre className="mt-3 overflow-auto rounded bg-background/60 p-3 text-[11px] leading-5 text-foreground/90">
-{`model AuditLog {
+                {`model AuditLog {
   id        String   @id @default(cuid())
   action    String   // e.g., "CREATE", "UPDATE", "DELETE"
   entity    String   // e.g., "User", "Post"
@@ -312,8 +325,8 @@ export function LogsView(props: {
             <div className="rounded-md border border-border/70 bg-muted/20 px-3 py-3 text-xs text-muted-foreground">
               <p>AuditLog table exists but has no rows.</p>
               <p className="mt-1">
-                Add Prisma Client log handlers (`prisma.$on(...)`) and persist events into `AuditLog`. See
-                {" "}
+                Add Prisma Client log handlers (`prisma.$on(...)`) and persist events into
+                `AuditLog`. See{" "}
                 <a
                   href="https://www.prisma.io/docs/orm/prisma-client/observability-and-logging/logging"
                   target="_blank"
@@ -351,18 +364,30 @@ export function LogsView(props: {
                               {event.action}
                             </Badge>
                           </TableCell>
-                          <TableCell className="font-mono text-xs text-muted-foreground">{event.entity}</TableCell>
+                          <TableCell className="font-mono text-xs text-muted-foreground">
+                            {event.entity}
+                          </TableCell>
                           <TableCell className="text-sm">{event.summary}</TableCell>
-                          <TableCell className="font-mono text-xs text-muted-foreground" title={event.entityId}>
+                          <TableCell
+                            className="font-mono text-xs text-muted-foreground"
+                            title={event.entityId}
+                          >
                             {event.entityId}
                           </TableCell>
-                          <TableCell className="font-mono text-xs text-muted-foreground" title={event.createdAtRaw}>
+                          <TableCell
+                            className="font-mono text-xs text-muted-foreground"
+                            title={event.createdAtRaw}
+                          >
                             <button
                               type="button"
                               className="inline-flex items-center gap-1 rounded-sm px-1 py-0.5 hover:bg-muted"
                               onClick={() => toggleRowExpanded(rowIndex)}
                             >
-                              {isExpanded ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
+                              {isExpanded ? (
+                                <ChevronDown className="size-3" />
+                              ) : (
+                                <ChevronRight className="size-3" />
+                              )}
                               {event.createdAtLabel}
                             </button>
                           </TableCell>
@@ -372,13 +397,17 @@ export function LogsView(props: {
                             <TableCell colSpan={6} className="p-3">
                               <div className="grid gap-3 md:grid-cols-2">
                                 <div>
-                                  <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Old Data</div>
+                                  <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                    Old Data
+                                  </div>
                                   <pre className="max-h-52 overflow-auto rounded border border-border/70 bg-background p-2 font-mono text-[11px] leading-5">
                                     {formatJsonBlock(event.oldData)}
                                   </pre>
                                 </div>
                                 <div>
-                                  <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">New Data</div>
+                                  <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                    New Data
+                                  </div>
                                   <pre className="max-h-52 overflow-auto rounded border border-border/70 bg-background p-2 font-mono text-[11px] leading-5">
                                     {formatJsonBlock(event.newData)}
                                   </pre>

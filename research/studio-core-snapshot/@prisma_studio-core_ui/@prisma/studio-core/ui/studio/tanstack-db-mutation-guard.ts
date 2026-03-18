@@ -1,9 +1,7 @@
 import { hasWindow } from "std-env";
 
 const DEFAULT_MAX_MUTATIONS_PER_TICK = 120;
-const INSTRUMENTED_SYMBOL = Symbol(
-  "prisma.studio.tanstack_db_mutation_guard.instrumented",
-);
+const INSTRUMENTED_SYMBOL = Symbol("prisma.studio.tanstack_db_mutation_guard.instrumented");
 
 type MutationMethod = "insert" | "update" | "delete";
 
@@ -85,8 +83,7 @@ export function createTanStackDbMutationBurstGuard(
   options: TanStackDbMutationBurstGuardOptions = {},
 ): TanStackDbMutationBurstGuard {
   const enabled = options.enabled ?? process.env.NODE_ENV === "development";
-  const maxMutationsPerTick =
-    options.maxMutationsPerTick ?? DEFAULT_MAX_MUTATIONS_PER_TICK;
+  const maxMutationsPerTick = options.maxMutationsPerTick ?? DEFAULT_MAX_MUTATIONS_PER_TICK;
   const mode = options.mode ?? "warn";
   const onViolation = options.onViolation;
 
@@ -167,10 +164,7 @@ interface StrictModeWindow extends Window {
 }
 
 function isStrictModeEnabledFromWindow(): boolean {
-  return (
-    hasWindow &&
-    (window as StrictModeWindow).__PRISMA_STUDIO_STRICT_TANSTACK_DB__ === true
-  );
+  return hasWindow && (window as StrictModeWindow).__PRISMA_STUDIO_STRICT_TANSTACK_DB__ === true;
 }
 
 function shouldInstallDefaultInstrumentation(): boolean {

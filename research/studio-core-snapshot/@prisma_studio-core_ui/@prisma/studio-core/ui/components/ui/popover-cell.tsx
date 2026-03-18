@@ -45,12 +45,9 @@ const PopoverCell = ({
     },
     [isControlled, onOpenChange],
   );
-  const registerInteractOutsideAction = useCallback(
-    (action: (() => void) | null) => {
-      interactOutsideActionRef.current = action;
-    },
-    [],
-  );
+  const registerInteractOutsideAction = useCallback((action: (() => void) | null) => {
+    interactOutsideActionRef.current = action;
+  }, []);
   const commitInteractOutside = useCallback(() => {
     interactOutsideActionRef.current?.();
   }, []);
@@ -72,9 +69,7 @@ const PopoverCell = ({
 };
 PopoverCell.displayName = "PopoverCell";
 
-type PopoverCellTriggerProps = React.ComponentPropsWithoutRef<
-  typeof PopoverPrimitive.Trigger
->;
+type PopoverCellTriggerProps = React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger>;
 
 const PopoverCellTrigger = forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Trigger>,
@@ -127,52 +122,41 @@ PopoverCellTrigger.displayName = "PopoverCellTrigger";
 const PopoverCellContent = forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
->(
-  (
-    {
-      className,
-      align = "center",
-      onInteractOutside,
-      sideOffset = 4,
-      ...props
-    },
-    ref,
-  ) => {
-    const context = useContext(PopoverCellContext);
+>(({ className, align = "center", onInteractOutside, sideOffset = 4, ...props }, ref) => {
+  const context = useContext(PopoverCellContext);
 
-    return (
-      <PopoverPrimitive.Portal>
-        <div className="ps">
-          <PopoverPrimitive.Content
-            {...props}
-            align={align}
-            className={cn(
-              "flex flex-col gap-2 z-50 border border-border bg-popover text-popover-foreground shadow-md outline-none",
-              className,
-            )}
-            data-studio-cell-editor="true"
-            onCloseAutoFocus={(event) => {
-              event.preventDefault();
-            }}
-            onInteractOutside={(event) => {
-              onInteractOutside?.(event);
+  return (
+    <PopoverPrimitive.Portal>
+      <div className="ps">
+        <PopoverPrimitive.Content
+          {...props}
+          align={align}
+          className={cn(
+            "flex flex-col gap-2 z-50 border border-border bg-popover text-popover-foreground shadow-md outline-none",
+            className,
+          )}
+          data-studio-cell-editor="true"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+          }}
+          onInteractOutside={(event) => {
+            onInteractOutside?.(event);
 
-              if (event.defaultPrevented) {
-                return;
-              }
+            if (event.defaultPrevented) {
+              return;
+            }
 
-              context?.commitInteractOutside();
-            }}
-            // we are handling this ourselves, do not let radix take over
-            onEscapeKeyDown={(event) => event.preventDefault()}
-            ref={ref}
-            sideOffset={sideOffset}
-          />
-        </div>
-      </PopoverPrimitive.Portal>
-    );
-  },
-);
+            context?.commitInteractOutside();
+          }}
+          // we are handling this ourselves, do not let radix take over
+          onEscapeKeyDown={(event) => event.preventDefault()}
+          ref={ref}
+          sideOffset={sideOffset}
+        />
+      </div>
+    </PopoverPrimitive.Portal>
+  );
+});
 PopoverCellContent.displayName = PopoverPrimitive.Content.displayName;
 
 function shouldSuppressCellOpen(event: MouseEvent<HTMLElement>): boolean {
@@ -227,10 +211,7 @@ export function usePopoverActions(actions: {
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent | ReactKeyboardEvent<HTMLElement>) => {
-      if (
-        (event.key === "Enter" || event.key === "Return") &&
-        !event.shiftKey
-      ) {
+      if ((event.key === "Enter" || event.key === "Return") && !event.shiftKey) {
         event.preventDefault();
         event.stopPropagation();
         handleSave();
@@ -287,10 +268,7 @@ export function usePopoverActions(actions: {
 }
 
 function blurActiveElement() {
-  if (
-    document.activeElement instanceof HTMLElement &&
-    document.activeElement !== document.body
-  ) {
+  if (document.activeElement instanceof HTMLElement && document.activeElement !== document.body) {
     document.activeElement.blur();
   }
 }

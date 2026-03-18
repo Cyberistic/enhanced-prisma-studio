@@ -25,39 +25,40 @@ export function parseStudioHash(hash: string): StudioUrlState {
   const viewParam = params.get("view");
   const schemaParam = params.get("schema");
   const tableParam = params.get("table");
-  const sortOrderParam = params
-    .get("sort")
-    ?.split(",")
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0)
-    .map((value) => {
-      const [column, direction] = value.split(":");
-      const normalizedDirection = direction === "desc" ? "desc" : direction === "asc" ? "asc" : null;
+  const sortOrderParam =
+    params
+      .get("sort")
+      ?.split(",")
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0)
+      .map((value) => {
+        const [column, direction] = value.split(":");
+        const normalizedDirection =
+          direction === "desc" ? "desc" : direction === "asc" ? "asc" : null;
 
-      if (!column || !normalizedDirection) {
-        return null;
-      }
+        if (!column || !normalizedDirection) {
+          return null;
+        }
 
-      return {
-        column,
-        direction: normalizedDirection,
-      } satisfies SortOrderItem;
-    })
-    .filter((value): value is SortOrderItem => value != null) ?? [];
-  const pinnedColumnsParam = params
-    .get("pin")
-    ?.split(",")
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0) ?? [];
+        return {
+          column,
+          direction: normalizedDirection,
+        } satisfies SortOrderItem;
+      })
+      .filter((value): value is SortOrderItem => value != null) ?? [];
+  const pinnedColumnsParam =
+    params
+      .get("pin")
+      ?.split(",")
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0) ?? [];
 
   return {
     pinnedColumnsParam,
     schemaParam: schemaParam ?? DEFAULT_STUDIO_URL_STATE.schemaParam,
     sortOrderParam,
     tableParam,
-    viewParam: isStudioView(viewParam)
-      ? viewParam
-      : DEFAULT_STUDIO_URL_STATE.viewParam,
+    viewParam: isStudioView(viewParam) ? viewParam : DEFAULT_STUDIO_URL_STATE.viewParam,
   };
 }
 
@@ -73,9 +74,7 @@ export function createStudioHash(state: StudioUrlState): string {
   if (state.sortOrderParam.length > 0) {
     params.set(
       "sort",
-      state.sortOrderParam
-        .map((item) => `${item.column}:${item.direction}`)
-        .join(","),
+      state.sortOrderParam.map((item) => `${item.column}:${item.direction}`).join(","),
     );
   }
 

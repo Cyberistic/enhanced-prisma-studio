@@ -27,10 +27,7 @@ export function useActiveTableInsert() {
         throw new Error("Active table is not available");
       }
 
-      const [error, result] = await adapter.insert(
-        { rows, table: activeTable },
-        {},
-      );
+      const [error, result] = await adapter.insert({ rows, table: activeTable }, {});
 
       if (error) {
         onEvent({

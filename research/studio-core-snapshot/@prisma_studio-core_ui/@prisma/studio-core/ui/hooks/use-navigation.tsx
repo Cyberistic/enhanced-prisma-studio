@@ -1,10 +1,4 @@
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-} from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo } from "react";
 
 import { Adapter, AdapterIntrospectResult } from "@/data";
 
@@ -35,10 +29,7 @@ export function createUrl(values: UrlValues) {
   return `#${params}`;
 }
 
-function getDefaultParams(args: {
-  adapter: Adapter;
-  introspection: AdapterIntrospectResult;
-}) {
+function getDefaultParams(args: { adapter: Adapter; introspection: AdapterIntrospectResult }) {
   const { adapter, introspection } = args;
   const { schemas } = introspection;
   const { defaultSchema } = adapter;
@@ -106,9 +97,7 @@ function useNavigationInternal() {
     const nextRows = buildNavigationTableNames(introspection);
     const nextRowsById = new Map(nextRows.map((row) => [row.id, row]));
     const existingRows = Array.from(navigationTableNamesCollection.toArray);
-    const staleIds = existingRows
-      .map((row) => row.id)
-      .filter((id) => !nextRowsById.has(id));
+    const staleIds = existingRows.map((row) => row.id).filter((id) => !nextRowsById.has(id));
 
     if (staleIds.length > 0) {
       navigationTableNamesCollection.delete(staleIds);
@@ -166,20 +155,13 @@ function useNavigationInternal() {
   });
 
   // If URL params are stale from a previous database, fall back to current defaults.
-  const resolvedSchemaParam =
-    schemaParam && schemas[schemaParam] ? schemaParam : defaults.schema;
-  const activeSchema = resolvedSchemaParam
-    ? schemas[resolvedSchemaParam]
-    : undefined;
+  const resolvedSchemaParam = schemaParam && schemas[schemaParam] ? schemaParam : defaults.schema;
+  const activeSchema = resolvedSchemaParam ? schemas[resolvedSchemaParam] : undefined;
   const activeTables = activeSchema ? activeSchema.tables : undefined;
   const resolvedTableParam =
-    tableParam && activeTables?.[tableParam]
-      ? tableParam
-      : Object.keys(activeTables ?? {})[0];
+    tableParam && activeTables?.[tableParam] ? tableParam : Object.keys(activeTables ?? {})[0];
   const activeTable =
-    activeTables && resolvedTableParam
-      ? activeTables[resolvedTableParam]
-      : undefined;
+    activeTables && resolvedTableParam ? activeTables[resolvedTableParam] : undefined;
 
   const metadata = useMemo(
     () => ({
@@ -217,33 +199,23 @@ function useNavigationInternal() {
   };
 }
 
-const NavigationContext = createContext<
-  ReturnType<typeof useNavigationInternal> | undefined
->(undefined);
+const NavigationContext = createContext<ReturnType<typeof useNavigationInternal> | undefined>(
+  undefined,
+);
 
 /**
  * useNavigationInternal is placed into a single context to minimize re-renders.
  */
-export function NavigationContextProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function NavigationContextProvider({ children }: { children: ReactNode }) {
   const navigation = useNavigationInternal();
 
-  return (
-    <NavigationContext.Provider value={navigation}>
-      {children}
-    </NavigationContext.Provider>
-  );
+  return <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>;
 }
 
 export function useNavigation() {
   const context = useContext(NavigationContext);
   if (context === undefined) {
-    throw new Error(
-      "useNavigationContext must be used within a NavigationContextProvider",
-    );
+    throw new Error("useNavigationContext must be used within a NavigationContextProvider");
   }
   return context;
 }

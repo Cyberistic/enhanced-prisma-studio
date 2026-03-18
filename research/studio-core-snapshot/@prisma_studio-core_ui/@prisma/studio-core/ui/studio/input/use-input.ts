@@ -10,15 +10,11 @@ export function useInput(props: UseInputProps) {
   const fallbackKey = useStableUiStateKey("studio-input");
   const resolvedKey = stateKey ?? fallbackKey;
 
-  const [value, setValue] = useUiState<string>(
-    resolvedKey,
-    initialValue ?? "",
-    { cleanupOnUnmount: true },
-  );
+  const [value, setValue] = useUiState<string>(resolvedKey, initialValue ?? "", {
+    cleanupOnUnmount: true,
+  });
 
-  const handleOnChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setValue(event.target.value);
   };
 

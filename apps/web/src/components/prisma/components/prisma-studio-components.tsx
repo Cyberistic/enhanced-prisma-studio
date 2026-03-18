@@ -1,10 +1,4 @@
-import {
-  Children,
-  Fragment,
-  isValidElement,
-  type ReactElement,
-  type ReactNode,
-} from "react";
+import { Children, Fragment, isValidElement, type ReactElement, type ReactNode } from "react";
 
 import { IconSearch, IconTable } from "@/components/prisma/icons";
 import { cn } from "@/lib/utils";
@@ -13,11 +7,7 @@ import { useAdapter } from "../providers/adapters";
 import { useURLProvider } from "../providers/url";
 import { usePrismaStudioTheme } from "./prisma-studio-context";
 import { StudioShell } from "./studio/studio";
-import type {
-  StudioSectionDefinition,
-  StudioView,
-  StudioViewDefinition,
-} from "./studio/types";
+import type { StudioSectionDefinition, StudioView, StudioViewDefinition } from "./studio/types";
 
 type PrismaStudioLayoutProps = {
   children: ReactNode;
@@ -177,10 +167,7 @@ type PrismaTablesSearchHeaderType = {
   __studioHandlesSearch?: boolean;
 };
 
-export function PrismaTablesSearchHeader(props: {
-  className?: string;
-  onSearch?: () => void;
-}) {
+export function PrismaTablesSearchHeader(props: { className?: string; onSearch?: () => void }) {
   const { className, onSearch } = props;
 
   return (

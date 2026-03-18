@@ -2,17 +2,12 @@ import { mkdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import dotenv from "dotenv";
-
 import { createStudioRequestExecutor } from "../../shared/studio-executor";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const testSuiteRoot = path.resolve(scriptDir, "../../..");
-const workspaceRoot = path.resolve(testSuiteRoot, "../..");
 
-dotenv.config({ path: path.join(workspaceRoot, "apps/web/.env") });
-
-const dbFilePath = path.join(testSuiteRoot, "tmp", "sqlite", "provider-test.db");
+const dbFilePath = path.join(testSuiteRoot, "test-suite", "tmp", "sqlite", "provider-test.db");
 const databaseUrl = `file:${dbFilePath}`;
 
 async function main() {

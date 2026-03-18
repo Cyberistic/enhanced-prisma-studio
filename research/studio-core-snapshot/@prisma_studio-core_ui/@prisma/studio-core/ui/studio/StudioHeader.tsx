@@ -22,9 +22,7 @@ export function StudioHeader(props: StudioHeaderProps) {
       <div className="flex w-full items-center gap-3">
         <div className="flex min-w-0 grow items-center gap-2">
           <Button
-            aria-label={
-              isNavigationOpen ? "Close navigation" : "Open navigation"
-            }
+            aria-label={isNavigationOpen ? "Close navigation" : "Open navigation"}
             variant="outline"
             size="icon"
             onClick={toggleNavigation}

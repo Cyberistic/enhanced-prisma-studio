@@ -19,16 +19,7 @@ export interface EnumInputProps {
 }
 
 export function EnumInput(props: EnumInputProps) {
-  const {
-    column,
-    context,
-    onNavigate,
-    onSubmit,
-    options,
-    readonly,
-    showSaveAction,
-    value,
-  } = props;
+  const { column, context, onNavigate, onSubmit, options, readonly, showSaveAction, value } = props;
   const { defaultValue, nullable } = column;
 
   const inputStateKey = useStableUiStateKey("enum-input");
