@@ -1,11 +1,14 @@
 generator client {
-  provider     = "prisma-client"
-  output       = "../generated"
-  moduleFormat = "esm"
+  provider        = "prisma-client"
+  output          = "../../node_modules/.prisma/client"
+  previewFeatures = ["driverAdapters"]
+  runtime         = "cloudflare"
+  moduleFormat    = "esm"
 }
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model User {

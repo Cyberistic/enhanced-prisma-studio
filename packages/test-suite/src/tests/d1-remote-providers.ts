@@ -7,6 +7,7 @@ import { createSQLiteBunSqlProvider } from "../../../../apps/web/src/components/
 import { createSQLiteCloudflareD1Provider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/cloudflare-d1";
 import { createSQLiteDrizzleProvider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/drizzle";
 import { createSQLiteKyselyProvider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/kysely";
+import { createSQLitePrismaD1Provider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/prisma-d1";
 import { createSQLitePrismaRawProvider } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/prisma-raw";
 import type { SQLiteProviderFactory } from "../../../../apps/web/src/components/prisma/providers/adapters/db/sqlite/types";
 import { createD1StudioRequestExecutor } from "../shared/d1-http-executor";
@@ -39,6 +40,7 @@ const packageRoot = testSuiteRoot;
 const d1DbName = process.env.D1_TEST_DB_NAME ?? "eps-provider-test";
 const initToken = process.env.CLOUDFLARE_API_TOKEN ?? process.env.VITE_CLOUDFLARE_API_TOKEN;
 const initAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+const workerUrl = process.env.PRISMA_D1_WORKER_URL;
 
 function getCloudflareAuth() {
   const cloudflareApiToken =
@@ -233,6 +235,18 @@ async function main() {
       name: "cloudflare-d1",
     },
   ];
+
+  if (workerUrl) {
+    providers.push({
+      create: createSQLitePrismaD1Provider,
+      env: {
+        PRISMA_D1_WORKER_URL: workerUrl,
+      },
+      name: "prisma-d1",
+    });
+  } else {
+    console.log("Skipping prisma-d1 provider test: PRISMA_D1_WORKER_URL not set");
+  }
 
   const baselineProvider = providers[0]!;
   const baselineSnapshot = await captureProviderSnapshot(baselineProvider, executeStudioRequest);
