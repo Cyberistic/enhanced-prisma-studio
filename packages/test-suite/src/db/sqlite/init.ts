@@ -7,7 +7,7 @@ import { createStudioRequestExecutor } from "../../shared/studio-executor";
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const testSuiteRoot = path.resolve(scriptDir, "../../..");
 
-const dbFilePath = path.join(testSuiteRoot, "test-suite", "tmp", "sqlite", "provider-test.db");
+const dbFilePath = path.join(testSuiteRoot, "tmp", "sqlite", "provider-test.db");
 const databaseUrl = `file:${dbFilePath}`;
 
 async function main() {

@@ -10,8 +10,9 @@ const testSuiteRoot = path.resolve(scriptDir, "../../..");
 const workspaceRoot = path.resolve(testSuiteRoot, "../..");
 
 const d1DbName = process.env.D1_TEST_DB_NAME ?? "eps-provider-test";
-const schemaFilePath = path.join(testSuiteRoot, "src", "db", "d1", "schema.sql");
-const seedFilePath = path.join(testSuiteRoot, "src", "db", "d1", "seed.sql");
+const packageRoot = testSuiteRoot;
+const schemaFilePath = path.join(packageRoot, "src", "db", "d1", "schema.sql");
+const seedFilePath = path.join(packageRoot, "src", "db", "d1", "seed.sql");
 const cloudflareApiToken =
   process.env.CLOUDFLARE_API_TOKEN ?? process.env.VITE_CLOUDFLARE_API_TOKEN;
 

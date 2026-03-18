@@ -121,6 +121,9 @@
         "alchemy": "^0.89.0",
         "dotenv": "catalog:",
       },
+      "devDependencies": {
+        "prisma": "^7.5.0",
+      },
     },
   },
   "catalog": {

@@ -5,17 +5,19 @@
   "scripts": {
     "alchemy:deploy": "bunx alchemy deploy alchemy.run.ts",
     "alchemy:run": "bunx alchemy run alchemy.run.ts",
-    "db:init:sqlite": "bunx dotenvx run --env-file ./.env -- bun run src/db/sqlite/init.ts",
-    "db:init:d1": "bunx dotenvx run --env-file ./.env -- bun run src/db/d1/init.ts",
-    "test:providers:sqlite": "bunx dotenvx run --env-file ./.env -- bun run src/tests/sqlite-providers.ts",
-    "test:providers:d1-remote": "bunx dotenvx run --env-file ./.env -- bun run src/tests/d1-remote-providers.ts",
+    "db:init:sqlite": "bun run src/db/sqlite/init.ts",
+    "db:init:d1": "bun run src/db/d1/init.ts",
+    "test:providers:sqlite": "bun run src/tests/sqlite-providers.ts",
+    "test:providers:d1-remote": "bun run src/tests/d1-remote-providers.ts",
     "test:sqlite": "bun run db:init:sqlite && bun run test:providers:sqlite",
     "test:d1-remote": "bun run db:init:d1 && bun run test:providers:d1-remote"
   },
   "dependencies": {
     "@enhanced-prisma-studio/studio-core": "workspace:*",
     "@libsql/client": "^0.17.0",
-    "alchemy": "^0.89.0",
-    "dotenv": "catalog:"
+    "alchemy": "^0.89.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.5.0"
   }
 }

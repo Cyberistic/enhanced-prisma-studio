@@ -34,7 +34,7 @@ const execFileAsync = promisify(execFile);
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const testSuiteRoot = path.resolve(scriptDir, "../../..");
 const workspaceRoot = path.resolve(testSuiteRoot, "../..");
-const packageRoot = path.resolve(testSuiteRoot, "test-suite");
+const packageRoot = testSuiteRoot;
 
 const d1DbName = process.env.D1_TEST_DB_NAME ?? "eps-provider-test";
 const initToken = process.env.CLOUDFLARE_API_TOKEN ?? process.env.VITE_CLOUDFLARE_API_TOKEN;
